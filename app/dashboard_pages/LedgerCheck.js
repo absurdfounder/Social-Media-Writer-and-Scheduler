@@ -18,10 +18,7 @@ const LedgerCheckDashboard = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
-          <FileText className="mr-2 text-blue-500" />
-          Ledger Check
-        </h2>
+
         <div className="text-right">
           <div className="text-sm text-gray-500 dark:text-gray-400">DATE TODAY</div>
           <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">30-Jul-2024</div>

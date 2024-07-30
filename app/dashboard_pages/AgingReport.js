@@ -29,9 +29,7 @@ const AgingReport = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Aging Report
-        </h2>
+
         <div className="text-sm text-gray-500 dark:text-gray-400">
           from 01-04-22 to 22-10-22
         </div>

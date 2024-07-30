@@ -33,10 +33,6 @@ const LedgerDB = () => {
   return (
     <div className="bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
-          <Folder className="mr-2" />
-          Ledger DB
-        </h2>
         <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
           XYZ LTD
         </div>

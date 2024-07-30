@@ -50,7 +50,6 @@ const CommissionReport = () => {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Commission Report</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <StatCard title="Total Boxes" value="25220" icon={Package} />

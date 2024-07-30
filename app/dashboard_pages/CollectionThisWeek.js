@@ -30,9 +30,7 @@ const CollectionReport = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Collection Report
-        </h2>
+
         <div className="text-sm text-gray-500 dark:text-gray-400">
           from 01/07/2022 to 12/31/2022
         </div>

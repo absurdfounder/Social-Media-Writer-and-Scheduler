@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, Search, FileText, AlertCircle, DollarSign, Calendar, Clock } from 'lucide-react';
 
+
 const LedgerCheckDashboard = () => {
   const [selectedParty, setSelectedParty] = useState("(B) B-198(CB)");
   const [ledgerData, setLedgerData] = useState([
@@ -22,7 +23,7 @@ const LedgerCheckDashboard = () => {
           Ledger Check
         </h2>
         <div className="text-right">
-          <div className="text-sm text-gray-500 dark:text-gray-400">TODAY'S DATE</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">DATE TODAY</div>
           <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">30-Jul-2024</div>
         </div>
       </div>

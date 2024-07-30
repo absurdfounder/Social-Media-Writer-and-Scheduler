@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { DollarSign, List, Database, FileSpreadsheet, CheckSquare, Clock, Calendar, Menu, X, Sun, Moon, Bell, Search, ChevronDown } from 'lucide-react';
 import MainDashboard from './dashboard_pages/MainDashboard';
 import BuyerList from './dashboard_pages/BuyerList';
@@ -143,7 +144,13 @@ export default function Dashboard() {
                 </button>
                 <div className="relative">
                   <button className="flex items-center space-x-2 text-sm focus:outline-none">
-                    <img className="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar" />
+                    <Image 
+                      src="/userimage.png" 
+                      alt="User avatar" 
+                      width={32} 
+                      height={32} 
+                      className="rounded-full"
+                    />
                     <span className="hidden md:inline-block font-medium">John Doe</span>
                     <ChevronDown className="h-4 w-4 text-gray-400" />
                   </button>

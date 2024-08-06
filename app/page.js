@@ -9,6 +9,7 @@ import Commissions from './dashboard_pages/Commissions';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
 import CollectionThisWeek from './dashboard_pages/CollectionThisWeek';
+import ThreadWriter from './dashboard_pages/MainDashboard';
 
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
@@ -71,7 +72,7 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <MainDashboard />;
+        return <ThreadWriter />;
       case 'partylist-db':
         return <BuyerList />;
       case 'ledger-db':

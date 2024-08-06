@@ -1,191 +1,266 @@
-import React, { useState } from 'react';
-import { Upload, FileSpreadsheet, DollarSign, Users, ShoppingBag, TrendingUp, Clock, AlertCircle, Calendar, Briefcase } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
+import { PlusCircle, X, Smile, Image as ImageIcon, Edit, Wand2, Link as LinkIcon } from 'lucide-react';
 
-const DashboardCard = ({ title, children }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-    <h3 className="text-lg font-semibold mb-4">{title}</h3>
-    {children}
-  </div>
-);
+const TipTapEditor = ({ content, onUpdate, onImageUpload, onLinkAdd }) => {
+  const [isClient, setIsClient] = useState(false);
 
-const FileUploader = ({ onUpload, type }) => (
-  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors duration-200">
-    <input type="file" id={`file-upload-${type}`} className="hidden" onChange={(e) => onUpload(e, type)} />
-    <label htmlFor={`file-upload-${type}`} className="cursor-pointer">
-      <Upload className="mx-auto mb-2 text-gray-400" size={32} />
-      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Upload {type}</span>
-    </label>
-  </div>
-);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-const LogEntry = ({ timestamp, filename, status, type }) => (
-  <div className="flex items-center space-x-4 py-2">
-    <div className="flex-shrink-0">
-      <FileSpreadsheet className="h-6 w-6 text-blue-500" />
-    </div>
-    <div className="flex-grow">
-      <p className="text-sm font-medium">{filename}</p>
-      <p className="text-xs text-gray-500">{timestamp} - {type}</p>
-    </div>
-    <div className="flex-shrink-0">
-      <span className={`px-2 py-1 rounded-full text-xs ${
-        status === 'Uploaded successfully' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
-        {status}
-      </span>
-    </div>
-  </div>
-);
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Link.configure({
+        openOnClick: false,
+      }),
+      Image.configure({
+        inline: false,
+        allowBase64: true,
+      }),
+    ],
+    content: content,
+    onUpdate: ({ editor }) => {
+      onUpdate(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: 'prose max-w-full min-h-[100px] focus:outline-none',
+      },
+    },
+  });
 
-const StatCard = ({ title, value, subValue, icon: Icon, trend, trendValue }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-    <div className="flex items-center justify-between mb-4">
-      <div>
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
-        <h3 className="text-2xl font-bold mt-1">{value}</h3>
-      </div>
-      <div className={`p-3 rounded-full ${Icon === AlertCircle ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400' : 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'}`}>
-        <Icon className="h-6 w-6" />
-      </div>
-    </div>
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-500 dark:text-gray-400">{subValue}</p>
-      {trend && (
-        <p className={`text-sm font-medium ${trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-          {trend === 'up' ? '↑' : '↓'} {trendValue}
-        </p>
-      )}
-    </div>
-  </div>
-);
-
-const MainDashboardContent = () => {
-  const [logs, setLogs] = useState([]);
-
-  const handleFileUpload = (event, type) => {
-    const file = event.target.files[0];
-    if (file) {
-      const newLog = {
-        timestamp: new Date().toLocaleString(),
-        filename: file.name,
-        status: 'Uploaded successfully',
-        type: type
+  const handleImageUpload = useCallback(async () => {
+    try {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.multiple = false;
+      input.onchange = async () => {
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (typeof e.target?.result === 'string') {
+              onImageUpload(e.target.result);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
       };
-      setLogs([newLog, ...logs]);
-      console.log(`${type} file uploaded:`, file);
+      input.click();
+    } catch (error) {
+      console.error('Error uploading image:', error);
     }
-  };
+  }, [onImageUpload]);
+
+  const handleLinkAdd = useCallback(() => {
+    const url = window.prompt('Enter the URL');
+    if (url) {
+      onLinkAdd(url);
+    }
+  }, [onLinkAdd]);
+
+  const handleAIWrite = useCallback(async () => {
+    try {
+      const aiGeneratedText = "This is AI-generated text. Replace this with actual AI-generated content.";
+      editor?.chain().focus().insertContent(aiGeneratedText).run();
+    } catch (error) {
+      console.error('Error generating AI text:', error);
+    }
+  }, [editor]);
+
+  const handleAIImageGenerate = useCallback(async () => {
+    try {
+      const aiGeneratedImageUrl = "/api/placeholder/300/200?text=AI+Generated+Image";
+      onImageUpload(aiGeneratedImageUrl);
+    } catch (error) {
+      console.error('Error generating AI image:', error);
+    }
+  }, [onImageUpload]);
+
+  if (!isClient) {
+    return <div>Loading editor...</div>;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Main Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Total Revenue"
-          value="₹31,142,263"
-          subValue="Buyer Gross Amount"
-          icon={DollarSign}
-          trend="up"
-          trendValue="8.76%"
-        />
-        <StatCard
-          title="Active Buyers"
-          value="246"
-          subValue="From Party List"
-          icon={Users}
-          trend="up"
-          trendValue="12"
-        />
-        <StatCard
-          title="Total Boxes Sold"
-          value="25,220"
-          subValue="Last 30 days"
-          icon={ShoppingBag}
-          trend="up"
-          trendValue="1,234"
-        />
-        <StatCard
-          title="Commission Earned"
-          value="₹2,727,268"
-          subValue="Last 30 days"
-          icon={TrendingUp}
-          trend="up"
-          trendValue="15.3%"
-        />
-      </div>
-
-      {/* Detailed Sections */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <DashboardCard title="Upload Files">
-          <div className="grid grid-cols-2 gap-4">
-            <FileUploader onUpload={handleFileUpload} type="Ledger" />
-            <FileUploader onUpload={handleFileUpload} type="Commission" />
-          </div>
-        </DashboardCard>
-        <DashboardCard title="Recent Uploads">
-          <div className="space-y-4">
-            {logs.length > 0 ? (
-              logs.slice(0, 3).map((log, index) => (
-                <LogEntry key={index} {...log} />
-              ))
-            ) : (
-              <p className="text-gray-500 text-center">No recent uploads</p>
-            )}
-          </div>
-        </DashboardCard>
-        <DashboardCard title="Total Due">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-blue-600">$123,456</p>
-            <p className="text-sm text-gray-500">As of today</p>
-          </div>
-        </DashboardCard>
-        <DashboardCard title="Aging Summary">
-          <div className="space-y-4">
-            {[
-              { label: '0-30 days', value: 50000, percentage: 40 },
-              { label: '31-60 days', value: 30000, percentage: 24 },
-              { label: '61-90 days', value: 20000, percentage: 16 },
-              { label: '90+ days', value: 23456, percentage: 20 },
-            ].map((item, index) => (
-              <div key={index}>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">{item.label}</span>
-                  <span className="text-sm font-medium">${item.value.toLocaleString()}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                  <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${item.percentage}%` }}></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </DashboardCard>
-        <DashboardCard title="Recent Parties">
-          <ul className="space-y-2">
-            {['Acme Corp', 'GlobalTech Industries', 'Smith & Co.'].map((company, index) => (
-              <li key={index} className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                  <span className="text-sm font-medium">{company.split(' ').map(word => word[0]).join('')}</span>
-                </div>
-                <span>{company}</span>
-              </li>
-            ))}
-          </ul>
-        </DashboardCard>
-        <DashboardCard title="Upcoming Collections">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">This week</span>
-              <span className="text-green-600 font-bold">$25,000</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Next week</span>
-              <span className="text-blue-600 font-bold">$35,000</span>
-            </div>
-          </div>
-        </DashboardCard>
+    <div>
+      <EditorContent editor={editor} />
+      <div className="flex space-x-2 mt-2">
+        <button onClick={handleImageUpload} className="p-2 bg-gray-200 rounded hover:bg-gray-300">
+          <ImageIcon size={20} />
+        </button>
+        <button onClick={handleLinkAdd} className="p-2 bg-gray-200 rounded hover:bg-gray-300">
+          <LinkIcon size={20} />
+        </button>
+        <button onClick={handleAIWrite} className="p-2 bg-gray-200 rounded hover:bg-gray-300">
+          <Edit size={20} />
+        </button>
+        <button onClick={handleAIImageGenerate} className="p-2 bg-gray-200 rounded hover:bg-gray-300">
+          <Wand2 size={20} />
+        </button>
       </div>
     </div>
   );
 };
 
-export default MainDashboardContent;
+const ThreadWriter = () => {
+  const [tweets, setTweets] = useState([{ id: Date.now(), content: '', image: null, link: null }]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const addNewTweet = () => {
+    setTweets(prevTweets => [...prevTweets, { id: Date.now(), content: '', image: null, link: null }]);
+  };
+
+  const removeTweet = (id) => {
+    if (tweets.length > 1) {
+      setTweets(prevTweets => prevTweets.filter(tweet => tweet.id !== id));
+    }
+  };
+
+  const handleEditorChange = (id, content) => {
+    setTweets(prevTweets =>
+      prevTweets.map(tweet =>
+        tweet.id === id ? { ...tweet, content } : tweet
+      )
+    );
+  };
+
+  const handleImageUpload = (id, imageUrl) => {
+    setTweets(prevTweets =>
+      prevTweets.map(tweet =>
+        tweet.id === id ? { ...tweet, image: imageUrl, link: null } : tweet
+      )
+    );
+  };
+
+  const handleLinkAdd = (id, url) => {
+    setTweets(prevTweets =>
+      prevTweets.map(tweet =>
+        tweet.id === id ? { ...tweet, link: url, image: null } : tweet
+      )
+    );
+  };
+
+  const generateAITweet = async (id) => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/anthropic', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          temperature: 0.7,
+          max_tokens: 280,
+          messages: [{ role: "user", content: "Generate a tweet about a random interesting topic." }],
+          system: "You are a helpful AI assistant that generates engaging tweets.",
+          model: "claude-3-sonnet-20240229",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generatedTweet = data.content[0].text.trim();
+
+      setTweets(prevTweets =>
+        prevTweets.map(tweet =>
+          tweet.id === id ? { ...tweet, content: generatedTweet } : tweet
+        )
+      );
+    } catch (error) {
+      console.error('Error generating AI tweet:', error);
+      alert('Failed to generate AI tweet. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <div className="max-w-xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mb-16">
+      {tweets.map((tweet, index) => (
+        <div key={tweet.id} className="border-b border-gray-200 last:border-b-0">
+          <div className="p-4">
+            <div className="flex items-center mb-4">
+              <img src="/api/placeholder/40/40" alt="User avatar" className="w-10 h-10 rounded-full mr-3" />
+              <div>
+                <h2 className="font-bold">John Doe</h2>
+                <p className="text-gray-500 text-sm">@johndoe</p>
+              </div>
+              {index > 0 && (
+                <button 
+                  onClick={() => removeTweet(tweet.id)} 
+                  className="ml-auto text-gray-500 hover:text-red-500"
+                >
+                  <X size={20} />
+                </button>
+              )}
+            </div>
+            {tweet.image && (
+              <div className="mb-4">
+                <img src={tweet.image} alt="Uploaded content" className="max-w-full h-auto rounded-lg" />
+              </div>
+            )}
+            <TipTapEditor
+              content={tweet.content}
+              onUpdate={(content) => handleEditorChange(tweet.id, content)}
+              onImageUpload={(imageUrl) => handleImageUpload(tweet.id, imageUrl)}
+              onLinkAdd={(url) => handleLinkAdd(tweet.id, url)}
+            />
+            {tweet.link && (
+              <div className="mt-4 p-2 bg-gray-100 rounded">
+                <a href={tweet.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                  {tweet.link}
+                </a>
+              </div>
+            )}
+            <button
+              onClick={() => generateAITweet(tweet.id)}
+              disabled={isGenerating}
+              className={`mt-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isGenerating ? 'Generating...' : 'Generate AI Tweet'}
+            </button>
+          </div>
+        </div>
+      ))}
+      <div className="p-4">
+        <button 
+          onClick={addNewTweet}
+          className="flex items-center text-blue-500 hover:text-blue-600"
+        >
+          <PlusCircle size={20} className="mr-2" />
+          Add another tweet
+        </button>
+      </div>
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 flex justify-between items-center">
+        <div className="flex space-x-4">
+          <button 
+            className="text-gray-500 hover:text-gray-700"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <Smile size={20} />
+          </button>
+        </div>
+        <button className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-200">
+          Post
+        </button>
+      </div>
+      {showEmojiPicker && (
+        <div className="fixed bottom-16 left-0 p-4 bg-white border border-gray-200 rounded-lg shadow-lg">
+          <div>Emoji Picker Placeholder</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ThreadWriter;

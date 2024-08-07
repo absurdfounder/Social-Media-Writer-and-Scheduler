@@ -20,6 +20,7 @@
     "@tiptap/extension-mention": "^2.5.8",
     "@tiptap/react": "^2.5.8",
     "@tiptap/starter-kit": "^2.5.8",
+    "canvas": "^2.11.2",
     "lucide-react": "^0.417.0",
     "next": "14.2.5",
     "prosemirror-state": "^1.4.3",

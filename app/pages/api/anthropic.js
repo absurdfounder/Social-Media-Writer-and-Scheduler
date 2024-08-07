@@ -1,11 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 export default async function handler(req, res) {
+  console.log('API route called (Pages Router)');
+  console.log('Request method:', req.method);
+  console.log('Request body:', req.body);
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY is not set');
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY is not set' });
   }
 

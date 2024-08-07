@@ -5,7 +5,7 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { PlusCircle, X, Smile, Image as ImageIcon, Edit, Wand2, Link as LinkIcon } from 'lucide-react';
 
-const TipTapEditor = ({ content, onUpdate, onImageUpload, onLinkAdd }) => {
+const TipTapEditor = ({ content, onUpdate, onImageUpload, onLinkAdd, key }) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onLinkAdd }) => {
         class: 'prose max-w-full min-h-[100px] focus:outline-none',
       },
     },
-  });
+  }, [key]);
 
   const handleImageUpload = useCallback(async () => {
     try {
@@ -97,24 +97,18 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onLinkAdd }) => {
         <button onClick={handleLinkAdd} className="p-2 bg-gray-200 rounded hover:bg-gray-300">
           <LinkIcon size={20} />
         </button>
-        <button onClick={handleAIWrite} className="p-2 bg-gray-200 rounded hover:bg-gray-300">
-          <Edit size={20} />
-        </button>
-        <button onClick={handleAIImageGenerate} className="p-2 bg-gray-200 rounded hover:bg-gray-300">
-          <Wand2 size={20} />
-        </button>
       </div>
     </div>
   );
 };
 
 const ThreadWriter = () => {
-  const [tweets, setTweets] = useState([{ id: Date.now(), content: '', image: null, link: null }]);
+  const [tweets, setTweets] = useState([{ id: Date.now(), content: '', image: null, link: null, key: Date.now() }]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const addNewTweet = () => {
-    setTweets(prevTweets => [...prevTweets, { id: Date.now(), content: '', image: null, link: null }]);
+    setTweets(prevTweets => [...prevTweets, { id: Date.now(), content: '', image: null, link: null, key: Date.now() }]);
   };
 
   const removeTweet = (id) => {
@@ -150,6 +144,7 @@ const ThreadWriter = () => {
   const generateAITweet = async (id) => {
     setIsGenerating(true);
     try {
+      console.log('Sending request to /api/anthropic');
       const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
@@ -163,22 +158,36 @@ const ThreadWriter = () => {
           model: "claude-3-sonnet-20240229",
         }),
       });
-
+  
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
       }
-
-      const data = await response.json();
+  
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse JSON:', e);
+        throw new Error('Invalid JSON response from server');
+      }
+  
+      if (!data.content || data.content.length === 0) {
+        throw new Error('No content received from the API');
+      }
       const generatedTweet = data.content[0].text.trim();
-
+  
       setTweets(prevTweets =>
         prevTweets.map(tweet =>
-          tweet.id === id ? { ...tweet, content: generatedTweet } : tweet
+          tweet.id === id ? { ...tweet, content: generatedTweet, key: Date.now() } : tweet
         )
       );
     } catch (error) {
       console.error('Error generating AI tweet:', error);
-      alert('Failed to generate AI tweet. Please try again.');
+      alert(`Failed to generate AI tweet: ${error.message}`);
     } finally {
       setIsGenerating(false);
     }
@@ -187,10 +196,10 @@ const ThreadWriter = () => {
   return (
     <div className="max-w-xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mb-16">
       {tweets.map((tweet, index) => (
-        <div key={tweet.id} className="border-b border-gray-200 last:border-b-0">
+        <div key={tweet.key} className="border-b border-gray-200 last:border-b-0">
           <div className="p-4">
             <div className="flex items-center mb-4">
-              <img src="/api/placeholder/40/40" alt="User avatar" className="w-10 h-10 rounded-full mr-3" />
+              <img src="https://placehold.co/40x40/333333/ffffff?text=U&font=Raleway" alt="User avatar" className="w-10 h-10 rounded-full mr-3" />
               <div>
                 <h2 className="font-bold">John Doe</h2>
                 <p className="text-gray-500 text-sm">@johndoe</p>
@@ -210,6 +219,7 @@ const ThreadWriter = () => {
               </div>
             )}
             <TipTapEditor
+              key={tweet.key}
               content={tweet.content}
               onUpdate={(content) => handleEditorChange(tweet.id, content)}
               onImageUpload={(imageUrl) => handleImageUpload(tweet.id, imageUrl)}
@@ -222,13 +232,25 @@ const ThreadWriter = () => {
                 </a>
               </div>
             )}
+
+            <div className='flex gap-4'>
             <button
               onClick={() => generateAITweet(tweet.id)}
               disabled={isGenerating}
-              className={`mt-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`flex gap-2 mt-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {isGenerating ? 'Generating...' : 'Generate AI Tweet'}
+             <Wand2 size={20} /> {isGenerating ? 'Generating...' : 'AI Tweet'}
             </button>
+
+            <button
+              onClick={() => generateAITweet(tweet.id)}
+              disabled={isGenerating}
+              className={`flex gap-2 mt-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+             <Wand2 size={20} /> {isGenerating ? 'Generating thread...' : 'AI Thread'}
+            </button>
+            </div>
+
           </div>
         </div>
       ))}

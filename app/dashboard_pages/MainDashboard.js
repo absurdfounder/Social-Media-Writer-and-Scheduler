@@ -237,7 +237,7 @@ const ThreadWriter = () => {
             <button
               onClick={() => generateAITweet(tweet.id)}
               disabled={isGenerating}
-              className={`flex gap-2 mt-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`flex gap-2 mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
              <Wand2 size={20} /> {isGenerating ? 'Generating...' : 'AI Tweet'}
             </button>
@@ -245,7 +245,7 @@ const ThreadWriter = () => {
             <button
               onClick={() => generateAITweet(tweet.id)}
               disabled={isGenerating}
-              className={`flex gap-2 mt-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`flex gap-2 mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
              <Wand2 size={20} /> {isGenerating ? 'Generating thread...' : 'AI Thread'}
             </button>

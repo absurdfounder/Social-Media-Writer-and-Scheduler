@@ -61,12 +61,12 @@ const CollectionReport = () => {
 
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-purple-100 dark:bg-purple-900">
+          <thead className="bg-blue-100 dark:bg-blue-900">
             <tr>
               {['Credit Days', 'Party Name', 'Due', 'OverDue', 'Total'].map((header, index) => (
                 <th 
                   key={index}
-                  className="px-4 py-3 text-xs font-medium text-purple-800 dark:text-purple-200 uppercase tracking-wider cursor-pointer"
+                  className="px-4 py-3 text-xs font-medium text-blue-800 dark:text-blue-200 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort(header.toLowerCase())}
                 >
                   <div className="flex items-center">
@@ -79,7 +79,7 @@ const CollectionReport = () => {
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {collectionData.map((row, index) => (
-              <tr key={row.id} className={index % 2 === 0 ? 'bg-purple-50 dark:bg-purple-900/10' : ''}>
+              <tr key={row.id} className={index % 2 === 0 ? 'bg-blue-50 dark:bg-blue-900/10' : ''}>
                 <td className="px-4 py-3 text-sm">{row.creditDays}</td>
                 <td className="px-4 py-3 text-sm font-medium">{row.partyName}</td>
                 <td className="px-4 py-3 text-sm">₹{row.due.toFixed(2)}</td>

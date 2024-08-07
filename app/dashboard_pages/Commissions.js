@@ -1,126 +1,114 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Download, Filter, TrendingUp, Package, DollarSign, Percent } from 'lucide-react';
+import { Tag, MessageCircle, Repeat, Heart, Share2 } from 'lucide-react';
 
-const StatCard = ({ title, value, icon: Icon }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
-        <p className="text-xl font-semibold mt-1">{value}</p>
-      </div>
-      <Icon className="h-8 w-8 text-blue-500" />
-    </div>
-  </div>
-);
+const Commissions = () => {
+  const [selectedTags, setSelectedTags] = useState([]);
 
-const CommissionReport = () => {
-  const [sortColumn, setSortColumn] = useState('');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const tags = ['Technology', 'Politics', 'Sports', 'Entertainment', 'Business'];
 
-  const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
+  const tweets = [
+    {
+      id: 1,
+      author: 'John Doe',
+      handle: '@johndoe',
+      content: 'Just launched our new product! #excited #tech',
+      timestamp: '2h ago',
+      replies: 5,
+      retweets: 12,
+      likes: 24,
+      tags: ['Technology', 'Business']
+    },
+    {
+      id: 2,
+      author: 'Jane Smith',
+      handle: '@janesmith',
+      content: 'Breaking: Major policy change announced #politics',
+      timestamp: '4h ago',
+      replies: 18,
+      retweets: 45,
+      likes: 67,
+      tags: ['Politics']
+    },
+    {
+      id: 3,
+      author: 'Sports Fan',
+      handle: '@sportsfan',
+      content: 'What a game! Cant believe that last-minute goal #soccer',
+      timestamp: '6h ago',
+      replies: 8,
+      retweets: 20,
+      likes: 56,
+      tags: ['Sports']
     }
-  };
-
-  const SortIcon = ({ column }) => {
-    if (sortColumn !== column) return null;
-    return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
-  };
-
-  // Sample data - replace with actual data fetching logic
-  const commissionData = [
-    { date: "25/06/2022", boxes: 25, supplierGrossAmt: 30000.00, buyerGrossAmount: 32500.00, commission: 2500.00, percentage: 7.69 },
-    { date: "27/06/2022", boxes: 12, supplierGrossAmt: 14900.00, buyerGrossAmount: 15400.00, commission: 500.00, percentage: 3.25 },
-    // Add more data here
   ];
 
-  const formatNumber = (number) => {
-    return number.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const handleTagClick = (tag) => {
+    setSelectedTags(prevTags => 
+      prevTags.includes(tag)
+        ? prevTags.filter(t => t !== tag)
+        : [...prevTags, tag]
+    );
   };
 
-  const getPercentageColor = (percentage) => {
-    if (percentage > 5) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-    if (percentage > 0) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-  };
+  const filteredTweets = selectedTags.length > 0
+    ? tweets.filter(tweet => tweet.tags.some(tag => selectedTags.includes(tag)))
+    : tweets;
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg p-6">
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <StatCard title="Total Boxes" value="25220" icon={Package} />
-        <StatCard title="Supplier Gross Amt" value="₹28,414,995" icon={DollarSign} />
-        <StatCard title="Buyer Gross Amount" value="₹31,142,263" icon={DollarSign} />
-        <StatCard title="Commission" value="₹2,727,268" icon={TrendingUp} />
-        <StatCard title="Average Percentage" value="8.76%" icon={Percent} />
-      </div>
-
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-2">
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200">
-            <Download className="w-4 h-4 inline mr-2" />
-            Export
-          </button>
-          <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
-            <Filter className="w-4 h-4 inline mr-2" />
-            Filter
-          </button>
-        </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          108 box
+    <div className="tweet-library">
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Tweet Tags</h2>
+        <div className="flex flex-wrap gap-2">
+          {tags.map(tag => (
+            <button
+              key={tag}
+              onClick={() => handleTagClick(tag)}
+              className={`px-3 py-1 rounded-full text-sm ${
+                selectedTags.includes(tag)
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {tag}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="bg-yellow-200 dark:bg-yellow-900">
-            <tr>
-              {['Date', 'Boxes', 'Supplier Gross Amt', 'Buyer Gross Amount', 'Commission', 'Percentage'].map((header) => (
-                <th 
-                  key={header}
-                  className="px-4 py-3 text-xs font-medium text-yellow-800 dark:text-yellow-200 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort(header.toLowerCase())}
-                >
-                  <div className="flex items-center">
-                    {header}
-                    <SortIcon column={header.toLowerCase()} />
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {commissionData.map((row, index) => (
-              <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-750">
-                <td className="px-4 py-2 text-sm">{row.date}</td>
-                <td className="px-4 py-2 text-sm">{row.boxes}</td>
-                <td className="px-4 py-2 text-sm">{formatNumber(row.supplierGrossAmt)}</td>
-                <td className="px-4 py-2 text-sm">{formatNumber(row.buyerGrossAmount)}</td>
-                <td className="px-4 py-2 text-sm">{formatNumber(row.commission)}</td>
-                <td className={`px-4 py-2 text-sm ${getPercentageColor(row.percentage)}`}>
-                  {row.percentage.toFixed(2)}%
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="mt-4 flex justify-between items-center">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Showing 1 to 10 of 100 entries
-        </div>
-        <div className="flex space-x-2">
-          <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm">Previous</button>
-          <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm">Next</button>
-        </div>
+      <div className="space-y-4">
+        {filteredTweets.map(tweet => (
+          <div key={tweet.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+            <div className="flex items-center mb-2">
+              <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+              <div>
+                <p className="font-semibold">{tweet.author}</p>
+                <p className="text-gray-500 text-sm">{tweet.handle}</p>
+              </div>
+            </div>
+            <p className="mb-2">{tweet.content}</p>
+            <p className="text-gray-500 text-sm mb-2">{tweet.timestamp}</p>
+            <div className="flex justify-between text-gray-500">
+              <div className="flex items-center">
+                <MessageCircle className="w-4 h-4 mr-1" />
+                <span className="text-sm">{tweet.replies}</span>
+              </div>
+              <div className="flex items-center">
+                <Repeat className="w-4 h-4 mr-1" />
+                <span className="text-sm">{tweet.retweets}</span>
+              </div>
+              <div className="flex items-center">
+                <Heart className="w-4 h-4 mr-1" />
+                <span className="text-sm">{tweet.likes}</span>
+              </div>
+              <div className="flex items-center">
+                <Share2 className="w-4 h-4" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default CommissionReport;
+export default Commissions;

@@ -1,117 +1,63 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Download, Filter, Folder } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Send, User, Bot } from 'lucide-react';
 
 const LedgerDB = () => {
-  const [sortColumn, setSortColumn] = useState('');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const messagesEndRef = useRef(null);
 
-  const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(scrollToBottom, [messages]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (input.trim()) {
+      setMessages([...messages, { text: input, sender: 'user' }]);
+      setInput('');
+      // Simulate AI response
+      setTimeout(() => {
+        setMessages(prev => [...prev, { text: "This is a simulated AI response.", sender: 'ai' }]);
+      }, 1000);
     }
   };
 
-  const SortIcon = ({ column }) => {
-    if (sortColumn !== column) return null;
-    return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
-  };
-
-  // Sample data - replace with actual data fetching logic
-  const ledgerData = [
-    { id: 1, party: "(A) SHED NO-6(CA3)", date: "13/07/22", cases: 68, debit: 85361.00, credit: 0, settlements: 53186003.14, daysOld: 748 },
-    { id: 2, party: "(A) SHED NO-6(CA3)", date: "15/07/22", cases: 16, debit: 23412.00, credit: 0, settlements: -23412.00, daysOld: 746 },
-    // Add more data here
-  ];
-
-  const formatNumber = (number) => {
-    return number.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          XYZ LTD
-        </div>
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message, index) => (
+          <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`flex items-end space-x-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${message.sender === 'user' ? 'bg-blue-500' : 'bg-green-500'}`}>
+                {message.sender === 'user' ? <User size={20} className="text-white" /> : <Bot size={20} className="text-white" />}
+              </div>
+              <div className={`max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl rounded-lg p-3 ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200'}`}>
+                <p className="text-sm">{message.text}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
       </div>
-
-      <div className="flex justify-between items-center mb-4">
+      <form onSubmit={handleSubmit} className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <div className="flex space-x-2">
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200">
-            <Download className="w-4 h-4 inline mr-2" />
-            Export
-          </button>
-          <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
-            <Filter className="w-4 h-4 inline mr-2" />
-            Filter
-          </button>
-        </div>
-        <div className="relative">
           <input
             type="text"
-            placeholder="Search ledger..."
-            className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
           />
-          <svg className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
+          <button
+            type="submit"
+            className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <Send size={20} />
+          </button>
         </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="bg-gray-200 dark:bg-gray-700">
-            <tr>
-              {['Party', 'Date', 'Cases', 'Debit', 'Credit', 'Settlements', 'Days Old'].map((header) => (
-                <th 
-                  key={header}
-                  className="px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort(header.toLowerCase())}
-                >
-                  <div className="flex items-center">
-                    {header}
-                    <SortIcon column={header.toLowerCase()} />
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr className="bg-gray-100 dark:bg-gray-900">
-              <td colSpan="3" className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-sm font-medium">51,891,718.83</td>
-              <td className="px-4 py-2 text-sm font-medium">53,271,364.14</td>
-              <td colSpan="2" className="px-4 py-2"></td>
-            </tr>
-            {ledgerData.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-750">
-                <td className="px-4 py-2 text-sm font-medium">{row.party}</td>
-                <td className="px-4 py-2 text-sm">{row.date}</td>
-                <td className="px-4 py-2 text-sm">{row.cases}</td>
-                <td className="px-4 py-2 text-sm">{formatNumber(row.debit)}</td>
-                <td className="px-4 py-2 text-sm">{formatNumber(row.credit)}</td>
-                <td className={`px-4 py-2 text-sm ${row.settlements < 0 ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200' : ''}`}>
-                  {formatNumber(row.settlements)}
-                </td>
-                <td className="px-4 py-2 text-sm">{row.daysOld}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="mt-4 flex justify-between items-center">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Showing 1 to 10 of 100 entries
-        </div>
-        <div className="flex space-x-2">
-          <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm">Previous</button>
-          <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm">Next</button>
-        </div>
-      </div>
+      </form>
     </div>
   );
 };

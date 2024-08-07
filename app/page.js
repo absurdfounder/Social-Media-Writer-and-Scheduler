@@ -1,9 +1,8 @@
 "use client"
 
-
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { DollarSign, List, Database, FileSpreadsheet, CheckSquare, Clock, Calendar, Menu, X, Sun, Moon, Bell, Search, ChevronDown } from 'lucide-react';
+import { Building2, Users, MessageCircle, Brain, Menu, X, Sun, Moon, Bell, Search, ChevronDown, Twitter, ScanFace } from 'lucide-react';
 import MainDashboard from './dashboard_pages/MainDashboard';
 import BuyerList from './dashboard_pages/BuyerList';
 import Ledger from './dashboard_pages/Ledger';
@@ -81,10 +80,10 @@ export default function Dashboard() {
   }, [isDark]);
 
   const navItems = [
-    { icon: DollarSign, label: 'Build On X', id: 'dashboard' },
-    { icon: Database, label: 'X Founders', id: 'commissions' },
-    { icon: List, label: 'Reddit', id: 'partylist-db' },
-    { icon: FileSpreadsheet, label: 'Ask AI', id: 'ledger-db' }
+    { icon: Twitter, label: 'Build On X', id: 'dashboard' },
+    { icon: Users, label: 'X Founders', id: 'commissions' },
+    { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
+    { icon: ScanFace, label: 'Ask AI', id: 'ledger-db' }
   ];
 
   const renderContent = () => {

@@ -50,26 +50,73 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
   return (
     <div>
       <EditorContent editor={editor} />
+      <div className="flex space-x-2 mt-2">
+        <button
+          onClick={onImageUpload}
+          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+        >
+          <ImageIcon size={20} />
+        </button>
+        <button
+          onClick={onVideoUpload}
+          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+        >
+          <Video size={20} />
+        </button>
+        <button
+          onClick={onLinkAdd}
+          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+        >
+          <LinkIcon size={20} />
+        </button>
+      </div>
     </div>
   );
 };
 
-const TweetContent = ({ content, images, links, index }) => {
+const LinkPreview = ({ url }) => {
+  const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    const fetchPreview = async () => {
+      try {
+        const response = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        setPreview(data);
+      } catch (error) {
+        console.error('Error fetching link preview:', error);
+      }
+    };
+
+    fetchPreview();
+  }, [url]);
+
+  if (!preview) return null;
+
   return (
-    <div>
+    <div className="border rounded-md overflow-hidden mt-2">
+      {preview.image && <img src={preview.image} alt={preview.title} className="w-full h-32 object-cover" />}
+      <div className="p-2">
+        <h3 className="font-bold">{preview.title}</h3>
+        <p className="text-sm text-gray-600">{preview.description}</p>
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-sm">
+          {url}
+        </a>
+      </div>
+    </div>
+  );
+};
+
+const TweetContent = ({ content, images, links }) => {
+  return (
+    <div className="mb-4">
       {images.map((img, i) => (
         <img key={i} src={img} alt={`Tweet image ${i + 1}`} className="mb-2 rounded-md max-w-full h-auto" />
       ))}
       <div dangerouslySetInnerHTML={{ __html: content }} />
-      {links.length > 0 && (
-        <div className="mt-2">
-          {links.map((link, i) => (
-            <a key={i} href={link} target="_blank" rel="noopener noreferrer" className="block text-blue-500 hover:underline">
-              {link}
-            </a>
-          ))}
-        </div>
-      )}
+      {links.map((link, i) => (
+        <LinkPreview key={i} url={link} />
+      ))}
     </div>
   );
 };
@@ -240,7 +287,7 @@ const ThreadWriter = () => {
           break;
         case 'full':
         default:
-          maxTweets = 10; // Or any other reasonable maximum for a "full" thread
+          maxTweets = 10;
       }
 
       const response = await fetch('/api/anthropic', {
@@ -319,18 +366,18 @@ const ThreadWriter = () => {
               onClick={generateAIThread}
               disabled={isGenerating}
             >
-              {isGenerating ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
+{isGenerating ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
               Generate {threadType === 'single' ? 'Tweet' : 'Thread'}
             </button>
           </div>
         </div>
       </div>
       <div className='bg-gray-900 py-8'>
-        <div className="max-w-xl mx-auto border shadow-lg rounded-lg  mb-16 bg-white">
+        <div className="max-w-xl mx-auto border shadow-lg rounded-lg mb-16 bg-white">
           {tweets.map((tweet, index) => (
             <div key={tweet.key} className={`relative border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} last:border-b-0`}>
               <div className="absolute left-0 top-0 -ml-8 mt-4 text-sm font-bold text-white">
-                 {index + 1}
+                {index + 1}
               </div>
               <div className="p-4">
                 <div className="flex items-center mb-4">
@@ -343,67 +390,49 @@ const ThreadWriter = () => {
                     <button
                       onClick={() => removeTweet(tweet.id)}
                       className={`ml-auto ${isDarkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'}`}
-                      >
-                        <X size={20} />
-                      </button>
-                    )}
-                  </div>
-                  <TweetContent
-                    content={tweet.content}
-                    images={tweet.images}
-                    links={tweet.links}
-                  />
-                  <TipTapEditor
-                    key={tweet.key}
-                    content={tweet.content}
-                    onUpdate={(content) => handleEditorChange(tweet.id, content)}
-                    onImageUpload={() => handleImageUpload(tweet.id)}
-                    onVideoUpload={() => handleVideoUpload(tweet.id)}
-                    onLinkAdd={() => handleLinkAdd(tweet.id)}
-                  />
-                  <div className="flex space-x-2 mt-2">
-                    <button
-                      onClick={() => handleImageUpload(tweet.id)}
-                      className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
                     >
-                      <ImageIcon size={20} />
+                      <X size={20} />
                     </button>
-                    <button
-                      onClick={() => handleVideoUpload(tweet.id)}
-                      className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
-                    >
-                      <Video size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleLinkAdd(tweet.id)}
-                      className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
-                    >
-                      <LinkIcon size={20} />
-                    </button>
-                    <button
-                      onClick={() => generateAITweet(tweet.id)}
-                      className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
-                      disabled={rewritingTweetId === tweet.id}
-                    >
-                      {rewritingTweetId === tweet.id ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
-                    </button>
-                  </div>
+                  )}
+                </div>
+                <TweetContent
+                  content={tweet.content}
+                  images={tweet.images}
+                  links={tweet.links}
+                />
+                <TipTapEditor
+                  key={tweet.key}
+                  content={tweet.content}
+                  onUpdate={(content) => handleEditorChange(tweet.id, content)}
+                  onImageUpload={() => handleImageUpload(tweet.id)}
+                  onVideoUpload={() => handleVideoUpload(tweet.id)}
+                  onLinkAdd={() => handleLinkAdd(tweet.id)}
+                />
+                <div className="flex space-x-2 mt-2">
+                  <button
+                    onClick={() => generateAITweet(tweet.id)}
+                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
+                    disabled={rewritingTweetId === tweet.id}
+                  >
+                    {rewritingTweetId === tweet.id ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
+                  </button>
                 </div>
               </div>
-            ))}
-            <div className="p-4">
-              <button
-                onClick={addNewTweet}
-                className={`flex items-center ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-600'}`}
-              >
-                <PlusCircle size={20} className="mr-2" />
-                Add another tweet
-              </button>
             </div>
+          ))}
+          <div className="p-4">
+            <button
+              onClick={addNewTweet}
+              className={`flex items-center ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-600'}`}
+            >
+              <PlusCircle size={20} className="mr-2" />
+              Add another tweet
+            </button>
           </div>
         </div>
       </div>
-    );
-  };
-  
-  export default ThreadWriter;
+    </div>
+  );
+};
+
+export default ThreadWriter;

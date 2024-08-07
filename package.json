@@ -21,8 +21,10 @@
     "@tiptap/react": "^2.5.8",
     "@tiptap/starter-kit": "^2.5.8",
     "canvas": "^2.11.2",
+    "cheerio": "^1.0.0-rc.12",
     "lucide-react": "^0.417.0",
     "next": "14.2.5",
+    "node-fetch": "^3.3.2",
     "prosemirror-state": "^1.4.3",
     "react": "^18",
     "react-dom": "^18"

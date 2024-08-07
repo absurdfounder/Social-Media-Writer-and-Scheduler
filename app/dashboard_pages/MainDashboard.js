@@ -207,13 +207,15 @@ const ThreadWriter = () => {
   };
 
   return (
-    <div className={`max-w-xl mx-auto ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white'} shadow-lg rounded-lg overflow-hidden mb-16`}>
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-        <h1 className="text-xl font-bold">Create Thread</h1>
+    <div>
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 grid items-center mb-4">
+        <h1 className="text-xl font-bold">What is this update about ?</h1>
+        <textarea className='w-full border p-4 rounded-md mt-4'>I need to share an update with the community..</textarea>
         <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
           {isDarkMode ? '☀️' : '🌙'}
         </button>
       </div>
+          <div className={`max-w-xl mx-auto ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white'} shadow-lg rounded-lg overflow-hidden mb-16`}>
       {tweets.map((tweet, index) => (
         <div key={tweet.key} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} last:border-b-0`}>
           <div className="p-4">
@@ -290,6 +292,7 @@ const ThreadWriter = () => {
           <div>Emoji Picker Placeholder</div>
         </div>
       )}
+    </div>
     </div>
   );
 };

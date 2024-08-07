@@ -93,7 +93,7 @@ export default function Dashboard() {
         {/* Sidebar */}
         <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out`}>
           <div className="p-6 flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Build in Public</h1>
+            <img src="logo.png"/>
             <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
               <X className="h-6 w-6" />
             </button>

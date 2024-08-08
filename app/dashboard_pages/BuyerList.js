@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  ChevronDown, ChevronUp, Search, 
+import {
+  ChevronDown, ChevronUp, Search,
   RefreshCcw, Home, Plus, X, Users,
   Flame, Trophy, HelpCircle, Frown,
   DollarSign, PenTool, Megaphone, Zap,
-  Newspaper, Lightbulb
+  Newspaper, Lightbulb, Check, ArrowLeft
 } from 'lucide-react';
 
 const Tab = ({ label, active, onClick }) => (
   <button
-    className={`px-4 py-2 ${
-      active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-    } rounded-t-lg transition-colors duration-200`}
+    className={`px-4 py-2 ${active ? 'bg-blue-200 text-blue-800' : 'bg-gray-50 text-gray-700 hover:bg-gray-300'
+      } rounded-t-lg transition-colors duration-200`}
     onClick={onClick}
   >
     {label}
@@ -37,6 +36,8 @@ const RedditExplorer = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [postContent, setPostContent] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [showGroupPopup, setShowGroupPopup] = useState(false);
+  const [selectedSubredditsForGroup, setSelectedSubredditsForGroup] = useState([]);
 
   const observer = useRef();
   const lastCommunityElementRef = useCallback(node => {
@@ -61,6 +62,48 @@ const RedditExplorer = () => {
     setDisplayedCommunities(filtered.slice(0, page * 20));
   }, [communities, searchTerm, page]);
 
+  useEffect(() => {
+    // Load groups from localStorage or use predefined groups if localStorage is empty
+    const savedGroups = localStorage.getItem('redditGroups');
+    if (savedGroups) {
+      setGroups(JSON.parse(savedGroups));
+    } else {
+      const predefinedGroups = [
+        {
+          name: "Tech News",
+          subreddits: [
+            { id: "technology", name: "technology" },
+            { id: "programming", name: "programming" },
+            { id: "science", name: "science" }
+          ]
+        },
+        {
+          name: "Entertainment",
+          subreddits: [
+            { id: "movies", name: "movies" },
+            { id: "television", name: "television" },
+            { id: "music", name: "music" }
+          ]
+        },
+        {
+          name: "Finance",
+          subreddits: [
+            { id: "personalfinance", name: "personalfinance" },
+            { id: "investing", name: "investing" },
+            { id: "cryptocurrency", name: "cryptocurrency" }
+          ]
+        }
+      ];
+      setGroups(predefinedGroups);
+      localStorage.setItem('redditGroups', JSON.stringify(predefinedGroups));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save groups to localStorage whenever they change
+    localStorage.setItem('redditGroups', JSON.stringify(groups));
+  }, [groups]);
+
   const fetchData = async (tab) => {
     setLoading(true);
     setError(null);
@@ -79,13 +122,13 @@ const RedditExplorer = () => {
         default:
           endpoint = 'https://www.reddit.com/subreddits/popular.json?limit=100';
       }
-      
+
       const response = await fetch(endpoint);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      
+
       let mappedCommunities;
       if (tab === 'trending') {
         mappedCommunities = data.subreddit_names.map(name => ({
@@ -109,7 +152,7 @@ const RedditExplorer = () => {
           growthPerMonth: Math.floor(Math.random() * 4000),
         }));
       }
-      
+
       setCommunities(mappedCommunities);
       setDisplayedCommunities(mappedCommunities.slice(0, 20));
       setPage(1);
@@ -177,8 +220,16 @@ const RedditExplorer = () => {
 
   const handleCreateGroup = () => {
     if (newGroupName.trim()) {
-      setGroups([...groups, { name: newGroupName.trim(), subreddits: [] }]);
+      const newGroup = {
+        name: newGroupName.trim(),
+        subreddits: selectedSubredditsForGroup
+      };
+      const updatedGroups = [...groups, newGroup];
+      setGroups(updatedGroups);
+      localStorage.setItem('redditGroups', JSON.stringify(updatedGroups));
       setNewGroupName('');
+      setSelectedSubredditsForGroup([]);
+      setShowGroupPopup(false);
     }
   };
 
@@ -190,6 +241,7 @@ const RedditExplorer = () => {
       return g;
     });
     setGroups(updatedGroups);
+    localStorage.setItem('redditGroups', JSON.stringify(updatedGroups));
   };
 
   const handleRemoveFromGroup = (groupName, subredditId) => {
@@ -203,11 +255,12 @@ const RedditExplorer = () => {
       return group;
     });
     setGroups(updatedGroups);
+    localStorage.setItem('redditGroups', JSON.stringify(updatedGroups));
   };
 
   const handleGroupClick = (group) => {
     setSelectedGroup(group);
-    Promise.all(group.subreddits.map(subreddit => 
+    Promise.all(group.subreddits.map(subreddit =>
       fetch(`https://www.reddit.com/r/${subreddit.name}/hot.json?limit=5`)
         .then(res => res.json())
         .then(data => data.data.children.map(child => ({
@@ -232,6 +285,14 @@ const RedditExplorer = () => {
   const handlePostClick = async (post) => {
     setSelectedPost(post);
     setPostContent(post.selftext);
+  };
+
+  const handleSubredditSelection = (subreddit) => {
+    setSelectedSubredditsForGroup(prev =>
+      prev.some(s => s.id === subreddit.id)
+        ? prev.filter(s => s.id !== subreddit.id)
+        : [...prev, subreddit]
+    );
   };
 
   const filterBadges = [
@@ -274,272 +335,300 @@ const RedditExplorer = () => {
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        
-        <div className="flex space-x-2 mb-6">
-          <Tab label="Popular" active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
-          <Tab label="Trending" active={activeTab === 'trending'} onClick={() => setActiveTab('trending')} />
-          <Tab label="New" active={activeTab === 'new'} onClick={() => setActiveTab('new')} />
-          <Tab label="Groups" active={activeTab === 'groups'} onClick={() => setActiveTab('groups')} />
+
+        <div className="flex space-x-2">
+          <Tab label="Audiences" active={activeTab === 'groups'} onClick={() => setActiveTab('groups')} />
+          <Tab label="Popular Subreddits" active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
+          <Tab label="Trending Subreddits" active={activeTab === 'trending'} onClick={() => setActiveTab('trending')} />
+          <Tab label="New Subreddits" active={activeTab === 'new'} onClick={() => setActiveTab('new')} />
         </div>
 
-        {activeTab !== 'groups' && (
-          <div className="mb-6">
-            <input
-              type="text"
-              placeholder="Search subreddits..."
-              value={searchTerm}
-              onChange={handleSearch}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        )}
+        <div className='bg-gray-50 border p-4'>
 
-        {activeTab !== 'groups' && !selectedSubreddit && !selectedGroup && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  {['Community', 'Members', 'Weekly Growth', 'Monthly Growth'].map((header) => (
-                    <th
-                      key={header}
-                      className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                      onClick={() => handleSort(header.toLowerCase().replace(' ', ''))}
-                    >
-                      <div className="flex items-center">
-                        {header}
-                        <SortIcon column={header.toLowerCase().replace(' ', '')} />
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {sortedCommunities.map((community, index) => (
-                  <tr 
-                    key={community.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
-                    ref={index === sortedCommunities.length - 1 ? lastCommunityElementRef : null}
-                  >
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                      <button onClick={() => handleSubredditClick(community)} className="hover:underline">
-                        {community.name}
-                      </button>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
-                      {community.subscribersCount.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400">
-                      +{community.growthPerWeek.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400">
-                      +{community.growthPerMonth.toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {activeTab === 'groups' && !selectedGroup && (
-          <div>
-            <div className="mb-4 flex items-center">
+          {activeTab !== 'groups' && (
+            <div className="mb-6">
               <input
                 type="text"
-                placeholder="New group name"
-                value={newGroupName}
-                onChange={(e) => setNewGroupName(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                placeholder="Search subreddits..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <button
-                onClick={handleCreateGroup}
-                className="px-4 py-2 bg-blue-500 border text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Group
-              </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {groups.map((group) => (
-                <div key={group.name} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 flex items-center justify-between">
-                    <span>{group.name}</span>
-                    <button
-                      onClick={() => handleGroupClick(group)}
-                      className="text-blue-500 hover:text-blue-600"
+          )}
+
+          {activeTab !== 'groups' && !selectedSubreddit && !selectedGroup && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    {['Community', 'Members', 'Weekly Growth', 'Monthly Growth'].map((header) => (
+                      <th
+                        key={header}
+                        className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                        onClick={() => handleSort(header.toLowerCase().replace(' ', ''))}
+                      >
+                        <div className="flex items-center">
+                          {header}
+                          <SortIcon column={header.toLowerCase().replace(' ', '')} />
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {sortedCommunities.map((community, index) => (
+                    <tr
+                      key={community.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                      ref={index === sortedCommunities.length - 1 ? lastCommunityElementRef : null}
                     >
-                      <Users className="w-5 h-5" />
-                    </button>
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    {group.subreddits.length} subreddit{group.subreddits.length !== 1 ? 's' : ''}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {group.subreddits.slice(0, 5).map((subreddit) => (
-                      <span key={subreddit.id} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
-                        {subreddit.name}
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        <button onClick={() => handleSubredditClick(community)} className="hover:underline">
+                          {community.name}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
+                        {community.subscribersCount.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400">
+                        +{community.growthPerWeek.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400">
+                        +{community.growthPerMonth.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {activeTab === 'groups' && !selectedGroup && (
+            <div>
+
+              <div className='items-center flex justify-between'>
+                <h6 className='font-bold h4'>Curated Audiences</h6>
+                <button
+                  onClick={() => setShowGroupPopup(true)}
+                  className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Group
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {groups.map((group) => (
+                  <div
+                    key={group.name}
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    onClick={() => handleGroupClick(group)}
+                  >
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 flex items-center justify-between">
+                      <span>{group.name}</span>
+                      <Users className="w-5 h-5 text-blue-500" />
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      {group.subreddits.length} subreddit{group.subreddits.length !== 1 ? 's' : ''}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {group.subreddits.slice(0, 5).map((subreddit) => (
+                        <span key={subreddit.id} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
+                          {subreddit.name}
+                        </span>
+                      ))}
+                      {group.subreddits.length > 5 && (
+                        <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
+                          +{group.subreddits.length - 5} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(selectedSubreddit || selectedGroup) && (
+            <div className="mt-8">
+              <button
+                onClick={() => {
+                  setSelectedSubreddit(null);
+                  setSelectedGroup(null);
+                  setSelectedPost(null);
+                }}
+                className="mb-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to {activeTab === 'groups' ? 'Groups' : 'Communities'}
+              </button>
+              {selectedGroup ? (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                    {selectedGroup.name} Group
+                  </h2>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {selectedGroup.subreddits.map((subreddit) => (
+                      <span key={subreddit.id} className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                        r/{subreddit.name}
                       </span>
                     ))}
-                    {group.subreddits.length > 5 && (
-                      <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
-                        +{group.subreddits.length - 5} more
-                      </span>
-                    )}
                   </div>
                 </div>
-              ))}
+              ) : (
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                  r/{selectedSubreddit.name}
+                </h2>
+              )}
+              <div className="mb-6 flex flex-wrap gap-2">
+                {filterBadges.map((badge) => (
+                  <button
+                    key={badge.label}
+                    onClick={() => setActiveFilter(badge.label.toLowerCase())}
+                    className={`px-3 py-1 rounded-full text-sm flex items-center ${activeFilter === badge.label.toLowerCase()
+                        ? 'bg-blue-200 text-blue-800'
+                        : 'bg-white border dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                      }`}
+                  >
+                    <badge.icon className="w-4 h-4 mr-2" />
+                    {badge.label}
+                    {badge.count > 0 && (
+                      <span className="ml-2 bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full text-xs">
+                        {badge.count}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              {loading && <div className="text-center p-4"><RefreshCcw className="w-8 h-8 animate-spin text-blue-600 mx-auto" /></div>}
+              {error && <div className="text-center p-4 text-red-500">{error}</div>}
+              {!loading && !error && !selectedPost && (
+                <ul className="space-y-4">
+                  {posts.map((post) => (
+                    <li key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                      <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 p-2 rounded">
+                        <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
+                          <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
+                          <span>{post.created}</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{post.title}</h3>
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                          <span className="mr-4">{post.score} points</span>
+                          <span>{post.numComments} comments</span>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {selectedPost && (
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                  <button
+                    onClick={() => setSelectedPost(null)}
+                    className="mb-4 text-blue-500 hover:text-blue-600 flex items-center"
+                  >
+                    <ChevronUp className="w-4 h-4 mr-2" />
+                    Back to posts
+                  </button>
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">{selectedPost.title}</h2>
+                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <span>Posted by u/{selectedPost.author} {selectedGroup && `in r/${selectedPost.subreddit}`}</span>
+                    <span>{selectedPost.created}</span>
+                  </div>
+                  <div className="prose dark:prose-invert">
+                    {postContent}
+                  </div>
+                  <div className="mt-4 flex items-center text-sm text-gray-600 dark:text-gray-300">
+                    <span className="mr-4">{selectedPost.score} points</span>
+                    <span>{selectedPost.numComments} comments</span>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="mt-6">
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Add Subreddits to Groups</h3>
+          )}
+
+        </div>
+
+      </div>
+
+      {showGroupPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-3/4 max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Create New Group</h2>
+            <input
+              type="text"
+              placeholder="Group name"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+            />
+            <div className="mb-4">
               <input
                 type="text"
-                placeholder="Search subreddits to add..."
+                placeholder="Search subreddits..."
                 value={groupSearchTerm}
                 onChange={(e) => setGroupSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                        Subreddit
-                      </th>
-                      <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                        Add to Group
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {communities
-                      .filter(community => community.name.toLowerCase().includes(groupSearchTerm.toLowerCase()))
-                      .slice(0, 10)
-                      .map((community) => (
-                        <tr key={community.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                            {community.name}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="flex space-x-2">
-                              {groups.map((group) => (
-                                <button
-                                  key={group.name}
-                                  onClick={() => handleAddToGroup(group, community)}
-                                  className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 text-xs"
-                                >
-                                  Add to {group.name}
-                                </button>
-                              ))}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-4">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                      Select
+                    </th>
+                    <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                      Subreddit
+                    </th>
+                    <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                      Members
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {communities
+                    .filter(community => community.name.toLowerCase().includes(groupSearchTerm.toLowerCase()))
+                    .map((community) => (
+                      <tr key={community.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                        <td className="px-4 py-3 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={selectedSubredditsForGroup.some(s => s.id === community.id)}
+                            onChange={() => handleSubredditSelection(community)}
+                            className="form-checkbox h-5 w-5 text-blue-600"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                          {community.name}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
+                          {community.subscribersCount.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex justify-end space-x-2 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
+              <button
+                onClick={() => setShowGroupPopup(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateGroup}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Save Group
+              </button>
             </div>
           </div>
-        )}
-
-        {(selectedSubreddit || selectedGroup) && (
-          <div className="mt-8">
-            <button
-              onClick={() => {
-                setSelectedSubreddit(null);
-                setSelectedGroup(null);
-                setSelectedPost(null);
-              }}
-              className="mb-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Back to {activeTab === 'groups' ? 'Groups' : 'Communities'}
-            </button>
-            {selectedGroup ? (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-                  {selectedGroup.name} Group
-                </h2>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {selectedGroup.subreddits.map((subreddit) => (
-                    <span key={subreddit.id} className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
-                      r/{subreddit.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-                r/{selectedSubreddit.name}
-              </h2>
-            )}
-            <div className="mb-6 flex flex-wrap gap-2">
-              {filterBadges.map((badge) => (
-                <button
-                  key={badge.label}
-                  onClick={() => setActiveFilter(badge.label.toLowerCase())}
-                  className={`px-3 py-1 rounded-full text-sm flex items-center ${
-                    activeFilter === badge.label.toLowerCase()
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                  }`}
-                >
-                  <badge.icon className="w-4 h-4 mr-2" />
-                  {badge.label}
-                  {badge.count > 0 && (
-                    <span className="ml-2 bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full text-xs">
-                      {badge.count}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-            {loading && <div className="text-center p-4"><RefreshCcw className="w-8 h-8 animate-spin text-blue-600 mx-auto" /></div>}
-            {error && <div className="text-center p-4 text-red-500">{error}</div>}
-            {!loading && !error && !selectedPost && (
-              <ul className="space-y-4">
-                {posts.map((post) => (
-                  <li key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                    <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 p-2 rounded">
-                      <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
-                        <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
-                        <span>{post.created}</span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{post.title}</h3>
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                        <span className="mr-4">{post.score} points</span>
-                        <span>{post.numComments} comments</span>
-                      </div>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {selectedPost && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <button
-                  onClick={() => setSelectedPost(null)}
-                  className="mb-4 text-blue-500 hover:text-blue-600 flex items-center"
-                >
-                  <ChevronUp className="w-4 h-4 mr-2" />
-                  Back to posts
-                </button>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">{selectedPost.title}</h2>
-                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  <span>Posted by u/{selectedPost.author} {selectedGroup && `in r/${selectedPost.subreddit}`}</span>
-                  <span>{selectedPost.created}</span>
-                </div>
-                <div className="prose dark:prose-invert">
-                  {postContent}
-                </div>
-                <div className="mt-4 flex items-center text-sm text-gray-600 dark:text-gray-300">
-                  <span className="mr-4">{selectedPost.score} points</span>
-                  <span>{selectedPost.numComments} comments</span>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

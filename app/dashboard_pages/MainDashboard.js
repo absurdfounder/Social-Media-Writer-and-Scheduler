@@ -502,15 +502,13 @@ Remember to maintain a consistent voice that's authentic, slightly humorous, and
   return (
     <div className={`${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white rounded-md overflow-hidden'}`}>
       <div className="p-4 border-gray-400 dark:border-gray-700 grid items-center mb-4">
+
+        <div className='bg-white dark:bg-gray-800 rounded-md p-4'>
         <div className='flex justify-between'>
-          <h1 className="text-xl font-bold">What is this update about?</h1>
-          <button onClick={toggleDarkMode} className="p-2 border border-gray-600 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-            {isDarkMode ? '☀️' : '🌙'}
-          </button>
+          <h1 className="text-xl font-bold text-blue-500">What is this update about?</h1>
         </div>
-        <div className='bg-white dark:bg-gray-800 rounded-md p-4 mt-4'>
           <textarea 
-            className='w-full p-4 rounded-md mt-4 bg-white dark:bg-gray-700 text-black dark:text-white'
+            className='w-full p-4 rounded-md mt-4 bg-blue-50 dark:bg-gray-700 text-blue-900 dark:text-white'
             value={overallPrompt}
             onChange={(e) => setOverallPrompt(e.target.value)}
             placeholder="I need to share an update with the community.."
@@ -519,7 +517,7 @@ Remember to maintain a consistent voice that's authentic, slightly humorous, and
             <select
               value={threadType}
               onChange={(e) => setThreadType(e.target.value)}
-              className="p-2 rounded-md bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600"
+              className="p-4 rounded-md bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600"
             >
               <option value="single">Single Tweet</option>
               <option value="three">3 Tweet Thread</option>
@@ -536,7 +534,7 @@ Remember to maintain a consistent voice that's authentic, slightly humorous, and
           </div>
         </div>
       </div>
-      <div className='bg-gray-900 py-8'>
+      <div className='bg-blue-200 p-4'>
         <div className="max-w-xl mx-auto border shadow-lg rounded-lg mb-16 bg-white">
           {tweets.map((tweet, index) => (
             <div key={tweet.key} className={`relative border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} last:border-b-0`}>

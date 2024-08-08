@@ -25,11 +25,11 @@ const LedgerDB = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex flex-col h-screen bg-white dark:bg-gray-900 ">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 h-fit">
         {messages.map((message, index) => (
           <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`flex items-end space-x-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+            <div className={`flex gap-4 items-center space-x-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${message.sender === 'user' ? 'bg-blue-500' : 'bg-green-500'}`}>
                 {message.sender === 'user' ? <User size={20} className="text-white" /> : <Bot size={20} className="text-white" />}
               </div>

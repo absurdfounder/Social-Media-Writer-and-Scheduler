@@ -3,7 +3,7 @@ import {
   ChevronDown, ChevronUp, Search, 
   RefreshCcw, Home, Plus, X, Users,
   Flame, Trophy, HelpCircle, Frown,
-  DollarSign, Tool, Megaphone, Zap,
+  DollarSign, PenTool, Megaphone, Zap,
   Newspaper, Lightbulb
 } from 'lucide-react';
 
@@ -240,7 +240,7 @@ const RedditExplorer = () => {
     { label: 'Advice Requests', icon: HelpCircle, description: 'People asking for advice & resources', count: 224 },
     { label: 'Pain & Anger', icon: Frown, description: 'People expressing pain points & frustrations', count: 163 },
     { label: 'Money Talk', icon: DollarSign, description: 'People talking about spending money', count: 16 },
-    { label: 'Solution Requests', icon: Tool, description: 'People asking for tools & solutions', count: 3 },
+    { label: 'Solution Requests', icon: PenTool, description: 'People asking for tools & solutions', count: 3 },
     { label: 'Self-Promotion', icon: Megaphone, description: 'People launching products & services', count: 1 },
     { label: 'Opportunities', icon: Zap, description: 'Conversations about things that can be improved', count: 0 },
     { label: 'News', icon: Newspaper, description: 'Conversations about current news & events', count: 0 },

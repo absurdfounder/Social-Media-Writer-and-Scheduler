@@ -5,7 +5,9 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { PlusCircle, X, Smile, Image as ImageIcon, Link as LinkIcon, Wand2, FileText, Video, Loader } from 'lucide-react';
 
-const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkAdd, key }) => {
+
+
+const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkAdd }) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -14,7 +16,14 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        hardBreak: {
+          keepMarks: true,
+          HTMLAttributes: {
+            class: 'my-custom-class',
+          },
+        },
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -32,10 +41,11 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
     },
     editorProps: {
       attributes: {
-        class: 'prose w-full min-h-[100px] focus:outline-none dark:text-white',
+        class: 'prose w-full min-h-[100px] focus:outline-none dark:text-white whitespace-pre-wrap',
       },
     },
-  }, [key]);
+    immediatelyRender: false,
+  }, []);
 
   useEffect(() => {
     if (editor && content) {
@@ -74,6 +84,7 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
   );
 };
 
+
 const LinkPreview = ({ url }) => {
   const [preview, setPreview] = useState(null);
 
@@ -107,13 +118,23 @@ const LinkPreview = ({ url }) => {
   );
 };
 
-const TweetContent = ({ content, images, links }) => {
+const TweetContent = ({ images, links, videos }) => {
   return (
     <div className="mb-4">
       {images.map((img, i) => (
-        <img key={i} src={img} alt={`Tweet image ${i + 1}`} className="mb-2 rounded-md max-w-full h-auto" />
+        <img key={i} src={img} alt={`Tweet image ${i + 1}`} className="mb-2 mt-2 rounded-md max-w-full h-auto" />
       ))}
-      <div dangerouslySetInnerHTML={{ __html: content }} />
+      {videos.map((video, i) => (
+        <div key={i} className="mb-2 mt-2 rounded-md overflow-hidden">
+          <iframe
+            src={video}
+            title={`Tweet video ${i + 1}`}
+            className="w-full aspect-video"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </div>
+      ))}
       {links.map((link, i) => (
         <LinkPreview key={i} url={link} />
       ))}
@@ -122,7 +143,7 @@ const TweetContent = ({ content, images, links }) => {
 };
 
 const ThreadWriter = () => {
-  const [tweets, setTweets] = useState([{ id: Date.now(), content: '', images: [], links: [], key: Date.now() }]);
+  const [tweets, setTweets] = useState([{ id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [overallPrompt, setOverallPrompt] = useState('');
@@ -130,7 +151,7 @@ const ThreadWriter = () => {
   const [threadType, setThreadType] = useState('full');
 
   const addNewTweet = () => {
-    setTweets(prevTweets => [...prevTweets, { id: Date.now(), content: '', images: [], links: [], key: Date.now() }]);
+    setTweets(prevTweets => [...prevTweets, { id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
   };
 
   const removeTweet = (id) => {
@@ -219,20 +240,33 @@ const ThreadWriter = () => {
     let content = '';
     let images = [];
     let links = [];
+    let videos = [];
   
     lines.forEach(line => {
       if (line.startsWith('Image:')) {
-        const imageUrl = line.split('Image:')[1].trim();
-        images.push(imageUrl);
+        const match = line.match(/\[(.+?)\]/);
+        if (match) {
+          const imageUrl = match[1].trim();
+          images.push(imageUrl);
+        }
+      } else if (line.startsWith('Video:')) {
+        const match = line.match(/\[(.+?)\]/);
+        if (match) {
+          const videoUrl = match[1].trim();
+          videos.push(videoUrl);
+        }
       } else if (line.startsWith('Link:')) {
-        const linkUrl = line.split('Link:')[1].trim();
-        links.push(linkUrl);
+        const match = line.match(/\[(.+?)\]/);
+        if (match) {
+          const linkUrl = match[1].trim();
+          links.push(linkUrl);
+        }
       } else {
         content += line + ' ';
       }
     });
   
-    return { content: content.trim(), images, links };
+    return { content: content.trim(), images, links, videos };
   };
 
   const generateAITweet = async (id) => {
@@ -248,7 +282,7 @@ const ThreadWriter = () => {
           temperature: 0.7,
           max_tokens: 280,
           messages: [{ role: "user", content: `Rewrite the following tweet in a more engaging way, and include suggestions for an image, video, or link to add context: "${tweetToRewrite.content}"` }],
-          system: "You are a helpful AI assistant that rewrites tweets to make them more engaging and suggests relevant media to include. For image suggestions, use 'Image: https://placehold.co/600x400?text=Your+Text+Here'. For video suggestions, use 'Video: https://example.com/video.mp4'. For link suggestions, use 'Link: https://example.com'. Always include these suggestions after the main content, separated by two newlines.",
+          system: "You are a helpful AI assistant that rewrites tweets to make them more engaging and suggests relevant media to include. For image suggestions, use 'Image: https://placehold.co/600x400?text=Your+Text+Here'. For video suggestions, use 'Video: https://placehold.co/1920x1080.mp4?text=Your+Video+Text+Here'. For link suggestions, use 'Link: https://example.com'. Always include these suggestions after the main content, separated by two newlines.",
           model: "claude-3-sonnet-20240229",
         }),
       });
@@ -259,11 +293,11 @@ const ThreadWriter = () => {
   
       const data = await response.json();
       const rewrittenContent = data.content[0].text.trim();
-      const { content, images, links } = parseAIResponse(rewrittenContent);
+      const { content, images, links, videos } = parseAIResponse(rewrittenContent);
   
       setTweets(prevTweets =>
         prevTweets.map(tweet =>
-          tweet.id === id ? { ...tweet, content, images, links, key: Date.now() } : tweet
+          tweet.id === id ? { ...tweet, content, images, links, videos, key: Date.now() } : tweet
         )
       );
     } catch (error) {
@@ -298,8 +332,81 @@ const ThreadWriter = () => {
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 1000,
-          messages: [{ role: "user", content: `Generate a ${threadType === 'single' ? 'single tweet' : `thread of ${maxTweets} tweets`} about the following update, including suggestions for images, videos, or links to add context: "${overallPrompt}"` }],
-          system: `You are a helpful AI assistant that generates engaging ${threadType === 'single' ? 'tweets' : 'tweet threads'} based on user prompts and suggests relevant media to include. For image suggestions, use 'Image: https://placehold.co/600x400?text=Your+Text+Here'. For video suggestions, use 'Video: https://example.com/video.mp4'. For link suggestions, use 'Link: https://example.com'. Always include an image suggestion for the first tweet. Limit the response to ${maxTweets} tweet${maxTweets > 1 ? 's' : ''}.`,
+          messages: [{ role: "user", content: `Generate a ${threadType === 'single' ? 'single tweet' : `thread of ${maxTweets} tweets`} about the following update, including suggestions for images, videos, or links to add context: "${overallPrompt}" NOTE: i just need the tweet no extra text , Dont use emojis unless its asked , Dont write numbers infront of each tweet. One media image or video. decide how it should be, in the url provide text what the image should be about or what to show what to add etc; spacing breaks etc is what makes the tweet stand out.` }],
+          system: `You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
+
+Start with a strong hook or attention-grabbing statement
+Use simple, concise language that conveys your message quickly
+Incorporate personal stories or experiences to make your content relatable
+Structure your tweets for easy readability (e.g., bullet points, numbered lists, or before/after comparisons)
+Include a clear value proposition or takeaway for your audience
+For longer content, break it into a thread with each tweet focusing on a single point
+Always include a visual element (image, video, or gif) in the first tweet of a thread or standalone tweet
+End with a call-to-action or thought-provoking question to encourage engagement
+
+When I provide a prompt, generate ${maxTweets} tweet${maxTweets > 1 ? 's' : ''} that align with these principles. NOTE: at the end of each tweet you need to use '/endtweet'
+For image suggestions, use 'Image: [https://placehold.co/600x400?text=Your+Text+Here]'.
+For video suggestions, use 'Video: [https://placehold.co/1920x1080.mp4?text=Your+Video+Text+Here]'.
+For link suggestions, use 'Link: [https://example.com]'.
+Always put these media suggestions on separate lines after the main tweet content.
+
+Your writing style should follow these guidelines:
+
+- Use simple structures (listicles, before/after comparisons)
+- Convey the main message in the first sentence
+- Add space between lines for better readability
+- Keep language concise and straightforward
+- Avoid using emojis completely
+
+As a solo founder we can write about:
+
+Technical tips with actionable code snippets 
+Personal journey updates that showcase growth and lessons learned
+Work/life balance insights that highlight the indie founder lifestyle
+Lessons learned from mistakes or challenges overcome
+Content strategy insights that provide value to other creators
+
+LEARN FROM THIS: This is good writing format & style 
+
+"
+Me, last month:
+
+"Do you seriously think you can make money online?"
+
+Me, today:
+
+{image of my stripe chart}
+"
+
+# IMPORTANT: DO NOT USE EMOJIS IN ANY TWEETS
+
+Tweet structure:
+1. Strong opening hook
+2. Main content (using simple structures like lists or comparisons)
+3. Key takeaway or value proposition
+4. Call-to-action or question
+5. Media suggestion (on a new line)
+6. /endtweet
+
+Example of good writing format & style:
+
+"Indie founder milestone:
+
+Last month: 0 users, $0 revenue
+This month: 100 users, $1000 revenue
+
+What changed? 
+- Launched MVP
+- Engaged on Twitter daily
+- Listened to user feedback
+
+Next goal: 1000 users by Q3
+
+Image: [https://placehold.co/600x400?text=Revenue+Growth+Chart]
+
+/endtweet"
+
+Remember to maintain a consistent voice that's authentic, slightly humorous, and always focused on providing value to your audience. Each tweet should be able to stand alone while also contributing to your overall brand narrative as an indie founder.`,
           model: "claude-3-sonnet-20240229",
         }),
       });
@@ -309,15 +416,16 @@ const ThreadWriter = () => {
       }
 
       const data = await response.json();
-      const generatedThreadContent = data.content[0].text.split('\n\n').filter(tweet => tweet.trim() !== '');
+      const generatedThreadContent = data.content[0].text.split('/endtweet').filter(tweet => tweet.trim() !== '');
 
-      const generatedThread = generatedThreadContent.map((tweetContent, index) => {
-        const { content, images, links } = parseAIResponse(tweetContent);
+      const generatedThread = generatedThreadContent.map((tweetContent) => {
+        const { content, images, links, videos } = parseAIResponse(tweetContent);
         return {
           id: Date.now() + Math.random(),
           content,
-          images: index === 0 && images.length === 0 ? ['https://placehold.co/600x400?text=Default+Image'] : images,
+          images,
           links,
+          videos,
           key: Date.now() + Math.random()
         };
       });
@@ -366,7 +474,7 @@ const ThreadWriter = () => {
               onClick={generateAIThread}
               disabled={isGenerating}
             >
-{isGenerating ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
+              {isGenerating ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
               Generate {threadType === 'single' ? 'Tweet' : 'Thread'}
             </button>
           </div>
@@ -395,11 +503,6 @@ const ThreadWriter = () => {
                     </button>
                   )}
                 </div>
-                <TweetContent
-                  content={tweet.content}
-                  images={tweet.images}
-                  links={tweet.links}
-                />
                 <TipTapEditor
                   key={tweet.key}
                   content={tweet.content}
@@ -408,13 +511,18 @@ const ThreadWriter = () => {
                   onVideoUpload={() => handleVideoUpload(tweet.id)}
                   onLinkAdd={() => handleLinkAdd(tweet.id)}
                 />
+                <TweetContent
+                  images={tweet.images}
+                  links={tweet.links}
+                  videos={tweet.videos}
+                />
                 <div className="flex space-x-2 mt-2">
                   <button
                     onClick={() => generateAITweet(tweet.id)}
-                    className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
+                    className={`p-2 flex gap-2 rounded-full ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
                     disabled={rewritingTweetId === tweet.id}
                   >
-                    {rewritingTweetId === tweet.id ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
+                    {rewritingTweetId === tweet.id ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />} Rewrite
                   </button>
                 </div>
               </div>

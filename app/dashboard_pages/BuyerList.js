@@ -272,9 +272,8 @@ const RedditExplorer = () => {
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen p-6">
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Reddit Explorer</h1>
         
         <div className="flex space-x-2 mb-6">
           <Tab label="Popular" active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
@@ -354,7 +353,7 @@ const RedditExplorer = () => {
               />
               <button
                 onClick={handleCreateGroup}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center"
+                className="px-4 py-2 bg-blue-500 border text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Group

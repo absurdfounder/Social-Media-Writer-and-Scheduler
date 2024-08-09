@@ -28,12 +28,12 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
 
 const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
-    className={`flex flex-col items-center justify-center p-2  ${
+    className={`flex flex-col items-center justify-center p-2 ${
       active ? 'text-blue-500' : 'text-gray-500'
     }`}
     onClick={onClick}
   >
-    <Icon size={24} />
+    <Icon size={20} />
     <span className="text-xs mt-1">{label}</span>
   </button>
 );
@@ -45,9 +45,7 @@ export default function Dashboard() {
 
   const navItems = [
     { icon: Twitter, label: 'Build On X', id: 'dashboard' },
-    { icon: Users, label: 'X Founders', id: 'commissions' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
-    { icon: ScanFace, label: 'Ask AI', id: 'ledger-db' }
   ];
 
   const renderContent = () => {
@@ -74,8 +72,16 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
       <div className="flex h-screen overflow-hidden">
+        {/* Overlay */}
+        {isMobileMenuOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          ></div>
+        )}
+
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out`}>
+        <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
           <div className="p-6 flex justify-between items-center">
             <Image 
               src={logoSrc}
@@ -91,7 +97,7 @@ export default function Dashboard() {
               <X className="h-6 w-6" />
             </button>
           </div>
-          <nav className="mt-6 px-6 space-y-1">
+          <nav className="mt-6 px-6 space-y-1 flex-grow">
             {navItems.map((item) => (
               <NavItem
                 key={item.id}
@@ -105,45 +111,32 @@ export default function Dashboard() {
               />
             ))}
           </nav>
+
+          {/* User profile moved to sidebar */}
+          <div className="p-4 border-t">
+            <button className="flex items-center space-x-2 w-full text-left">
+              <Image 
+                src="/userimage.png" 
+                alt="User avatar" 
+                width={32} 
+                height={32} 
+                className="rounded-full"
+              />
+              <div className="flex-grow">
+                <span className="block font-medium text-sm">John Doe</span>
+                <span className="block text-xs text-gray-500">john@example.com</span>
+              </div>
+              <ChevronDown className="h-4 w-4 text-gray-400" />
+            </button>
+          </div>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 rounded-md">
-          {/* Top bar */}
-          <header className="">
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center space-x-4">
 
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Talk to BuildInPublic AI..."
-                    className="pl-10 pr-4 py-2 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <button className="flex items-center space-x-2 text-sm focus:outline-none">
-                    <Image 
-                      src="/userimage.png" 
-                      alt="User avatar" 
-                      width={32} 
-                      height={32} 
-                      className="rounded-full"
-                    />
-                    <span className="hidden md:inline-block font-medium">John Doe</span>
-                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                  </button>
-                  {/* Dropdown menu would go here */}
-                </div>
-              </div>
-            </div>
-          </header>
 
           {/* Page content */}
-          <div className="pb-20 md:pb-6 rounded-xl">
+          <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">{navItems.find(item => item.id === activeTab)?.label}</h2>
             {renderContent()}
           </div>
@@ -153,7 +146,7 @@ export default function Dashboard() {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
         <div className="flex justify-around p-2">
-          {navItems.slice(0, 4).map((item) => (
+          {navItems.map((item) => (
             <MobileNavItem
               key={item.id}
               icon={item.icon}

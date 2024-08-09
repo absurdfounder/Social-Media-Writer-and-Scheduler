@@ -494,57 +494,58 @@ Remember to maintain a consistent voice that's authentic, slightly humorous, and
   return (
     <div className="bg-white rounded-md overflow-hidden">
       <div className="p-4 border-gray-400 grid items-center mb-4">
-        <div className='bg-white rounded-md p-4'>
-          <div className='flex justify-between'>
-            <h1 className="text-xl font-bold text-blue-500">What is this update about?</h1>
+        <div className='bg-white rounded-md p-2 sm:p-4'>
+          <div className='flex flex-col sm:flex-row sm:justify-between'>
+            <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
           </div>
           <textarea 
-            className='w-full p-4 rounded-md mt-4 bg-blue-50 text-blue-900'
+            className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-blue-50 text-blue-900 text-sm sm:text-base'
             value={overallPrompt}
             onChange={(e) => setOverallPrompt(e.target.value)}
             placeholder="I need to share an update with the community.."
+            rows={4}
           />
-          <div className="flex justify-between items-center mt-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0">
             <select
               value={threadType}
               onChange={(e) => setThreadType(e.target.value)}
-              className="p-4 rounded-md bg-white text-black border border-gray-300"
+              className="p-2 sm:p-4 rounded-md bg-white text-black border border-gray-300 text-sm sm:text-base w-full sm:w-auto mb-2 sm:mb-0"
             >
               <option value="single">Single Tweet</option>
               <option value="three">3 Tweet Thread</option>
               <option value="full">Full Thread</option>
             </select>
             <button 
-              className='bg-blue-100 p-4 rounded-md flex gap-4 text-blue-900'
+              className='bg-blue-100 p-2 sm:p-4 rounded-md flex items-center justify-center gap-2 sm:gap-4 text-blue-900 text-sm sm:text-base w-full sm:w-auto'
               onClick={generateAIThread}
               disabled={isGenerating}
             >
-              {isGenerating ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />}
+              {isGenerating ? <Loader size={16} className="animate-spin" /> : <Wand2 size={16} />}
               Generate {threadType === 'single' ? 'Tweet' : 'Thread'}
             </button>
           </div>
         </div>
       </div>
-      <div className='bg-blue-200 p-4'>
-        <div className="max-w-xl mx-auto border shadow-lg rounded-lg mb-16 bg-white">
+      <div className='bg-blue-200 p-2 sm:p-4'>
+        <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-8 sm:mb-16 bg-white">
           {tweets.map((tweet, index) => (
             <div key={tweet.key} className="relative border-b border-gray-200 last:border-b-0">
-              <div className="absolute left-0 top-0 -ml-8 mt-4 text-sm font-bold text-white">
+              <div className="absolute left-0 top-0 -ml-6 sm:-ml-8 mt-2 sm:mt-4 text-xs sm:text-sm font-bold text-white">
                 {index + 1}
               </div>
-              <div className="p-4">
-                <div className="flex items-center mb-4">
-                  <img src="https://placehold.co/40x40/333333/ffffff?text=U&font=Raleway" alt="User avatar" className="w-10 h-10 rounded-full mr-3" />
+              <div className="p-2 sm:p-4">
+                <div className="flex items-center mb-2 sm:mb-4">
+                  <img src="https://placehold.co/40x40/333333/ffffff?text=U&font=Raleway" alt="User avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 sm:mr-3" />
                   <div>
-                    <h2 className="font-bold">John Doe</h2>
-                    <p className="text-gray-500 text-sm">@johndoe</p>
+                    <h2 className="font-bold text-sm sm:text-base">John Doe</h2>
+                    <p className="text-gray-500 text-xs sm:text-sm">@johndoe</p>
                   </div>
                   {tweets.length > 1 && (
                     <button
                       onClick={() => removeTweet(tweet.id)}
                       className="ml-auto text-gray-500 hover:text-red-500"
                     >
-                      <X size={20} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -564,21 +565,21 @@ Remember to maintain a consistent voice that's authentic, slightly humorous, and
                 <div className="flex space-x-2 mt-2">
                   <button
                     onClick={() => generateAITweet(tweet.id)}
-                    className="p-2 flex gap-2 rounded-full hover:bg-gray-200"
+                    className="p-1 sm:p-2 flex gap-1 sm:gap-2 rounded-full hover:bg-gray-200 text-xs sm:text-sm"
                     disabled={rewritingTweetId === tweet.id}
                   >
-                    {rewritingTweetId === tweet.id ? <Loader size={20} className="animate-spin" /> : <Wand2 size={20} />} Rewrite
+                    {rewritingTweetId === tweet.id ? <Loader size={14} className="animate-spin" /> : <Wand2 size={14} />} Rewrite
                   </button>
                 </div>
               </div>
             </div>
           ))}
-          <div className="p-4">
+          <div className="p-2 sm:p-4">
             <button
               onClick={addNewTweet}
-              className="flex items-center text-blue-500 hover:text-blue-600"
+              className="flex items-center text-blue-500 hover:text-blue-600 text-sm sm:text-base"
             >
-              <PlusCircle size={20} className="mr-2" />
+              <PlusCircle size={16} className="mr-1 sm:mr-2" />
               Add another tweet
             </button>
           </div>

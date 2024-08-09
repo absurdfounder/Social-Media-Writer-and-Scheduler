@@ -144,7 +144,7 @@ const ThreadWriter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [overallPrompt, setOverallPrompt] = useState('');
   const [rewritingTweetId, setRewritingTweetId] = useState(null);
-  const [threadType, setThreadType] = useState('full');
+  const [threadType, setThreadType] = useState('single');
 
   const addNewTweet = () => {
     setTweets(prevTweets => [...prevTweets, { id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);

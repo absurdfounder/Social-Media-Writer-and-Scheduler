@@ -333,9 +333,8 @@ const RedditExplorer = () => {
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="bg-gray-100 min-h-screen">
       <div className="max-w-7xl mx-auto">
-
         <div className="flex space-x-2">
           <Tab label="Audiences" active={activeTab === 'groups'} onClick={() => setActiveTab('groups')} />
           <Tab label="Popular Subreddits" active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
@@ -344,7 +343,6 @@ const RedditExplorer = () => {
         </div>
 
         <div className='bg-gray-50 border p-4'>
-
           {activeTab !== 'groups' && (
             <div className="mb-6">
               <input
@@ -352,20 +350,20 @@ const RedditExplorer = () => {
                 placeholder="Search subreddits..."
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           )}
 
           {activeTab !== 'groups' && !selectedSubreddit && !selectedGroup && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-lg shadow overflow-hidden">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+                <thead className="bg-gray-50">
                   <tr>
                     {['Community', 'Members', 'Weekly Growth', 'Monthly Growth'].map((header) => (
                       <th
                         key={header}
-                        className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                        className="px-4 py-3 text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer"
                         onClick={() => handleSort(header.toLowerCase().replace(' ', ''))}
                       >
                         <div className="flex items-center">
@@ -376,25 +374,25 @@ const RedditExplorer = () => {
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="divide-y divide-gray-200">
                   {sortedCommunities.map((community, index) => (
                     <tr
                       key={community.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                      className="hover:bg-gray-50 transition-colors duration-150"
                       ref={index === sortedCommunities.length - 1 ? lastCommunityElementRef : null}
                     >
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
                         <button onClick={() => handleSubredditClick(community)} className="hover:underline">
                           {community.name}
                         </button>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
+                      <td className="px-4 py-3 text-sm text-gray-500">
                         {community.subscribersCount.toLocaleString()}
                       </td>
-                      <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400">
+                      <td className="px-4 py-3 text-sm text-green-600">
                         +{community.growthPerWeek.toLocaleString()}
                       </td>
-                      <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400">
+                      <td className="px-4 py-3 text-sm text-green-600">
                         +{community.growthPerMonth.toLocaleString()}
                       </td>
                     </tr>
@@ -406,7 +404,6 @@ const RedditExplorer = () => {
 
           {activeTab === 'groups' && !selectedGroup && (
             <div>
-
               <div className='items-center flex justify-between'>
                 <h6 className='font-bold h4'>Curated Audiences</h6>
                 <button
@@ -422,24 +419,24 @@ const RedditExplorer = () => {
                 {groups.map((group) => (
                   <div
                     key={group.name}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    className="bg-white rounded-lg shadow p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
                     onClick={() => handleGroupClick(group)}
                   >
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center justify-between">
                       <span>{group.name}</span>
                       <Users className="w-5 h-5 text-blue-500" />
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-sm text-gray-600 mb-2">
                       {group.subreddits.length} subreddit{group.subreddits.length !== 1 ? 's' : ''}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {group.subreddits.slice(0, 5).map((subreddit) => (
-                        <span key={subreddit.id} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
+                        <span key={subreddit.id} className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs">
                           {subreddit.name}
                         </span>
                       ))}
                       {group.subreddits.length > 5 && (
-                        <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
+                        <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs">
                           +{group.subreddits.length - 5} more
                         </span>
                       )}
@@ -458,26 +455,26 @@ const RedditExplorer = () => {
                   setSelectedGroup(null);
                   setSelectedPost(null);
                 }}
-                className="mb-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center"
+                className="mb-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to {activeTab === 'groups' ? 'Groups' : 'Communities'}
               </button>
               {selectedGroup ? (
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     {selectedGroup.name} Group
                   </h2>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {selectedGroup.subreddits.map((subreddit) => (
-                      <span key={subreddit.id} className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                      <span key={subreddit.id} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                         r/{subreddit.name}
                       </span>
                     ))}
                   </div>
                 </div>
               ) : (
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
                   r/{selectedSubreddit.name}
                 </h2>
               )}
@@ -486,15 +483,16 @@ const RedditExplorer = () => {
                   <button
                     key={badge.label}
                     onClick={() => setActiveFilter(badge.label.toLowerCase())}
-                    className={`px-3 py-1 rounded-full text-sm flex items-center ${activeFilter === badge.label.toLowerCase()
+                    className={`px-3 py-1 rounded-full text-sm flex items-center ${
+                      activeFilter === badge.label.toLowerCase()
                         ? 'bg-blue-200 text-blue-800'
-                        : 'bg-white border dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                      }`}
+                        : 'bg-white border text-gray-700'
+                    }`}
                   >
                     <badge.icon className="w-4 h-4 mr-2" />
                     {badge.label}
                     {badge.count > 0 && (
-                      <span className="ml-2 bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full text-xs">
+                      <span className="ml-2 bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
                         {badge.count}
                       </span>
                     )}
@@ -506,14 +504,14 @@ const RedditExplorer = () => {
               {!loading && !error && !selectedPost && (
                 <ul className="space-y-4">
                   {posts.map((post) => (
-                    <li key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                      <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 p-2 rounded">
-                        <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <li key={post.id} className="bg-white rounded-lg shadow p-4">
+                      <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
+                        <div className="flex justify-between text-sm text-gray-500 mb-2">
                           <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
                           <span>{post.created}</span>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{post.title}</h3>
-                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-2">{post.title}</h3>
+                        <div className="flex items-center text-sm text-gray-600">
                           <span className="mr-4">{post.score} points</span>
                           <span>{post.numComments} comments</span>
                         </div>
@@ -523,7 +521,7 @@ const RedditExplorer = () => {
                 </ul>
               )}
               {selectedPost && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-6">
                   <button
                     onClick={() => setSelectedPost(null)}
                     className="mb-4 text-blue-500 hover:text-blue-600 flex items-center"
@@ -531,15 +529,15 @@ const RedditExplorer = () => {
                     <ChevronUp className="w-4 h-4 mr-2" />
                     Back to posts
                   </button>
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">{selectedPost.title}</h2>
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">{selectedPost.title}</h2>
+                  <div className="flex justify-between text-sm text-gray-500 mb-4">
                     <span>Posted by u/{selectedPost.author} {selectedGroup && `in r/${selectedPost.subreddit}`}</span>
                     <span>{selectedPost.created}</span>
                   </div>
-                  <div className="prose dark:prose-invert">
+                  <div className="prose">
                     {postContent}
                   </div>
-                  <div className="mt-4 flex items-center text-sm text-gray-600 dark:text-gray-300">
+                  <div className="mt-4 flex items-center text-sm text-gray-600">
                     <span className="mr-4">{selectedPost.score} points</span>
                     <span>{selectedPost.numComments} comments</span>
                   </div>
@@ -547,21 +545,19 @@ const RedditExplorer = () => {
               )}
             </div>
           )}
-
         </div>
-
       </div>
 
       {showGroupPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-3/4 max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Create New Group</h2>
+          <div className="bg-white rounded-lg p-6 w-3/4 max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Create New Group</h2>
             <input
               type="text"
               placeholder="Group name"
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             />
             <div className="mb-4">
               <input
@@ -569,29 +565,29 @@ const RedditExplorer = () => {
                 placeholder="Search subreddits..."
                 value={groupSearchTerm}
                 onChange={(e) => setGroupSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-4">
+            <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Select
                     </th>
-                    <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Subreddit
                     </th>
-                    <th className="px-4 py-3 text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Members
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="divide-y divide-gray-200">
                   {communities
                     .filter(community => community.name.toLowerCase().includes(groupSearchTerm.toLowerCase()))
                     .map((community) => (
-                      <tr key={community.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                      <tr key={community.id} className="hover:bg-gray-50 transition-colors duration-150">
                         <td className="px-4 py-3 text-sm">
                           <input
                             type="checkbox"
@@ -600,10 +596,10 @@ const RedditExplorer = () => {
                             className="form-checkbox h-5 w-5 text-blue-600"
                           />
                         </td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">
                           {community.name}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
+                        <td className="px-4 py-3 text-sm text-gray-500">
                           {community.subscribersCount.toLocaleString()}
                         </td>
                       </tr>
@@ -611,7 +607,7 @@ const RedditExplorer = () => {
                 </tbody>
               </table>
             </div>
-            <div className="flex justify-end space-x-2 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
+            <div className="flex justify-end space-x-2 sticky bottom-0 bg-white py-4">
               <button
                 onClick={() => setShowGroupPopup(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"

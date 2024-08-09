@@ -113,12 +113,7 @@ export default function Dashboard() {
           <header className="">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center space-x-4">
-                <button 
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="text-gray-500 hover:text-gray-700 md:hidden"
-                >
-                  <Menu className="h-6 w-6" />
-                </button>
+
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
@@ -129,10 +124,6 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <button className="relative p-2 text-gray-400 hover:text-gray-500">
-                  <Bell className="h-6 w-6" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
-                </button>
                 <div className="relative">
                   <button className="flex items-center space-x-2 text-sm focus:outline-none">
                     <Image 

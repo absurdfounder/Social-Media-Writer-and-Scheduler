@@ -126,8 +126,255 @@ const RedditExplorer = () => {
             { id: "investing", name: "investing" },
             { id: "cryptocurrency", name: "cryptocurrency" }
           ]
+        },
+        {
+          name: "Gaming",
+          subreddits: [
+            { id: "gaming", name: "gaming" },
+            { id: "pcgaming", name: "pcgaming" },
+            { id: "console", name: "console" }
+          ]
+        },
+        {
+          name: "Health & Fitness",
+          subreddits: [
+            { id: "fitness", name: "fitness" },
+            { id: "nutrition", name: "nutrition" },
+            { id: "health", name: "health" }
+          ]
+        },
+        {
+          name: "Travel",
+          subreddits: [
+            { id: "travel", name: "travel" },
+            { id: "solotravel", name: "solotravel" },
+            { id: "travelhacks", name: "travelhacks" }
+          ]
+        },
+        {
+          name: "Cooking",
+          subreddits: [
+            { id: "cooking", name: "cooking" },
+            { id: "recipes", name: "recipes" },
+            { id: "food", name: "food" }
+          ]
+        },
+        {
+          name: "Education",
+          subreddits: [
+            { id: "education", name: "education" },
+            { id: "learnprogramming", name: "learnprogramming" },
+            { id: "languagelearning", name: "languagelearning" }
+          ]
+        },
+        {
+          name: "DIY & Crafts",
+          subreddits: [
+            { id: "DIY", name: "DIY" },
+            { id: "crafts", name: "crafts" },
+            { id: "woodworking", name: "woodworking" }
+          ]
+        },
+        {
+          name: "Sports",
+          subreddits: [
+            { id: "sports", name: "sports" },
+            { id: "soccer", name: "soccer" },
+            { id: "nba", name: "nba" }
+          ]
+        },
+        {
+          name: "Pet Lovers",
+          subreddits: [
+            { id: "cats", name: "cats" },
+            { id: "dogs", name: "dogs" },
+            { id: "Aquariums", name: "Aquariums" },
+            { id: "Dogtraining", name: "Dogtraining" },
+            { id: "dogpictures", name: "dogpictures" },
+            { id: "parrots", name: "parrots" },
+            { id: "dogswithjobs", name: "dogswithjobs" },
+            { id: "RATS", name: "RATS" },
+            { id: "birding", name: "birding" },
+            { id: "BeardedDragons", name: "BeardedDragons" },
+            { id: "DOG", name: "DOG" },
+            { id: "puppy101", name: "puppy101" },
+            { id: "Ornithology", name: "Ornithology" },
+            { id: "cat", name: "cat" },
+            { id: "CatAdvice", name: "CatAdvice" },
+            { id: "Pets", name: "Pets" },
+            { id: "DogAdvice", name: "DogAdvice" },
+            { id: "germanshepherds", name: "germanshepherds" },
+            { id: "reptiles", name: "reptiles" },
+            { id: "lookatmydog", name: "lookatmydog" },
+            { id: "herpetology", name: "herpetology" },
+            { id: "ballpython", name: "ballpython" },
+            { id: "leopardgeckos", name: "leopardgeckos" },
+            { id: "turtle", name: "turtle" },
+            { id: "cockatiel", name: "cockatiel" },
+            { id: "doggrooming", name: "doggrooming" },
+            { id: "PetAdvice", name: "PetAdvice" },
+            { id: "DogTrainingTips", name: "DogTrainingTips" },
+            { id: "Dogowners", name: "Dogowners" },
+            { id: "DogBreeds101", name: "DogBreeds101" },
+            { id: "dogbreed", name: "dogbreed" }
+          ]
+        },
+        {
+          name: "Software Developers",
+          subreddits: [
+            { id: "programming", name: "programming" },
+            { id: "learnprogramming", name: "learnprogramming" },
+            { id: "webdev", name: "webdev" },
+            { id: "javascript", name: "javascript" },
+            { id: "AskEngineers", name: "AskEngineers" },
+            { id: "cscareerquestions", name: "cscareerquestions" },
+            { id: "linux", name: "linux" },
+            { id: "Python", name: "Python" },
+            { id: "learnpython", name: "learnpython" },
+            { id: "coding", name: "coding" },
+            { id: "reactjs", name: "reactjs" },
+            { id: "computerscience", name: "computerscience" },
+            { id: "devops", name: "devops" },
+            { id: "rust", name: "rust" },
+            { id: "csharp", name: "csharp" },
+            { id: "learnjavascript", name: "learnjavascript" },
+            { id: "software", name: "software" },
+            { id: "ExperiencedDevs", name: "ExperiencedDevs" },
+            { id: "iOSProgramming", name: "iOSProgramming" },
+            { id: "reactnative", name: "reactnative" },
+            { id: "SoftwareEngineering", name: "SoftwareEngineering" },
+            { id: "softwaredevelopment", name: "softwaredevelopment" },
+            { id: "AskComputerScience", name: "AskComputerScience" },
+            { id: "coolgithubprojects", name: "coolgithubprojects" },
+            { id: "elixir", name: "elixir" },
+            { id: "Development", name: "Development" }
+          ]
+        },
+        {
+          name: "No-Code",
+          subreddits: [
+            { id: "nocode", name: "nocode" },
+            { id: "webflow", name: "webflow" },
+            { id: "Airtable", name: "Airtable" },
+            { id: "NoCodeSaaS", name: "NoCodeSaaS" },
+            { id: "lowcode", name: "lowcode" },
+            { id: "nocodelowcode", name: "nocodelowcode" },
+            { id: "NoCodeMovement", name: "NoCodeMovement" },
+            { id: "Adalo", name: "Adalo" },
+            { id: "nocodedevelopers", name: "nocodedevelopers" }
+          ]
+        },
+        {
+          name: "Stock Investors",
+          subreddits: [
+            { id: "stocks", name: "stocks" },
+            { id: "Daytrading", name: "Daytrading" },
+            { id: "StockMarket", name: "StockMarket" },
+            { id: "investing", name: "investing" },
+            { id: "finance", name: "finance" },
+            { id: "FinancialCareers", name: "FinancialCareers" },
+            { id: "options", name: "options" },
+            { id: "dividends", name: "dividends" },
+            { id: "Forex", name: "Forex" },
+            { id: "ValueInvesting", name: "ValueInvesting" },
+            { id: "SecurityAnalysis", name: "SecurityAnalysis" },
+            { id: "Trading", name: "Trading" },
+            { id: "StocksAndTrading", name: "StocksAndTrading" },
+            { id: "swingtrading", name: "swingtrading" },
+            { id: "technicalanalysis", name: "technicalanalysis" }
+          ]
+        },
+        {
+          name: "Startup Founders",
+          subreddits: [
+            { id: "Entrepreneur", name: "Entrepreneur" },
+            { id: "business", name: "business" },
+            { id: "smallbusiness", name: "smallbusiness" },
+            { id: "startups", name: "startups" },
+            { id: "EntrepreneurRideAlong", name: "EntrepreneurRideAlong" },
+            { id: "SideProject", name: "SideProject" },
+            { id: "startup", name: "startup" },
+            { id: "SaaS", name: "SaaS" },
+            { id: "Entrepreneurship", name: "Entrepreneurship" },
+            { id: "ycombinator", name: "ycombinator" },
+            { id: "growmybusiness", name: "growmybusiness" },
+            { id: "advancedentrepreneur", name: "advancedentrepreneur" },
+            { id: "Entrepreneurs", name: "Entrepreneurs" },
+            { id: "indiehackers", name: "indiehackers" },
+            { id: "indiebiz", name: "indiebiz" },
+            { id: "startup_resources", name: "startup_resources" }
+          ]
+        },
+        {
+          name: "Designers",
+          subreddits: [
+            { id: "Design", name: "Design" },
+            { id: "graphic_design", name: "graphic_design" },
+            { id: "web_design", name: "web_design" },
+            { id: "typography", name: "typography" },
+            { id: "logodesign", name: "logodesign" },
+            { id: "UI_Design", name: "UI_Design" },
+            { id: "UXDesign", name: "UXDesign" },
+            { id: "userexperience", name: "userexperience" },
+            { id: "UXResearch", name: "UXResearch" },
+            { id: "learndesign", name: "learndesign" },
+            { id: "product_design", name: "product_design" },
+            { id: "UX_Design", name: "UX_Design" },
+            { id: "uidesign", name: "uidesign" }
+          ]
+        },
+        {
+          name: "Marketers",
+          subreddits: [
+            { id: "socialmedia", name: "socialmedia" },
+            { id: "marketing", name: "marketing" },
+            { id: "SEO", name: "SEO" },
+            { id: "digital_marketing", name: "digital_marketing" },
+            { id: "advertising", name: "advertising" },
+            { id: "Affiliatemarketing", name: "Affiliatemarketing" },
+            { id: "PPC", name: "PPC" },
+            { id: "DigitalMarketing", name: "DigitalMarketing" },
+            { id: "content_marketing", name: "content_marketing" },
+            { id: "InstagramMarketing", name: "InstagramMarketing" },
+            { id: "bigseo", name: "bigseo" },
+            { id: "FacebookAds", name: "FacebookAds" },
+            { id: "AskMarketing", name: "AskMarketing" },
+            { id: "Emailmarketing", name: "Emailmarketing" },
+            { id: "googleads", name: "googleads" },
+            { id: "MarketingResearch", name: "MarketingResearch" },
+            { id: "affiliate_marketing", name: "affiliate_marketing" },
+            { id: "OnlineMarketing", name: "OnlineMarketing" }
+          ]
+        },
+        {
+          name: "NFT Collectors",
+          subreddits: [
+            { id: "NFT", name: "NFT" },
+            { id: "NFTsMarketplace", name: "NFTsMarketplace" },
+            { id: "opensea", name: "opensea" },
+            { id: "NFTExchange", name: "NFTExchange" },
+            { id: "NFTmarket", name: "NFTmarket" },
+            { id: "NFTMarketplace", name: "NFTMarketplace" },
+            { id: "OpenSeaNFT", name: "OpenSeaNFT" },
+            { id: "CryptoArt", name: "CryptoArt" },
+            { id: "OpenseaMarket", name: "OpenseaMarket" },
+            { id: "DigitalItems", name: "DigitalItems" },
+            { id: "NftGiveawayOnly", name: "NftGiveawayOnly" },
+            { id: "NFTCollect", name: "NFTCollect" },
+            { id: "NFTgiveaway", name: "NFTgiveaway" },
+            { id: "NFTheaven", name: "NFTheaven" },
+            { id: "AllCryptoBets", name: "AllCryptoBets" },
+            { id: "EtherMining", name: "EtherMining" },
+            { id: "NFT_", name: "NFT_" },
+            { id: "Crypto_General", name: "Crypto_General" },
+            { id: "CryptoInvesting", name: "CryptoInvesting" },
+            { id: "FreeNFTs", name: "FreeNFTs" },
+            { id: "CoinBase", name: "CoinBase" },
+            { id: "cosmosnetwork", name: "cosmosnetwork" }
+          ]
         }
       ];
+      
       setGroups(predefinedGroups);
       localStorage.setItem('redditGroups', JSON.stringify(predefinedGroups));
     }

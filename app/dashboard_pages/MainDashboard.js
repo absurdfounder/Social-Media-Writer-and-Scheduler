@@ -565,7 +565,7 @@ Remember to maintain a consistent voice that's authentic, slightly humorous, and
                 <div className="flex space-x-2 mt-2">
                   <button
                     onClick={() => generateAITweet(tweet.id)}
-                    className="p-1 sm:p-2 flex gap-1 sm:gap-2 rounded-full hover:bg-gray-200 text-xs sm:text-sm"
+                    className="p-1 sm:p-2 flex gap-1 sm:gap-2 rounded-full hover:bg-gray-200 text-xs sm:text-sm hidden"
                     disabled={rewritingTweetId === tweet.id}
                   >
                     {rewritingTweetId === tweet.id ? <Loader size={14} className="animate-spin" /> : <Wand2 size={14} />} Rewrite

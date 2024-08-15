@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, Search, Bell, ChevronDown } from 'lucide-react';
+import { Building2, Users, MessageCircle,  Brain, Menu, X, Twitter, ScanFace, Search, Bell, ChevronDown } from 'lucide-react';
 import MainDashboard from './dashboard_pages/MainDashboard';
 import BuyerList from './dashboard_pages/BuyerList';
 import Ledger from './dashboard_pages/Ledger';
@@ -46,6 +46,7 @@ export default function Dashboard() {
   const navItems = [
     { icon: Twitter, label: 'Build On X', id: 'dashboard' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
+    { icon: Brain, label: 'Preach', id: 'ledger-db' },
   ];
 
   const renderContent = () => {

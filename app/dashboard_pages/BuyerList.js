@@ -834,7 +834,7 @@ const RedditExplorer = () => {
         },
         body: JSON.stringify({
           temperature: 0.7,
-          max_tokens: 500,
+          max_tokens: 8192,
           messages: [{ role: "user", content: `Analyze the following Reddit post. Extract keywords, provide a brief summary, and categorize it into one or more of the following categories: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas.
 
 Title: ${post.title}
@@ -846,7 +846,7 @@ Summary: [A brief 1-2 sentence summary of the post]
 Categories: [comma-separated list of categories from the following options: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas]
 
 Ensure that your analysis is concise and accurately captures the essence of the post. Assign categories based on the content and tone of the post, and you may assign multiple categories if appropriate.`,
-          model: "claude-3-haiku-20240307",
+          model: "claude-3-5-sonnet-20240620",
         }),
       });
 

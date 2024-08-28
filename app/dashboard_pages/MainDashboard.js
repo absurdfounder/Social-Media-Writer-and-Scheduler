@@ -279,7 +279,7 @@ const ThreadWriter = () => {
           max_tokens: 280,
           messages: [{ role: "user", content: `Rewrite the following tweet in a more engaging way, and include suggestions for an image, video, or link to add context: "${tweetToRewrite.content}"` }],
           system: "You are a helpful AI assistant that rewrites tweets to make them more engaging and suggests relevant media to include. For image suggestions, use 'Image: https://placehold.co/600x400?text=Your+Text+Here'. For video suggestions, use 'Video: https://placehold.co/1920x1080.mp4?text=Your+Video+Text+Here'. For link suggestions, use 'Link: https://example.com'. Always include these suggestions after the main content, separated by two newlines.",
-          model: "claude-3-sonnet-20240229",
+          model: "claude-3-5-sonnet-20240620",
         }),
       });
   
@@ -459,7 +459,7 @@ For video suggestions, use 'Video: [https://placehold.co/1920x1080.mp4?text=Your
 Always put these detailed media suggestions on separate lines after the main tweet content.
 
 Remember to maintain a consistent voice that's authentic, slightly humorous, and always focused on providing value to your audience. Each tweet should be able to stand alone while also contributing to your overall brand narrative as an indie founder.`,
-          model: "claude-3-sonnet-20240229",
+          model: "claude-3-5-sonnet-20240620",
         }),
       });
 

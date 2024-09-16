@@ -561,18 +561,18 @@ const ThreadWriter = () => {
 
   return (
     <div className="bg-white rounded-md overflow-hidden">
-      <div className="p-4 border-gray-400 grid items-center mb-4">
+      <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
         <div className='bg-white rounded-md p-2 sm:p-4'>
-          <div className='flex flex-col sm:flex-row sm:justify-between'>
+          <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
             <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
 
-            <div className="inline-flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner">
+            <div className="flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit">
               <button
                 onClick={() => {
                   setMode('share');
                   playSound(toggleSound);
                 }}
-                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                   mode === 'share'
                     ? 'text-white bg-blue-500'
                     : 'text-gray-500 hover:text-gray-500'
@@ -589,7 +589,7 @@ const ThreadWriter = () => {
                   setMode('reply');
                   playSound(toggleSound);
                 }}
-                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                   mode === 'reply'
                     ? 'text-white bg-blue-500'
                     : 'text-gray-500 hover:text-gray-500'
@@ -610,12 +610,12 @@ const ThreadWriter = () => {
             placeholder={mode === 'share' ? "I need to share an update with the community.." : "I want to reply to..."}
             rows={4}
           />
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0">
-            <div className='flex gap-2'>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
+            <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
               <select
                 value={threadType}
                 onChange={(e) => setThreadType(e.target.value)}
-                className="p-2 sm:p-4 rounded-md bg-white text-black border border-gray-300 text-sm sm:text-base w-full sm:w-auto mb-2 sm:mb-0"
+                className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
               >
                 <option value="single">Single Tweet</option>
                 <option value="three">3 Tweet Thread</option>
@@ -625,7 +625,7 @@ const ThreadWriter = () => {
               <select
                 value={feeling}
                 onChange={(e) => setFeeling(e.target.value)}
-                className="p-2 sm:p-4 rounded-md bg-white text-black border border-gray-300 text-sm sm:text-base w-full sm:w-auto mb-2 sm:mb-0"
+                className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
               >
                 <option value="not_specified">Not Specified</option>
                 <option value="curiosity">🤔 Curiosity</option>
@@ -641,46 +641,46 @@ const ThreadWriter = () => {
             </div>
 
             <button
-              className='bg-blue-100 p-2 sm:p-4 rounded-md flex items-center justify-center gap-2 sm:gap-4 text-blue-900 text-sm sm:text-base w-full sm:w-auto'
+              className='bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm w-full sm:w-auto'
               onClick={generateAIThread}
               disabled={isGenerating}
             >
-              {isGenerating ? <Loader size={16} className="animate-spin" /> : <Wand2 size={16} />}
+              {isGenerating ? <Loader size={14} className="animate-spin" /> : <Wand2 size={14} />}
               Generate {threadType === 'single' ? 'Tweet' : 'Thread'}
             </button>
           </div>
-          <div className="flex items-center mt-2 sm:mt-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 gap-2 mt-4">
             <button
               onClick={() => setIncludeProduct(!includeProduct)}
-              className="flex items-center text-blue-500 hover:text-blue-500 text-sm sm:text-base"
+              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm"
             >
-              {includeProduct ? <Circle size={30} /> : <CircleCheckBig size={30} />}
-              <span className="ml-2 flex gap-2 items-center text-slate-500">Include my <i className='flex gap-2 text-blue-500'><Blocks size={20} />product/service</i> with my <i className='flex gap-2 text-blue-500'> <BicepsFlexed size={20} />personal journey</i> </span>
+              {includeProduct ? <Circle size={20} /> : <CircleCheckBig size={20} />}
+              <span className="ml-2 flex gap-1 sm:gap-2 items-center text-slate-500">Include my <i className='flex gap-1 sm:gap-2 text-blue-500'><Blocks size={16} />product/service</i> with my <i className='flex gap-1 sm:gap-2 text-blue-500'> <BicepsFlexed size={16} />personal journey</i> </span>
             </button>
-            <button className='flex gap-2 bg-blue-500 text-white p-1 px-4 rounded-2xl ml-4'>Configure Training Data</button>
+            <button className='flex gap-2 bg-blue-100 text-blue-600 p-1 px-2 sm:px-4 rounded-2xl text-xs sm:text-sm'>Configure Training Data</button>
           </div>
         </div>
       </div>
       <div className='bg-blue-200 p-2 sm:p-4'>
-        <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-8 sm:mb-16 bg-white">
+        <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-4 sm:mb-8 bg-white">
           {tweets.map((tweet, index) => (
             <div key={tweet.key} className="relative border-b border-gray-200 last:border-b-0">
-              <div className="absolute left-0 top-0 -ml-6 sm:-ml-8 mt-2 sm:mt-4 text-xs sm:text-sm font-bold text-white">
+              <div className="absolute left-0 top-0 -ml-4 sm:-ml-6 mt-2 text-xs font-bold text-white">
                 {index + 1}
               </div>
               <div className="p-2 sm:p-4">
                 <div className="flex items-center mb-2 sm:mb-4">
-                  <img src="https://placehold.co/40x40/333333/ffffff?text=U&font=Raleway" alt="User avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 sm:mr-3" />
+                  <img src="https://placehold.co/40x40/333333/ffffff?text=U&font=Raleway" alt="User avatar" className="w-6 h-6 sm:w-8 sm:h-8 rounded-full mr-2" />
                   <div>
-                    <h2 className="font-bold text-sm sm:text-base">John Doe</h2>
-                    <p className="text-gray-500 text-xs sm:text-sm">@johndoe</p>
-                    </div>
+                    <h2 className="font-bold text-xs sm:text-sm">John Doe</h2>
+                    <p className="text-gray-500 text-xs">@johndoe</p>
+                  </div>
                   {tweets.length > 1 && (
                     <button
                       onClick={() => removeTweet(tweet.id)}
                       className="ml-auto text-gray-500 hover:text-red-500"
                     >
-                      <X size={16} />
+                      <X size={14} />
                     </button>
                   )}
                 </div>
@@ -700,10 +700,10 @@ const ThreadWriter = () => {
                 <div className="flex space-x-2 mt-2">
                   <button
                     onClick={() => generateAITweet(tweet.id)}
-                    className="p-1 sm:p-2 flex gap-1 sm:gap-2 rounded-full hover:bg-gray-200 text-xs sm:text-sm hidden"
+                    className="p-1 flex gap-1 rounded-full hover:bg-gray-200 text-xs hidden"
                     disabled={rewritingTweetId === tweet.id}
                   >
-                    {rewritingTweetId === tweet.id ? <Loader size={14} className="animate-spin" /> : <Wand2 size={14} />} Rewrite
+                    {rewritingTweetId === tweet.id ? <Loader size={12} className="animate-spin" /> : <Wand2 size={12} />} Rewrite
                   </button>
                 </div>
               </div>
@@ -712,9 +712,9 @@ const ThreadWriter = () => {
           <div className="p-2 sm:p-4">
             <button
               onClick={addNewTweet}
-              className="flex items-center text-blue-500 hover:text-blue-500 text-sm sm:text-base"
+              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm"
             >
-              <PlusCircle size={16} className="mr-1 sm:mr-2" />
+              <PlusCircle size={14} className="mr-1" />
               Add another tweet
             </button>
           </div>

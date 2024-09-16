@@ -165,7 +165,7 @@ const ProductQuestionnaire = () => {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="mb-6">
-        <h2 className="text-2xl text-center mb-4 text-blue-800">Tell our AI about your offerings</h2>
+        <h2 className="text-2xl text-center mb-4 text-blue-800">Tell our personal journey AI about your offerings</h2>
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setDisplayMode('card')}

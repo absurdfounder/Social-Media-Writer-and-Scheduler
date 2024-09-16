@@ -91,7 +91,7 @@ export default function Dashboard() {
             <Image 
               src={logoSrc}
               alt="Logo"
-              width={150}
+              width={200}
               height={50}
               onError={() => {
                 console.error(`Failed to load image: ${logoSrc}`);

@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { Building2, Users, MessageCircle,  Brain, Menu, X, Twitter, ScanFace, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
-import MainDashboard from './dashboard_pages/MainDashboard';
+import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
 import BuyerList from './dashboard_pages/BuyerList';
 import Ledger from './dashboard_pages/Ledger';
 import Commissions from './dashboard_pages/Commissions';
@@ -50,10 +49,14 @@ export default function Dashboard() {
     { icon: Shapes, label: 'Trained On', id: 'commissions' },
   ];
 
+  const handleConfigureTrainingData = () => {
+    setActiveTab('commissions');
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <ThreadWriter />;
+        return <ThreadWriter onConfigureTrainingData={handleConfigureTrainingData} />;
       case 'partylist-db':
         return <BuyerList />;
       case 'ledger-db':
@@ -135,8 +138,6 @@ export default function Dashboard() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 rounded-md">
-
-
           {/* Page content */}
           <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">{navItems.find(item => item.id === activeTab)?.label}</h2>

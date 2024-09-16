@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -139,7 +141,8 @@ const TweetContent = ({ images, links, videos }) => {
   );
 };
 
-const ThreadWriter = () => {
+const ThreadWriter = ({ onConfigureTrainingData }) => {
+  const [isBrowser, setIsBrowser] = useState(false);
   const [tweets, setTweets] = useState([{ id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [overallPrompt, setOverallPrompt] = useState('');
@@ -150,19 +153,22 @@ const ThreadWriter = () => {
   const [mode, setMode] = useState('share');
   const [feeling, setFeeling] = useState('not_specified');
 
-  const receivedSound = new Audio('https://dazzling-cat.netlify.app/recievedmsg.mp3');
-  const sentSound = new Audio('https://dazzling-cat.netlify.app/sendmsg1.mp3');
-  const toggleSound = new Audio('https://dazzling-cat.netlify.app/sendmsg2.mp3');
-
   useEffect(() => {
+    setIsBrowser(true);
     const storedProductInfo = localStorage.getItem('productQuestionnaire');
     if (storedProductInfo) {
       setProductInfo(JSON.parse(storedProductInfo));
     }
   }, []);
 
+  const receivedSound = isBrowser ? new Audio('https://dazzling-cat.netlify.app/recievedmsg.mp3') : null;
+  const sentSound = isBrowser ? new Audio('https://dazzling-cat.netlify.app/sendmsg1.mp3') : null;
+  const toggleSound = isBrowser ? new Audio('https://dazzling-cat.netlify.app/sendmsg2.mp3') : null;
+
   const playSound = (sound) => {
-    sound.play().catch(error => console.error('Error playing sound:', error));
+    if (isBrowser && sound) {
+      sound.play().catch(error => console.error('Error playing sound:', error));
+    }
   };
 
   const addNewTweet = () => {
@@ -657,7 +663,12 @@ const ThreadWriter = () => {
               {includeProduct ? <Circle size={20} /> : <CircleCheckBig size={20} />}
               <span className="ml-2 flex gap-1 sm:gap-2 items-center text-slate-500">Include my <i className='flex gap-1 sm:gap-2 text-blue-500'><Blocks size={16} />product/service</i> with my <i className='flex gap-1 sm:gap-2 text-blue-500'> <BicepsFlexed size={16} />personal journey</i> </span>
             </button>
-            <button className='flex gap-2 bg-blue-100 text-blue-600 p-1 px-2 sm:px-4 rounded-2xl text-xs sm:text-sm'>Configure Training Data</button>
+            <button 
+              className='flex gap-2 bg-blue-100 text-blue-600 p-1 px-2 sm:px-4 rounded-2xl text-xs sm:text-sm'
+              onClick={onConfigureTrainingData}
+            >
+              Configure Training Data
+            </button>
           </div>
         </div>
       </div>

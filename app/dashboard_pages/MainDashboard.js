@@ -63,19 +63,19 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
       <div className="flex space-x-2 mt-2">
         <button
           onClick={onImageUpload}
-          className="p-2 rounded-full hover:bg-gray-200"
+          className="p-2 rounded-full hover:bg-gray-100"
         >
           <ImageIcon size={20} />
         </button>
         <button
           onClick={onVideoUpload}
-          className="p-2 rounded-full hover:bg-gray-200"
+          className="p-2 rounded-full hover:bg-gray-100"
         >
           <Video size={20} />
         </button>
         <button
           onClick={onLinkAdd}
-          className="p-2 rounded-full hover:bg-gray-200"
+          className="p-2 rounded-full hover:bg-gray-100"
         >
           <LinkIcon size={20} />
         </button>
@@ -655,13 +655,13 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
               Generate {threadType === 'single' ? 'Tweet' : 'Thread'}
             </button>
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 gap-2 mt-4">
+          <div className="flex flex-col sm:flex-row items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 gap-2 mt-4">
             <button
               onClick={() => setIncludeProduct(!includeProduct)}
-              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm"
+              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm gap-4"
             >
               {includeProduct ? <Circle size={20} /> : <CircleCheckBig size={20} />}
-              <span className="flex items-center mt-4 gap-4 text-slate-500">
+              <span className="flex items-center gap-2 text-slate-500">
                 Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
                   <i className='flex gap-1 sm:gap-2 text-blue-500'>
                     <Blocks size={16} />product/service
@@ -690,10 +690,10 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
               </div>
               <div className="p-2 sm:p-4">
                 <div className="flex items-center mb-2 sm:mb-4">
-                  <img src="https://placehold.co/40x40/333333/ffffff?text=U&font=Raleway" alt="User avatar" className="w-6 h-6 sm:w-8 sm:h-8 rounded-full mr-2" />
+                  <img src="https://placehold.co/40x40/333333/ffffff?text=B&font=Raleway" alt="User avatar" className="w-6 h-6 sm:w-8 sm:h-8 rounded-full mr-2" />
                   <div>
-                    <h2 className="font-bold text-xs sm:text-sm">John Doe</h2>
-                    <p className="text-gray-500 text-xs">@johndoe</p>
+                    <h2 className="font-bold text-xs sm:text-sm">Big Mouth</h2>
+                    <p className="text-gray-500 text-xs">@absurdfounder</p>
                   </div>
                   {tweets.length > 1 && (
                     <button
@@ -732,7 +732,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
           <div className="p-2 sm:p-4">
             <button
               onClick={addNewTweet}
-              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm"
+              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm gap-4"
             >
               <PlusCircle size={14} className="mr-1" />
               Add another tweet

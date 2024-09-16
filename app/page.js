@@ -128,7 +128,7 @@ export default function Dashboard() {
                 className="rounded-full"
               />
               <div className="flex-grow">
-                <span className="block font-medium text-sm">John Doe</span>
+                <span className="block font-medium text-sm">Big Mouth</span>
                 <span className="block text-xs text-gray-500">john@example.com</span>
               </div>
               <ChevronDown className="h-4 w-4 text-gray-400" />

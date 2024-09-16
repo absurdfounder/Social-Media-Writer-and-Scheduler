@@ -16,8 +16,8 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${
       active 
-        ? 'bg-blue-100 text-blue-700' 
-        : 'text-gray-600 hover:bg-gray-100'
+        ? 'bg-blue-100 text-blue-500' 
+        : 'text-gray-500 hover:bg-gray-100'
     }`}
     onClick={onClick}
   >
@@ -95,7 +95,7 @@ export default function Dashboard() {
                 setLogoSrc('logo.png'); // Fallback to default logo
               }}
             />
-            <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-700">
+            <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-500">
               <X className="h-6 w-6" />
             </button>
           </div>

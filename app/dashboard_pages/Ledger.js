@@ -70,20 +70,20 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
                 onChange={(e) => setEditingTag(e.target.value)}
                 className="px-1 py-0 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
               />
-              <button onClick={() => handleEditTag(index)} className="ml-1 text-green-600">
+              <button onClick={() => handleEditTag(index)} className="ml-1 text-green-500">
                 <Check size={12} />
               </button>
-              <button onClick={() => setEditingIndex(null)} className="ml-1 text-red-600">
+              <button onClick={() => setEditingIndex(null)} className="ml-1 text-red-500">
                 <X size={12} />
               </button>
             </>
           ) : (
             <>
               {tag}
-              <button onClick={() => { setEditingIndex(index); setEditingTag(tag); }} className="ml-1 text-blue-600">
+              <button onClick={() => { setEditingIndex(index); setEditingTag(tag); }} className="ml-1 text-blue-500">
                 <Pencil size={12} />
               </button>
-              <button onClick={() => onDeleteTag(index)} className="ml-1 text-red-600">
+              <button onClick={() => onDeleteTag(index)} className="ml-1 text-red-500">
                 <X size={12} />
               </button>
             </>
@@ -101,7 +101,7 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
           />
           <button
             onClick={handleAddTag}
-            className="px-2 py-1 bg-blue-500 text-white rounded-r-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-2 py-1 bg-blue-500 text-white rounded-r-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
           >
             <Check size={16} />
           </button>
@@ -109,7 +109,7 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
       ) : (
         <button
           onClick={() => setIsAdding(true)}
-          className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           <Plus size={16} />
         </button>
@@ -148,13 +148,13 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
           />
           <div className="flex justify-end mt-2 space-x-2">
             <button
-              className="p-1 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300"
+              className="p-1 rounded-full bg-green-500 text-white hover:bg-green-500 transition-colors duration-300"
               onClick={handleSave}
             >
               <Check size={16} />
             </button>
             <button
-              className="p-1 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors duration-300"
+              className="p-1 rounded-full bg-red-500 text-white hover:bg-red-500 transition-colors duration-300"
               onClick={handleCancel}
             >
               <X size={16} />
@@ -165,7 +165,7 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
         <div>
           <p className="text-gray-800 font-handwriting">{note || "No note added yet."}</p>
           <button
-            className="mt-2 p-1 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-300"
+            className="mt-2 p-1 rounded-full bg-blue-500 text-white hover:bg-blue-500 transition-colors duration-300"
             onClick={() => setIsEditing(true)}
           >
             <Pencil size={16} />
@@ -199,7 +199,7 @@ const AddTweetForm = ({ onAdd }) => {
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           Embed Tweet
         </button>
@@ -225,7 +225,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, message }) => {
           </button>
           <button 
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500"
           >
             Confirm
           </button>
@@ -287,7 +287,7 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
           />
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="flex gap-2 items-center mt-4 p-2 bg-red-100 text-red-400 rounded-full hover:bg-red-600 transition-colors duration-300"
+            className="flex gap-2 items-center mt-4 p-2 bg-red-100 text-red-400 rounded-full hover:bg-red-500 transition-colors duration-300"
           >
             <Trash2 size={16} />
             Remove Tweet

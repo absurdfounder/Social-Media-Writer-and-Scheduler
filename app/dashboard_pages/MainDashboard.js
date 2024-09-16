@@ -106,7 +106,7 @@ const LinkPreview = ({ url }) => {
       {preview.image && <img src={preview.image} alt={preview.title} className="w-full h-32 object-cover" />}
       <div className="p-2">
         <h3 className="font-bold">{preview.title}</h3>
-        <p className="text-sm text-gray-600">{preview.description}</p>
+        <p className="text-sm text-gray-500">{preview.description}</p>
         <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-sm">
           {url}
         </a>
@@ -147,6 +147,7 @@ const ThreadWriter = () => {
   const [threadType, setThreadType] = useState('single');
   const [includeProduct, setIncludeProduct] = useState(false);
   const [productInfo, setProductInfo] = useState(null);
+  const [mode, setMode] = useState('share');
 
   useEffect(() => {
     const storedProductInfo = localStorage.getItem('productQuestionnaire');
@@ -378,7 +379,7 @@ const ThreadWriter = () => {
           As a solo founder we can write about:
 
           Technical tips with actionable code snippets 
-Personal journey updates that showcase growth and lessons learned
+          Personal journey updates that showcase growth and lessons learned
           Work/life balance insights that highlight the indie founder lifestyle
           Lessons learned from mistakes or challenges overcome
           Content strategy insights that provide value to other creators
@@ -519,18 +520,47 @@ Personal journey updates that showcase growth and lessons learned
         <div className='bg-white rounded-md p-2 sm:p-4'>
           <div className='flex flex-col sm:flex-row sm:justify-between'>
             <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
+
+            <div className="inline-flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner">
+              <button
+                onClick={() => setMode('share')}
+                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                  mode === 'share'
+                    ? 'text-white bg-blue-500'
+                    : 'text-gray-500 hover:text-gray-500'
+                }`}
+                aria-pressed={mode === 'share'}
+              >
+                <span className="relative z-10">Share</span>
+                {mode === 'share' && (
+                  <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />
+                )}
+              </button>
+              <button
+                onClick={() => setMode('reply')}
+                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                  mode === 'reply'
+                    ? 'text-white bg-blue-500'
+                    : 'text-gray-500 hover:text-gray-500'
+                }`}
+                aria-pressed={mode === 'reply'}
+              >
+                <span className="relative z-10">Reply</span>
+                {mode === 'reply' && (
+                  <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />
+                )}
+              </button>
+            </div>
           </div>
           <textarea
             className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-blue-50 text-blue-900 text-sm sm:text-base'
             value={overallPrompt}
             onChange={(e) => setOverallPrompt(e.target.value)}
-            placeholder="I need to share an update with the community.."
+            placeholder={mode === 'share' ? "I need to share an update with the community.." : "I want to reply to..."}
             rows={4}
           />
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0">
-
             <div className='flex gap-2'>
-
               <select
                 value={threadType}
                 onChange={(e) => setThreadType(e.target.value)}
@@ -554,7 +584,6 @@ Personal journey updates that showcase growth and lessons learned
                 <option value="hope">Feeling Hopeful</option>
                 <option value="fear">Show Fear</option>
               </select>
-
             </div>
 
             <button
@@ -569,12 +598,12 @@ Personal journey updates that showcase growth and lessons learned
           <div className="flex items-center mt-2 sm:mt-4">
             <button
               onClick={() => setIncludeProduct(!includeProduct)}
-              className="flex items-center text-blue-500 hover:text-blue-600 text-sm sm:text-base"
+              className="flex items-center text-blue-500 hover:text-blue-500 text-sm sm:text-base"
             >
               {includeProduct ? <Circle size={30} /> : <CircleCheckBig size={30} />}
-              <span className="ml-2 flex gap-2 items-center text-slate-600">Include my <u className='flex gap-2 text-blue-500'><Blocks size={20} />product/service</u> with my <u className='flex gap-2 text-blue-500'> <BicepsFlexed size={20} />personal journey</u> </span>
+              <span className="ml-2 flex gap-2 items-center text-slate-500">Include my <u className='flex gap-2 text-blue-500'><Blocks size={20} />product/service</u> with my <u className='flex gap-2 text-blue-500'> <BicepsFlexed size={20} />personal journey</u> </span>
             </button>
-            <button className='flex gap-2 bg-blue-600 text-white p-1 px-4 rounded-2xl ml-4'>Configure Training Data</button>
+            <button className='flex gap-2 bg-blue-500 text-white p-1 px-4 rounded-2xl ml-4'>Configure Training Data</button>
           </div>
         </div>
       </div>
@@ -629,7 +658,7 @@ Personal journey updates that showcase growth and lessons learned
           <div className="p-2 sm:p-4">
             <button
               onClick={addNewTweet}
-              className="flex items-center text-blue-500 hover:text-blue-600 text-sm sm:text-base"
+              className="flex items-center text-blue-500 hover:text-blue-500 text-sm sm:text-base"
             >
               <PlusCircle size={16} className="mr-1 sm:mr-2" />
               Add another tweet

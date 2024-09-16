@@ -103,23 +103,23 @@ const ProductQuestionnaire = () => {
   const renderCardView = () => (
     <div className="bg-white shadow-lg rounded-xl overflow-hidden transition-all duration-500 ease-out transform hover:scale-105">
       <div className="p-8">
-        <h3 className="text-xl font-semibold mb-4 text-gray-700">
+        <h3 className="text-xl font-semibold mb-4 text-gray-500">
           Question {currentQuestion + 1} of {questions.length}
         </h3>
-        <p className="text-lg text-gray-600 mb-4">{replaceContext(questions[currentQuestion].question)}</p>
+        <p className="text-lg text-gray-500 mb-4">{replaceContext(questions[currentQuestion].question)}</p>
         {getInputComponent(questions[currentQuestion].type, questions[currentQuestion].limit, questions[currentQuestion].id)}
       </div>
       <div className="px-8 py-4 bg-gray-50 flex justify-between items-center">
         <button
           onClick={handlePrevious}
           disabled={currentQuestion === 0}
-          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-300 transition duration-200 ease-in-out"
+          className="px-6 py-2 bg-gray-200 text-gray-500 rounded-lg disabled:opacity-50 hover:bg-gray-300 transition duration-200 ease-in-out"
         >
           Previous
         </button>
         <button
           onClick={handleSaveAndNext}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out flex items-center"
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition duration-200 ease-in-out flex items-center"
         >
           {currentQuestion === questions.length - 1 ? 'Finish' : 'Save & Next'}
           {saved && (
@@ -136,7 +136,7 @@ const ProductQuestionnaire = () => {
     <div className="bg-white shadow-lg rounded-xl overflow-hidden">
       {questions.map((q, index) => (
         <div key={q.id} className="p-6 border-b border-gray-200 last:border-b-0">
-          <h3 className="text-lg font-semibold mb-2 text-gray-700">
+          <h3 className="text-lg font-semibold mb-2 text-gray-500">
             Question {index + 1}: {replaceContext(q.question)}
           </h3>
           {getInputComponent(q.type, q.limit, q.id)}
@@ -149,7 +149,7 @@ const ProductQuestionnaire = () => {
             setSaved(true);
             setTimeout(() => setSaved(false), 1000);
           }}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out flex items-center"
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition duration-200 ease-in-out flex items-center"
         >
           Save All
           {saved && (
@@ -169,20 +169,20 @@ const ProductQuestionnaire = () => {
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setDisplayMode('card')}
-            className={`px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+            className={`px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'}`}
           >
             Card View
           </button>
           <button
             onClick={() => setDisplayMode('list')}
-            className={`px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+            className={`px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'}`}
           >
             List View
           </button>
         </div>
         {displayMode === 'card' && (
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
+            <div className="bg-blue-500 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
           </div>
         )}
       </div>

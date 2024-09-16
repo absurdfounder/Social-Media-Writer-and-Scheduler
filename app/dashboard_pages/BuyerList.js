@@ -11,7 +11,7 @@ import {
 
 const Tab = ({ label, active, onClick, icon: Icon }) => (
   <button
-    className={`px-2 sm:px-4 py-2 ${active ? 'bg-blue-200 text-blue-800' : 'bg-gray-50 text-gray-700 hover:bg-gray-300'
+    className={`px-2 sm:px-4 py-2 ${active ? 'bg-blue-200 text-blue-800' : 'bg-gray-50 text-gray-500 hover:bg-gray-300'
       } rounded-t-lg transition-colors duration-200 flex items-center text-xs sm:text-sm`}
     onClick={onClick}
   >
@@ -44,7 +44,7 @@ const LinkPreview = ({ url }) => {
       {preview.image && <img src={preview.image} alt={preview.title} className="w-full h-32 object-cover" />}
       <div className="p-2">
         <h3 className="font-bold">{preview.title}</h3>
-        <p className="text-sm text-gray-600">{preview.description}</p>
+        <p className="text-sm text-gray-500">{preview.description}</p>
         <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-sm">
           {url}
         </a>
@@ -1180,14 +1180,14 @@ Ensure that your analysis is concise and accurately captures the essence of the 
       <h3 className="text-lg font-semibold mb-2">Post Ideas</h3>
       {isGeneratingIdeas ? (
         <div className="text-center p-4">
-          <p className="text-gray-600">Generating post ideas for these subreddits...please wait...</p>
+          <p className="text-gray-500">Generating post ideas for these subreddits...please wait...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {postIdeas.map((idea, index) => (
             <div key={index} className="bg-white rounded-lg shadow p-4">
-              <h4 className="font-semibold text-blue-600">{idea.title}</h4>
-              <p className="text-sm text-gray-600 mt-2">{idea.description}</p>
+              <h4 className="font-semibold text-blue-500">{idea.title}</h4>
+              <p className="text-sm text-gray-500 mt-2">{idea.description}</p>
             </div>
           ))}
         </div>
@@ -1199,7 +1199,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
     <div>
       <h3 className="text-lg font-semibold mb-2">Comments</h3>
       {commentSuggestions[selectedPost.id] && (
-        <div className="bg-blue-100 border border-blue-500 text-blue-700 px-4 py-3 rounded relative mb-4">
+        <div className="bg-blue-100 border border-blue-500 text-blue-500 px-4 py-3 rounded relative mb-4">
           <strong className="font-bold">Suggested Comment: </strong>
           <span className="block sm:inline">{commentSuggestions[selectedPost.id]}</span>
         </div>
@@ -1228,7 +1228,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
   if (loading && communities.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <RefreshCcw className="w-8 h-8 animate-spin text-blue-600" />
+        <RefreshCcw className="w-8 h-8 animate-spin text-blue-500" />
       </div>
     );
   }
@@ -1244,7 +1244,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
   return (
     <div className="bg-gray-100 min-h-screen">
       {errorMessage && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div className="bg-red-100 border border-red-400 text-red-500 px-4 py-3 rounded relative mb-4" role="alert">
           <strong className="font-bold">Error! </strong>
           <span className="block sm:inline">{errorMessage}</span>
         </div>
@@ -1279,7 +1279,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                     {['Community', 'Members', 'Weekly', 'Monthly'].map((header) => (
                       <th
                         key={header}
-                        className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer"
+                        className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                         onClick={() => handleSort(header.toLowerCase().replace(' ', ''))}
                       >
                         <div className="flex items-center">
@@ -1304,10 +1304,10 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                   <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500">
                     {community.subscribersCount.toLocaleString()}
                   </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-600">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
                     +{community.growthPerWeek.toLocaleString()}
                   </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-600">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
                     +{community.growthPerMonth.toLocaleString()}
                   </td>
                 </tr>
@@ -1326,7 +1326,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
             </h6>
             <button
               onClick={() => setShowGroupPopup(true)}
-              className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+              className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
             >
               <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Create Group
@@ -1344,17 +1344,17 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                   <span>{group.name}</span>
                   <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 mb-2">
+                <p className="text-xs sm:text-sm text-gray-500 mb-2">
                   {group.subreddits.length} subreddit{group.subreddits.length !== 1 ? 's' : ''}
                 </p>
                 <div className="flex flex-wrap gap-1 sm:gap-2">
                   {group.subreddits.slice(0, 5).map((subreddit) => (
-                    <span key={subreddit.id} className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs">
+                    <span key={subreddit.id} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
                       {subreddit.name}
                     </span>
                   ))}
                   {group.subreddits.length > 5 && (
-                    <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs">
+                    <span className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
                       +{group.subreddits.length - 5} more
                     </span>
                   )}
@@ -1373,7 +1373,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
               setSelectedGroup(null);
               setSelectedPost(null);
             }}
-            className="mb-4 px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+            className="mb-4 px-3 sm:px-4 py-2 bg-gray-200 text-gray-500 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center text-xs sm:text-sm"
           >
             <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             Back to {activeTab === 'groups' ? 'Groups' : 'Communities'}
@@ -1411,7 +1411,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                 className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center ${
                   activeFilter === (badge.label === 'All' ? 'all' : badge.label)
                     ? 'bg-blue-200 text-blue-800'
-                    : 'bg-white border text-gray-700'
+                    : 'bg-white border text-gray-500'
                 }`}
               >
                 <badge.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -1421,8 +1421,8 @@ Ensure that your analysis is concise and accurately captures the essence of the 
           </div>
           {isAnalyzing && (
             <div className="text-center p-4">
-              <RefreshCcw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-600 mx-auto" />
-              <p className="mt-2 text-gray-600 text-sm sm:text-base">Fetching and Analyzing posts...</p>
+              <RefreshCcw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-500 mx-auto" />
+              <p className="mt-2 text-gray-500 text-sm sm:text-base">Fetching and Analyzing posts...</p>
             </div>
           )}
           {!isAnalyzing && !selectedPost && (
@@ -1439,7 +1439,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                           <span>{post.created}</span>
                         </div>
                         <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">{post.title}</h3>
-                        {post.summary && <p className="text-xs sm:text-sm text-gray-600 mb-2">{post.summary}</p>}
+                        {post.summary && <p className="text-xs sm:text-sm text-gray-500 mb-2">{post.summary}</p>}
                         {post.categories && (
                           <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
                             {post.categories.map((category, index) => (
@@ -1452,13 +1452,13 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                         {post.keywords && (
                           <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
                             {post.keywords.slice(0, 5).map((keyword, index) => (
-                              <span key={index} className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs">
+                              <span key={index} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
                                 {keyword}
                               </span>
                             ))}
                           </div>
                         )}
-                        <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                        <div className="flex items-center text-xs sm:text-sm text-gray-500">
                           <span className="mr-4 flex items-center"><Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.score}</span>
                           <span className="flex items-center"><MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.numComments}</span>
                         </div>
@@ -1472,7 +1472,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
             <div className="bg-white rounded-lg shadow p-4 sm:p-6">
               <button
                 onClick={() => setSelectedPost(null)}
-                className="mb-4 text-blue-500 hover:text-blue-600 flex items-center text-sm sm:text-base"
+                className="mb-4 text-blue-500 hover:text-blue-500 flex items-center text-sm sm:text-base"
               >
                 <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Back to posts
@@ -1486,7 +1486,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                 {postContent}
               </div>
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                <div className="flex items-center text-xs sm:text-sm text-gray-500">
                   <span className="mr-4 flex items-center"><Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {selectedPost.score}</span>
                   <span className="flex items-center"><MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {selectedPost.numComments}</span>
                 </div>
@@ -1494,7 +1494,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                   href={selectedPost.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                  className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
                 >
                   View on Reddit
                   <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
@@ -1513,7 +1513,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
       <div className="bg-white rounded-lg p-4 sm:p-6 w-full sm:w-3/4 max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Create New Group</h2>
-          <button onClick={() => setShowGroupPopup(false)} className="text-gray-500 hover:text-gray-700">
+          <button onClick={() => setShowGroupPopup(false)} className="text-gray-500 hover:text-gray-500">
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
@@ -1538,13 +1538,13 @@ Ensure that your analysis is concise and accurately captures the essence of the 
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Select
                 </th>
-                <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Subreddit
                     </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Members
                     </th>
                   </tr>
@@ -1559,7 +1559,7 @@ Ensure that your analysis is concise and accurately captures the essence of the 
                             type="checkbox"
                             checked={selectedSubredditsForGroup.some(s => s.id === community.id)}
                             onChange={() => handleSubredditSelection(community)}
-                            className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-blue-600"
+                            className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-blue-500"
                           />
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
@@ -1576,14 +1576,14 @@ Ensure that your analysis is concise and accurately captures the essence of the 
             <div className="flex justify-end space-x-2 sticky bottom-0 bg-white py-4">
               <button
                 onClick={() => setShowGroupPopup(false)}
-                className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-500 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center text-xs sm:text-sm"
               >
                 <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Cancel
               </button>
               <button
                 onClick={handleCreateGroup}
-                className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
               >
                 <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Save Group

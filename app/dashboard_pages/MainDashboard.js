@@ -311,7 +311,6 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   
       let promptContent = overallPrompt;
       
-      // Include product/service information from localStorage if the option is enabled
       if (includeProduct) {
         const storedProductInfo = localStorage.getItem('productQuestionnaire');
         if (storedProductInfo) {
@@ -340,7 +339,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
       2. "I can relate to your struggle with [problem]. Last year, I faced a similar challenge and found that [solution] really helped. What strategies have you tried so far?"
   
       3. "Your success with [achievement] is inspiring! It reminds me of when I [similar experience]. What's the next big goal you're aiming for?"
-      ` :''}
+      ` : ''}
   
       Start with a strong hook or attention-grabbing statement
       Use simple, concise language that conveys your message quickly
@@ -482,7 +481,10 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 1000,
-          messages: [{ role: "user", content: `Generate a ${threadType === 'single' ? 'single tweet' : `thread of ${maxTweets} tweets`} about the following ${mode === 'share' ? 'update' : 'reply'}, including suggestions for images, videos, or links to add context: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet no extra text , Dont use emojis unless its asked , Dont write numbers infront of each tweet. One media image or video. decide how it should be, in the url provide text what the image should be about or what to show what to add etc; spacing breaks etc is what makes the tweet stand out.` }],
+          messages: [{ 
+            role: "user", 
+            content: `${mode === 'reply' ? 'Generate a reply' : 'Generate a new tweet or thread'} ${threadType === 'single' ? '(single tweet)' : `(thread of ${maxTweets} tweets)`} ${mode === 'reply' ? 'in response to' : 'about'} the following ${mode === 'share' ? 'update' : 'tweet'}: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet content without any extra text. Don't use emojis unless specifically requested. Don't write numbers in front of each tweet. Include one media suggestion (image or video) per tweet. In the URL, provide text describing what the image or video should show. Use spacing and line breaks to make the tweet stand out.`
+          }],
           system: systemPrompt,
           model: "claude-3-5-sonnet-20240620",
         }),

@@ -661,13 +661,13 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
               className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm"
             >
               {includeProduct ? <Circle size={20} /> : <CircleCheckBig size={20} />}
-              <span className="ml-2 flex gap-1 sm:gap-2 items-center text-slate-500">Include my <i className='flex gap-1 sm:gap-2 text-blue-500'><Blocks size={16} />product/service</i> with my <i className='flex gap-1 sm:gap-2 text-blue-500'> <BicepsFlexed size={16} />personal journey</i> </span>
+              <span className="ml-2 flex gap-1 sm:gap-2 items-center text-slate-500">Include my <span className='lg:block sm:none'><i className='flex gap-1 sm:gap-2 text-blue-500'><Blocks size={16} />product/service</i> with my <i className='flex gap-1 sm:gap-2 text-blue-500'> <BicepsFlexed size={16} />personal journey</i></span> </span>
             </button>
             <button 
               className='flex gap-2 bg-blue-100 text-blue-600 p-1 px-2 sm:px-4 rounded-2xl text-xs sm:text-sm'
               onClick={onConfigureTrainingData}
             >
-              Configure Training Data
+              Training Data
             </button>
           </div>
         </div>

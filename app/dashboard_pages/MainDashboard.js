@@ -661,7 +661,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
               className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm"
             >
               {includeProduct ? <Circle size={20} /> : <CircleCheckBig size={20} />}
-              <span className="ml-2 flex gap-1 sm:gap-2 items-center text-slate-500">
+              <span className="flex items-center mt-4 gap-4 text-slate-500">
                 Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
                   <i className='flex gap-1 sm:gap-2 text-blue-500'>
                     <Blocks size={16} />product/service

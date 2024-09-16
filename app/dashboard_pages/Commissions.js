@@ -24,6 +24,7 @@ const ProductQuestionnaire = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [saved, setSaved] = useState(false);
+  const [displayMode, setDisplayMode] = useState('card'); // 'card' or 'list'
 
   useEffect(() => {
     const savedAnswers = localStorage.getItem('productQuestionnaire');
@@ -32,8 +33,9 @@ const ProductQuestionnaire = () => {
     }
   }, []);
 
-  const handleAnswer = (answer) => {
-    setAnswers(prev => ({ ...prev, [questions[currentQuestion].id]: answer }));
+  const handleAnswer = (answer, questionId = null) => {
+    const id = questionId || questions[currentQuestion].id;
+    setAnswers(prev => ({ ...prev, [id]: answer }));
   };
 
   const handleSaveAndNext = () => {
@@ -57,11 +59,11 @@ const ProductQuestionnaire = () => {
     return question.replace(/\[NAME\]/g, answers.name || 'your product/service');
   };
 
-  const getInputComponent = (type, limit) => {
-    const value = answers[questions[currentQuestion].id] || '';
+  const getInputComponent = (type, limit, questionId) => {
+    const value = answers[questionId] || '';
     const handleChange = (e) => {
       const newValue = e.target.value.slice(0, limit);
-      handleAnswer(newValue);
+      handleAnswer(newValue, questionId);
     };
 
     if (type === "long") {
@@ -98,43 +100,93 @@ const ProductQuestionnaire = () => {
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
+  const renderCardView = () => (
+    <div className="bg-white shadow-lg rounded-xl overflow-hidden transition-all duration-500 ease-out transform hover:scale-105">
+      <div className="p-8">
+        <h3 className="text-xl font-semibold mb-4 text-gray-700">
+          Question {currentQuestion + 1} of {questions.length}
+        </h3>
+        <p className="text-lg text-gray-600 mb-4">{replaceContext(questions[currentQuestion].question)}</p>
+        {getInputComponent(questions[currentQuestion].type, questions[currentQuestion].limit, questions[currentQuestion].id)}
+      </div>
+      <div className="px-8 py-4 bg-gray-50 flex justify-between items-center">
+        <button
+          onClick={handlePrevious}
+          disabled={currentQuestion === 0}
+          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-300 transition duration-200 ease-in-out"
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleSaveAndNext}
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out flex items-center"
+        >
+          {currentQuestion === questions.length - 1 ? 'Finish' : 'Save & Next'}
+          {saved && (
+            <svg className="w-5 h-5 ml-2 text-green-300" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+              <path d="M5 13l4 4L19 7"></path>
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderListView = () => (
+    <div className="bg-white shadow-lg rounded-xl overflow-hidden">
+      {questions.map((q, index) => (
+        <div key={q.id} className="p-6 border-b border-gray-200 last:border-b-0">
+          <h3 className="text-lg font-semibold mb-2 text-gray-700">
+            Question {index + 1}: {replaceContext(q.question)}
+          </h3>
+          {getInputComponent(q.type, q.limit, q.id)}
+        </div>
+      ))}
+      <div className="px-8 py-4 bg-gray-50 flex justify-end">
+        <button
+          onClick={() => {
+            localStorage.setItem('productQuestionnaire', JSON.stringify(answers));
+            setSaved(true);
+            setTimeout(() => setSaved(false), 1000);
+          }}
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out flex items-center"
+        >
+          Save All
+          {saved && (
+            <svg className="w-5 h-5 ml-2 text-green-300" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+              <path d="M5 13l4 4L19 7"></path>
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl text-center mb-4 text-blue-800">Tell our AI about your offerings</h2>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div className="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
-        </div>
-      </div>
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden transition-all duration-500 ease-out transform hover:scale-105">
-        <div className="p-8">
-          <h3 className="text-xl font-semibold mb-4 text-gray-700">
-            Question {currentQuestion + 1} of {questions.length}
-          </h3>
-          <p className="text-lg text-gray-600 mb-4">{replaceContext(questions[currentQuestion].question)}</p>
-          {getInputComponent(questions[currentQuestion].type, questions[currentQuestion].limit)}
-        </div>
-        <div className="px-8 py-4 bg-gray-50 flex justify-between items-center">
+        <div className="flex justify-center mb-4">
           <button
-            onClick={handlePrevious}
-            disabled={currentQuestion === 0}
-            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-300 transition duration-200 ease-in-out"
+            onClick={() => setDisplayMode('card')}
+            className={`px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
           >
-            Previous
+            Card View
           </button>
           <button
-            onClick={handleSaveAndNext}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out flex items-center"
+            onClick={() => setDisplayMode('list')}
+            className={`px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
           >
-            {currentQuestion === questions.length - 1 ? 'Finish' : 'Save & Next'}
-            {saved && (
-              <svg className="w-5 h-5 ml-2 text-green-300" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                <path d="M5 13l4 4L19 7"></path>
-              </svg>
-            )}
+            List View
           </button>
         </div>
+        {displayMode === 'card' && (
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
+          </div>
+        )}
       </div>
+      {displayMode === 'card' ? renderCardView() : renderListView()}
     </div>
   );
 };

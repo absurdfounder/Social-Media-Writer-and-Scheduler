@@ -3,7 +3,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { PlusCircle, X, Smile, Image as ImageIcon, Link as LinkIcon, Wand2, FileText, Video, Loader, ToggleLeft, ToggleRight } from 'lucide-react';
+import { PlusCircle, X, Smile, Image as ImageIcon, Link as LinkIcon, Wand2, FileText, Video, Loader, ToggleLeft, ToggleRight, Circle, CircleCheck, Blocks, BicepsFlexed, CircleCheckBig } from 'lucide-react';
 
 const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkAdd }) => {
   const [isClient, setIsClient] = useState(false);
@@ -520,7 +520,7 @@ Personal journey updates that showcase growth and lessons learned
           <div className='flex flex-col sm:flex-row sm:justify-between'>
             <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
           </div>
-          <textarea 
+          <textarea
             className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-blue-50 text-blue-900 text-sm sm:text-base'
             value={overallPrompt}
             onChange={(e) => setOverallPrompt(e.target.value)}
@@ -528,16 +528,36 @@ Personal journey updates that showcase growth and lessons learned
             rows={4}
           />
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0">
-            <select
-              value={threadType}
-              onChange={(e) => setThreadType(e.target.value)}
-              className="p-2 sm:p-4 rounded-md bg-white text-black border border-gray-300 text-sm sm:text-base w-full sm:w-auto mb-2 sm:mb-0"
-            >
-              <option value="single">Single Tweet</option>
-              <option value="three">3 Tweet Thread</option>
-              <option value="full">Full Thread</option>
-            </select>
-            <button 
+
+            <div className='flex gap-2'>
+
+              <select
+                value={threadType}
+                onChange={(e) => setThreadType(e.target.value)}
+                className="p-2 sm:p-4 rounded-md bg-white text-black border border-gray-300 text-sm sm:text-base w-full sm:w-auto mb-2 sm:mb-0"
+              >
+                <option value="single">Single Tweet</option>
+                <option value="three">3 Tweet Thread</option>
+                <option value="full">Full Thread</option>
+              </select>
+
+              <select
+                className="p-2 sm:p-4 rounded-md bg-white text-black border border-gray-300 text-sm sm:text-base w-full sm:w-auto mb-2 sm:mb-0"
+              >
+                <option value="curiosity">Curiosity</option>
+                <option value="humor">Humor Audience</option>
+                <option value="excitement">Show Excitement</option>
+                <option value="trust">Build Trust</option>
+                <option value="inspiration">Find and Share Inspiration</option>
+                <option value="surprise">Feel Surprise</option>
+                <option value="anger">Feel Pissed and Anger</option>
+                <option value="hope">Feeling Hopeful</option>
+                <option value="fear">Show Fear</option>
+              </select>
+
+            </div>
+
+            <button
               className='bg-blue-100 p-2 sm:p-4 rounded-md flex items-center justify-center gap-2 sm:gap-4 text-blue-900 text-sm sm:text-base w-full sm:w-auto'
               onClick={generateAIThread}
               disabled={isGenerating}
@@ -551,9 +571,10 @@ Personal journey updates that showcase growth and lessons learned
               onClick={() => setIncludeProduct(!includeProduct)}
               className="flex items-center text-blue-500 hover:text-blue-600 text-sm sm:text-base"
             >
-              {includeProduct ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-              <span className="ml-2">Include my <u>product/service</u> with my <u>personal journey</u></span>
+              {includeProduct ? <Circle size={30} /> : <CircleCheckBig size={30} />}
+              <span className="ml-2 flex gap-2 items-center text-slate-600">Include my <u className='flex gap-2 text-blue-500'><Blocks size={20} />product/service</u> with my <u className='flex gap-2 text-blue-500'> <BicepsFlexed size={20} />personal journey</u> </span>
             </button>
+            <button className='flex gap-2 bg-blue-600 text-white p-1 px-4 rounded-2xl ml-4'>Configure Training Data</button>
           </div>
         </div>
       </div>

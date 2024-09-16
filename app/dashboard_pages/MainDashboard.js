@@ -148,6 +148,11 @@ const ThreadWriter = () => {
   const [includeProduct, setIncludeProduct] = useState(false);
   const [productInfo, setProductInfo] = useState(null);
   const [mode, setMode] = useState('share');
+  const [feeling, setFeeling] = useState('not_specified');
+
+  const receivedSound = new Audio('https://dazzling-cat.netlify.app/recievedmsg.mp3');
+  const sentSound = new Audio('https://dazzling-cat.netlify.app/sendmsg1.mp3');
+  const toggleSound = new Audio('https://dazzling-cat.netlify.app/sendmsg2.mp3');
 
   useEffect(() => {
     const storedProductInfo = localStorage.getItem('productQuestionnaire');
@@ -155,6 +160,10 @@ const ThreadWriter = () => {
       setProductInfo(JSON.parse(storedProductInfo));
     }
   }, []);
+
+  const playSound = (sound) => {
+    sound.play().catch(error => console.error('Error playing sound:', error));
+  };
 
   const addNewTweet = () => {
     setTweets(prevTweets => [...prevTweets, { id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
@@ -315,6 +324,7 @@ const ThreadWriter = () => {
   };
 
   const generateAIThread = async () => {
+    playSound(sentSound);
     setIsGenerating(true);
     try {
       let maxTweets;
@@ -340,6 +350,8 @@ const ThreadWriter = () => {
         }
       }
 
+      const feelingPrompt = getFeelingPrompt(feeling);
+
       const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
@@ -348,8 +360,25 @@ const ThreadWriter = () => {
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 1000,
-          messages: [{ role: "user", content: `Generate a ${threadType === 'single' ? 'single tweet' : `thread of ${maxTweets} tweets`} about the following update, including suggestions for images, videos, or links to add context: "${promptContent}" NOTE: i just need the tweet no extra text , Dont use emojis unless its asked , Dont write numbers infront of each tweet. One media image or video. decide how it should be, in the url provide text what the image should be about or what to show what to add etc; spacing breaks etc is what makes the tweet stand out.` }],
+          messages: [{ role: "user", content: `Generate a ${threadType === 'single' ? 'single tweet' : `thread of ${maxTweets} tweets`} about the following ${mode === 'share' ? 'update' : 'reply'}, including suggestions for images, videos, or links to add context: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet no extra text , Dont use emojis unless its asked , Dont write numbers infront of each tweet. One media image or video. decide how it should be, in the url provide text what the image should be about or what to show what to add etc; spacing breaks etc is what makes the tweet stand out.` }],
           system: `You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
+
+          ${mode === 'reply' ? `
+          For reply mode, consider these additional guidelines:
+          - Address the original tweet's main points or questions directly
+          - Show empathy and understanding in your response
+          - Provide additional value or insights related to the topic
+          - Use a conversational tone that encourages further discussion
+          - If appropriate, share a relevant personal experience or anecdote
+          - End with a question to keep the conversation going
+
+          Examples of good replies:
+          1. "Interesting point about [topic]. In my experience, [share insight]. Have you considered [alternative viewpoint]? It might offer a different perspective on the issue."
+
+          2. "I can relate to your struggle with [problem]. Last year, I faced a similar challenge and found that [solution] really helped. What strategies have you tried so far?"
+
+          3. "Your success with [achievement] is inspiring! It reminds me of when I [similar experience]. What's the next big goal you're aiming for?"
+          ` :''}
 
           Start with a strong hook or attention-grabbing statement
           Use simple, concise language that conveys your message quickly
@@ -506,12 +535,28 @@ const ThreadWriter = () => {
       });
 
       setTweets(generatedThread);
+      playSound(receivedSound);
     } catch (error) {
       console.error('Error generating AI thread:', error);
       alert(`Failed to generate AI thread: ${error.message}`);
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const getFeelingPrompt = (feeling) => {
+    const feelingPrompts = {
+      curiosity: "Express curiosity and a desire to learn more in the tweet. Use phrases that encourage exploration and questioning.",
+      humor: "Inject humor into the tweet. Use witty observations or playful language to entertain the audience.",
+      excitement: "Convey excitement and enthusiasm in the tweet. Use energetic language and express optimism about the topic.",
+      trust: "Build trust with the audience in the tweet. Share authentic experiences and be transparent about challenges and successes.",
+      inspiration: "Inspire the audience with the tweet. Share motivational content and encourage others to pursue their goals.",
+      surprise: "Express surprise or amazement in the tweet. Share unexpected insights or revelations that might intrigue the audience.",
+      anger: "Channel constructive frustration into the tweet. Address pain points in the industry or common challenges faced by indie founders.",
+      hope: "Express hope and positivity in the tweet. Focus on potential solutions and opportunities for growth.",
+      fear: "Acknowledge common fears or anxieties in the indie founder journey, but frame them in a way that encourages overcoming obstacles."
+    };
+    return feelingPrompts[feeling] || "";
   };
 
   return (
@@ -523,7 +568,10 @@ const ThreadWriter = () => {
 
             <div className="inline-flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner">
               <button
-                onClick={() => setMode('share')}
+                onClick={() => {
+                  setMode('share');
+                  playSound(toggleSound);
+                }}
                 className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                   mode === 'share'
                     ? 'text-white bg-blue-500'
@@ -537,7 +585,10 @@ const ThreadWriter = () => {
                 )}
               </button>
               <button
-                onClick={() => setMode('reply')}
+                onClick={() => {
+                  setMode('reply');
+                  playSound(toggleSound);
+                }}
                 className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                   mode === 'reply'
                     ? 'text-white bg-blue-500'
@@ -572,17 +623,20 @@ const ThreadWriter = () => {
               </select>
 
               <select
+                value={feeling}
+                onChange={(e) => setFeeling(e.target.value)}
                 className="p-2 sm:p-4 rounded-md bg-white text-black border border-gray-300 text-sm sm:text-base w-full sm:w-auto mb-2 sm:mb-0"
               >
-                <option value="curiosity">Curiosity</option>
-                <option value="humor">Humor Audience</option>
-                <option value="excitement">Show Excitement</option>
-                <option value="trust">Build Trust</option>
-                <option value="inspiration">Find and Share Inspiration</option>
-                <option value="surprise">Feel Surprise</option>
-                <option value="anger">Feel Pissed and Anger</option>
-                <option value="hope">Feeling Hopeful</option>
-                <option value="fear">Show Fear</option>
+                <option value="not_specified">Not Specified</option>
+                <option value="curiosity">🤔 Curiosity</option>
+                <option value="humor">😄 Humor</option>
+                <option value="excitement">🎉 Excitement</option>
+                <option value="trust">🤝 Trust</option>
+                <option value="inspiration">💡 Inspiration</option>
+                <option value="surprise">😮 Surprise</option>
+                <option value="anger">😠 Frustration</option>
+                <option value="hope">🌟 Hope</option>
+                <option value="fear">😨 Concern</option>
               </select>
             </div>
 
@@ -601,7 +655,7 @@ const ThreadWriter = () => {
               className="flex items-center text-blue-500 hover:text-blue-500 text-sm sm:text-base"
             >
               {includeProduct ? <Circle size={30} /> : <CircleCheckBig size={30} />}
-              <span className="ml-2 flex gap-2 items-center text-slate-500">Include my <u className='flex gap-2 text-blue-500'><Blocks size={20} />product/service</u> with my <u className='flex gap-2 text-blue-500'> <BicepsFlexed size={20} />personal journey</u> </span>
+              <span className="ml-2 flex gap-2 items-center text-slate-500">Include my <i className='flex gap-2 text-blue-500'><Blocks size={20} />product/service</i> with my <i className='flex gap-2 text-blue-500'> <BicepsFlexed size={20} />personal journey</i> </span>
             </button>
             <button className='flex gap-2 bg-blue-500 text-white p-1 px-4 rounded-2xl ml-4'>Configure Training Data</button>
           </div>
@@ -620,7 +674,7 @@ const ThreadWriter = () => {
                   <div>
                     <h2 className="font-bold text-sm sm:text-base">John Doe</h2>
                     <p className="text-gray-500 text-xs sm:text-sm">@johndoe</p>
-                  </div>
+                    </div>
                   {tweets.length > 1 && (
                     <button
                       onClick={() => removeTweet(tweet.id)}

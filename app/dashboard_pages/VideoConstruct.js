@@ -47,9 +47,9 @@ const SCREEN_SIZES = {
 };
 
 const AI_TOOL_LOGOS = {
-  heygen: 'https://placehold.co/40x40/2E5090/FFFFFF?text=HG',
-  elevenlabs: 'https://placehold.co/40x40/904090/FFFFFF?text=11',
-  runway: 'https://placehold.co/40x40/206040/FFFFFF?text=RW'
+  heygen: 'https://img.icons8.com/?size=512&id=nYpTA1hyYtTK&format=png',
+  elevenlabs: 'https://aiora.ai/wp-content/uploads/2023/05/eleven-labs-ai-tool.png.png',
+  runway: 'https://digiseller.mycdn.ink/preview/888070/p1_3703730_9aad90bd.png'
 };
 
 const INITIAL_SCENE = {
@@ -78,7 +78,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   const [videoType, setVideoType] = useState('short');
   const [contentMood, setContentMood] = useState('engaging');
   const [contentType, setContentType] = useState('educational');
-  const [screenSize, setScreenSize] = useState('VERTICAL');
+  const [screenSize, setScreenSize] = useState('HORIZONTAL');
   const [scenes, setScenes] = useState([INITIAL_SCENE]);
   const [currentScene, setCurrentScene] = useState(0);
 
@@ -453,7 +453,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
 
 {/* Generated Script Display */}
 {scenes.length > 0 && (
-<div className="bg-gray-50 p-4">
+<div className="bg-blue-200 p-2 sm:p-4">
 <div className="max-w-6xl mx-auto">
   {/* Scene Timeline */}
   <div className="mb-6">
@@ -498,13 +498,13 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
         ))}
         <button
           onClick={addNewScene}
-          className={`flex-shrink-0 w-64 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-blue-500 transition-colors ${
+          className={`flex-shrink-0 w-64 rounded-lg border-2 border-dashed border-blue-400 flex items-center justify-center hover:border-blue-500 transition-colors ${
             screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
             screenSize === 'SQUARE' ? 'aspect-square' :
             screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
           }`}
         >
-          <div className="flex flex-col items-center text-gray-500 hover:text-blue-500">
+          <div className="flex flex-col items-center text-blue-500 hover:shadow-md">
             <PlusCircle className="w-6 h-6 mb-1" />
             <span className="text-sm">Add Scene</span>
           </div>
@@ -567,18 +567,6 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
     </div>
 
     <div className="space-y-6">
-      {/* Video Preview */}
-      <div className={`rounded-lg overflow-hidden bg-gray-100 ${
-        screenSize === 'VERTICAL' ? 'aspect-[9/16] max-w-[540px] mx-auto' :
-        screenSize === 'SQUARE' ? 'aspect-square max-w-[720px] mx-auto' :
-        screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
-      }`}>
-        <img 
-          src={scenes[currentScene].previewUrl?.replace('.mp4', '')}
-          alt={`Scene ${currentScene + 1} preview`}
-          className="w-full h-full object-cover"
-        />
-      </div>
 
       {/* Scene Description */}
       <div>
@@ -594,6 +582,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
         />
       </div>
 
+
       {/* AI Tool Prompts */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Runway Prompt */}
@@ -604,7 +593,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
               alt="Runway" 
               className="w-6 h-6 rounded"
             />
-            <span>Runway (Visual)</span>
+            <span>Runway (AI Visual)</span>
           </div>
           <textarea
             value={scenes[currentScene].aiPrompts.runwayPrompt}
@@ -623,7 +612,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
               alt="Heygen" 
               className="w-6 h-6 rounded"
             />
-            <span>Your Digital Clone</span>
+            <span>HeyGen : Your Digital Clone</span>
           </div>
           <textarea
             value={scenes[currentScene].aiPrompts.heygenPrompt}
@@ -642,7 +631,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
               alt="ElevenLabs" 
               className="w-6 h-6 rounded"
             />
-            <span>ElevenLabs (Voice)</span>
+            <span>ElevenLabs (AI Voice)</span>
           </div>
           <textarea
             value={scenes[currentScene].aiPrompts.elevenLabsPrompt}
@@ -653,6 +642,21 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
           />
         </div>
       </div>
+
+
+      {/* Video Preview */}
+      <div className={`rounded-lg overflow-hidden bg-gray-100 ${
+        screenSize === 'VERTICAL' ? 'aspect-[9/16] max-w-[540px] mx-auto' :
+        screenSize === 'SQUARE' ? 'aspect-square max-w-[720px] mx-auto' :
+        screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
+      }`}>
+        <img 
+          src={scenes[currentScene].previewUrl?.replace('.mp4', '')}
+          alt={`Scene ${currentScene + 1} preview`}
+          className="w-full h-full object-cover"
+        />
+      </div>
+
     </div>
   </div>
 

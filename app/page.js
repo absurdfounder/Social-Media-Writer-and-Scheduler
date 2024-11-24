@@ -2,14 +2,15 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
+import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,TrendingUp, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
 import BuyerList from './dashboard_pages/BuyerList';
 import Ledger from './dashboard_pages/Ledger';
-import Commissions from './dashboard_pages/Commissions';
+import Commissions from './dashboard_pages/BrandTraning';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
 import CollectionThisWeek from './dashboard_pages/CollectionThisWeek';
-import ThreadWriter from './dashboard_pages/MainDashboard';
+import ThreadWriter from './dashboard_pages/ThreadReply';
+import VideoScriptConstructor from './dashboard_pages/VideoConstruct';
 
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
@@ -44,6 +45,7 @@ export default function Dashboard() {
 
   const navItems = [
     { icon: Twitter, label: 'Build On X', id: 'dashboard' },
+    { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'commissions' },
@@ -57,6 +59,8 @@ export default function Dashboard() {
     switch (activeTab) {
       case 'dashboard':
         return <ThreadWriter onConfigureTrainingData={handleConfigureTrainingData} />;
+      case 'videoconstructor':
+        return <VideoScriptConstructor />;        
       case 'partylist-db':
         return <BuyerList />;
       case 'ledger-db':

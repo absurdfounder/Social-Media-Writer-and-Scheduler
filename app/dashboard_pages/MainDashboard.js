@@ -348,7 +348,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
       Include a clear value proposition or takeaway for your audience
       For longer content, break it into a thread with each tweet focusing on a single point
       Always include a visual element (image, video, or gif) in the first tweet of a thread or standalone tweet
-      End with a call-to-action or thought-provoking question to encourage engagement
+      End with a call-to-action or don't ask questions twitter does take it well
       
       ${includeProduct ? "When mentioning the product, focus on its unique selling points and how it solves problems for the target audience. Incorporate product details naturally into the tweets without making them sound like advertisements." : ""}
   
@@ -415,7 +415,6 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
       2. Use <br> for line breaks between sections
       3. Short, punchy lines or bullet points
       4. Before/after comparisons when applicable
-      5. End with a question or call-to-action
       6. Include relevant media suggestion
       7. Close with /endtweet
   
@@ -471,7 +470,270 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   
       Always put these detailed media suggestions on separate lines after the main tweet content.
   
-      Remember to maintain a consistent voice that's authentic, slightly humorous, and always focused on providing value to your audience. Each tweet should be able to stand alone while also contributing to your overall brand narrative as an indie founder.`;
+      Remember to maintain a consistent voice that's authentic, slightly humorous, and always focused on providing value to your audience. Each tweet should be able to stand alone while also contributing to your overall brand narrative as an indie founder.
+      
+      here's a few understanding of how to have a higher probability of going viral :
+
+      1. PSYCHOLOGICAL ARCHITECTURE
+A. Primary Emotional Triggers
+1. Surprise Elements
+
+Pattern Interruption
+
+Unexpected twists in familiar situations
+Subversion of established formats
+Timing manipulation for maximum impact
+Cultural expectation breaks
+Format disruption techniques
+
+
+
+2. Relatability Factors
+
+Universal Experiences
+
+Daily life moments
+Common frustrations
+Shared social awkwardness
+Workplace scenarios
+Relationship dynamics
+
+
+
+3. Nostalgia Activation
+
+Temporal References
+
+Childhood memories
+Pop culture callbacks
+Historical parallels
+Generational experiences
+Cultural touchstones
+
+
+
+B. Cognitive Engagement Patterns
+1. Pattern Recognition
+
+Format Familiarity
+
+Template consistency
+Visual hierarchy
+Information flow
+Cognitive shortcuts
+Memory triggers
+
+
+
+2. Cultural Context
+
+Referential Framework
+
+Current events integration
+Pop culture literacy
+Social commentary
+Subcultural knowledge
+Trending topics
+
+
+
+2. TECHNICAL OPTIMIZATION
+A. Visual Architecture
+1. Composition Elements
+
+Frame Construction
+Copy- Focal point positioning: Rule of thirds grid
+- Background-foreground relationship
+- Color psychology implementation
+- Movement flow patterns
+- Visual weight distribution
+
+
+2. Quality Parameters
+
+Technical Specifications
+Copy- Resolution optimization
+- Compression ratios
+- Color space management
+- File format selection
+- Platform-specific requirements
+
+
+B. Platform-Specific Requirements
+1. Format Specifications
+CopyInstagram:
+- Feed Posts: 1080 x 1080px (1:1)
+- Stories: 1080 x 1920px (9:16)
+- Reels: 1080 x 1920px (9:16)
+- Carousel: 1080 x 1080px (multiple)
+
+TikTok:
+- Standard: 1080 x 1920px (9:16)
+- Sound integration requirements
+- Caption character limits
+- Hashtag optimization
+- Effect compatibility
+
+Twitter:
+- Timeline: 1200 x 675px (16:9)
+- Card display: 800 x 418px
+- Profile images: 400 x 400px
+- Header images: 1500 x 500px
+3. CONTENT DEVELOPMENT STRATEGY
+A. Conceptualization Process
+1. Trend Analysis Framework
+
+Research Parameters
+Copy- Platform trend monitoring
+- Hashtag tracking
+- Community sentiment analysis
+- Format evolution tracking
+- Cross-platform correlation
+
+
+2. Format Selection Criteria
+
+Decision Matrix
+Copy- Audience alignment
+- Platform suitability
+- Technical feasibility
+- Trend timing
+- Resource availability
+
+
+B. Production Methodology
+1. Technical Setup
+
+Equipment Configuration
+Copy- Camera settings optimization
+- Lighting arrangement
+- Audio capture setup
+- Background preparation
+- Props and materials
+
+
+2. Capture Process
+
+Recording Protocol
+Copy- Multiple angle coverage
+- Backup recording systems
+- Audio redundancy
+- Timing synchronization
+- Version control
+
+
+4. DISTRIBUTION OPTIMIZATION
+A. Platform Strategy
+1. Timing Optimization
+
+Peak Engagement Windows
+CopyWeekdays:
+- Early morning: 6-8 AM local
+- Lunch break: 12-2 PM
+- Evening commute: 5-7 PM
+- Late night: 9-11 PM
+
+Weekends:
+- Mid-morning: 9-11 AM
+- Early evening: 4-6 PM
+
+
+2. Cross-Platform Synergy
+
+Distribution Sequence
+Copy1. Primary platform launch
+2. Secondary platform adaptation
+3. Cross-platform referencing
+4. Community engagement phase
+5. Remix encouragement
+
+
+B. Community Engagement
+1. Interaction Framework
+
+Response Protocol
+Copy- Comment engagement timing
+- Reply strategy
+- User-generated content integration
+- Community recognition
+- Collaboration opportunities
+
+
+5. MEASUREMENT AND ITERATION
+A. Analytics Framework
+1. Key Performance Indicators
+
+Metric Categories
+CopyEngagement Metrics:
+- View-to-share ratio
+- Comment velocity
+- Save rate
+- Remix frequency
+- Cross-platform spread
+
+Quality Metrics:
+- Sentiment analysis
+- Comment quality
+- Remix creativity
+- Community adoption
+- Longevity indicators
+
+
+2. Optimization Cycle
+
+Iteration Process
+Copy1. Data collection phase
+2. Analysis and interpretation
+3. Strategy adjustment
+4. Implementation
+5. Performance monitoring
+
+
+6. ADVANCED TECHNIQUES
+A. Viral Engineering
+1. Trigger Mechanisms
+
+Activation Elements
+Copy- Emotional hooks
+- Curiosity gaps
+- Pattern breaks
+- Cultural touchpoints
+- Participatory elements
+
+
+2. Amplification Strategy
+
+Growth Tactics
+Copy- Influencer seeding
+- Community activation
+- Platform algorithm optimization
+- Cross-platform synergy
+- Timing coordination
+
+
+B. Sustainability Planning
+1. Content Evolution
+
+Development Path
+Copy- Format adaptation
+- Theme expansion
+- Character development
+- Narrative building
+- Community integration
+
+
+2. Brand Building
+
+Identity Development
+Copy- Style guide creation
+- Voice consistency
+- Visual cohesion
+- Community guidelines
+- Growth strategy
+
+
+      
+      `;
   
       const response = await fetch('/api/anthropic', {
         method: 'POST',
@@ -521,18 +783,75 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
 
   const getFeelingPrompt = (feeling) => {
     const feelingPrompts = {
-      curiosity: "Express curiosity and a desire to learn more in the tweet. Use phrases that encourage exploration and questioning.",
-      humor: "Inject humor into the tweet. Use witty observations or playful language to entertain the audience.",
-      excitement: "Convey excitement and enthusiasm in the tweet. Use energetic language and express optimism about the topic.",
-      trust: "Build trust with the audience in the tweet. Share authentic experiences and be transparent about challenges and successes.",
-      inspiration: "Inspire the audience with the tweet. Share motivational content and encourage others to pursue their goals.",
-      surprise: "Express surprise or amazement in the tweet. Share unexpected insights or revelations that might intrigue the audience.",
-      anger: "Channel constructive frustration into the tweet. Address pain points in the industry or common challenges faced by indie founders.",
-      hope: "Express hope and positivity in the tweet. Focus on potential solutions and opportunities for growth.",
-      fear: "Acknowledge common fears or anxieties in the indie founder journey, but frame them in a way that encourages overcoming obstacles."
+      curiosity: {
+        prompt: "Share a thought-provoking question or observation that makes people think. Start with 'Ever wonder why...' or 'What if...'",
+        examples: [
+          "Ever wonder why some startups take off instantly while others struggle? Here's what I discovered:",
+          "What if the traditional advice about [topic] is completely wrong? 🤔"
+        ]
+      },
+      insight: {
+        prompt: "Share a surprising learning or realization from your experience. Use 'Just realized...' or 'Plot twist:'",
+        examples: [
+          "Just realized after 5 years of building: The hardest part isn't the code, it's...",
+          "Plot twist: The 'best practices' everyone follows? They might be holding you back."
+        ]
+      },
+      authenticity: {
+        prompt: "Share an honest, behind-the-scenes moment or challenge you're facing. Start with 'Real talk:' or 'Behind the scenes:'",
+        examples: [
+          "Real talk: Just spent 3 hours debugging what turned out to be a typo. We all have these days",
+          "Behind the scenes: Here's what running a startup actually looks like..."
+        ]
+      },
+      achievement: {
+        prompt: "Share a milestone or win, but keep it humble and focus on the learning. Lead with 'Small win:' or 'Milestone reached:'",
+        examples: [
+          "Small win: Hit 100 users today! Here's what worked (and what didn't):",
+          "Milestone reached: First paying customer! Lessons learned:"
+        ]
+      },
+      helpful: {
+        prompt: "Share a practical tip or solution to a common problem. Use 'Quick tip:' or 'Solved:'",
+        examples: [
+          "Quick tip: Found a way to cut my deployment time in half. Here's how:",
+          "Solved: That annoying problem with [common issue]. The fix is surprisingly simple:"
+        ]
+      },
+      reflection: {
+        prompt: "Share insights from past experiences or mistakes. Start with 'Looking back:' or 'Lesson learned:'",
+        examples: [
+          "Looking back: 3 things I wish I knew when starting my indie journey",
+          "Lesson learned: The biggest mistake I made in my first year (and how you can avoid it)"
+        ]
+      },
+      encouragement: {
+        prompt: "Offer support and motivation to others facing similar challenges. Use 'Reminder:' or 'For anyone who...'",
+        examples: [
+          "Reminder: Your side project taking longer than expected is totally normal. Here's why:",
+          "For anyone struggling with imposter syndrome today: Here's what helps me"
+        ]
+      },
+      process: {
+        prompt: "Break down your workflow or system for solving problems. Start with 'How I:' or 'My process:'",
+        examples: [
+          "How I validate new feature ideas in under 24 hours:",
+          "My process: From idea to launched feature in 5 steps"
+        ]
+      },
+      observation: {
+        prompt: "Share an interesting trend or pattern you've noticed. Use 'Noticed:' or 'Interesting pattern:'",
+        examples: [
+          "Noticed: The most successful indie hackers I know all do this one thing differently...",
+          "Interesting pattern: Analyzed 50+ successful launches. Here's what they have in common:"
+        ]
+      }
     };
-    return feelingPrompts[feeling] || "";
+
+    if (!feeling || feeling === 'not_specified') return "";
+    return feelingPrompts[feeling]?.prompt || "";
   };
+
 
   return (
     <div className="bg-white rounded-md overflow-hidden">
@@ -603,15 +922,15 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
                 className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
               >
                 <option value="not_specified">Not Specified</option>
-                <option value="curiosity">🤔 Curiosity</option>
-                <option value="humor">😄 Humor</option>
-                <option value="excitement">🎉 Excitement</option>
-                <option value="trust">🤝 Trust</option>
-                <option value="inspiration">💡 Inspiration</option>
-                <option value="surprise">😮 Surprise</option>
-                <option value="anger">😠 Frustration</option>
-                <option value="hope">🌟 Hope</option>
-                <option value="fear">😨 Concern</option>
+                <option value="curiosity">🔍 Curiosity</option>
+                <option value="insight">💡 Insight</option>
+                <option value="authenticity">🎭 Authenticity</option>
+                <option value="achievement">🏆 Achievement</option>
+                <option value="helpful">🤝 Helpful</option>
+                <option value="reflection">🤔 Reflection</option>
+                <option value="encouragement">💪 Encouragement</option>
+                <option value="process">⚙️ Process</option>
+                <option value="observation">👀 Observation</option>
               </select>
             </div>
 

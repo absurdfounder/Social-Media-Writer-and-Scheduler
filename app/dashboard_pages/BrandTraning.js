@@ -4,7 +4,7 @@ const questions = [
   { id: 'name', question: "What is the name of your product/service?", type: "short", limit: 50 },
   { id: 'description', question: "In one sentence, how would you describe [NAME]?", type: "long", limit: 150 },
   { id: 'website', question: "What is the website URL for [NAME]?", type: "short", limit: 100 },
-  { id: 'adjacent', question: "List 3-5 adjacent website URLs that could indirectly bring traffic to [NAME]'s website (e.g., relevant subreddits, forums, or complementary services)", type: "long", limit: 250 },
+  { id: 'adjacent', question: "List 3-5 adjacent website URLs that could indirectly bring traffic to [NAME]'s website", type: "long", limit: 250 },
   { id: 'audience', question: "Who is the target audience for [NAME]?", type: "short", limit: 100 },
   { id: 'problems', question: "What specific problems does [NAME] solve?", type: "long", limit: 200 },
   { id: 'features', question: "What are the main features of [NAME]?", type: "long", limit: 200 },
@@ -24,34 +24,104 @@ const ProductQuestionnaire = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [saved, setSaved] = useState(false);
-  const [displayMode, setDisplayMode] = useState('card'); // 'card' or 'list'
+  const [displayMode, setDisplayMode] = useState('card');
+  const [profiles, setProfiles] = useState([]);
+  const [currentProfileId, setCurrentProfileId] = useState(null);
 
   useEffect(() => {
-    const savedAnswers = localStorage.getItem('productQuestionnaire');
-    if (savedAnswers) {
-      setAnswers(JSON.parse(savedAnswers));
+    // Load profiles and current profile from localStorage
+    const savedProfiles = localStorage.getItem('profiles');
+    const currentId = localStorage.getItem('currentProfileId');
+    
+    if (savedProfiles) {
+      const parsedProfiles = JSON.parse(savedProfiles);
+      setProfiles(parsedProfiles);
+      
+      // If there's a current profile ID, load its answers
+      if (currentId && parsedProfiles.find(p => p.id === currentId)) {
+        setCurrentProfileId(currentId);
+        const profile = parsedProfiles.find(p => p.id === currentId);
+        setAnswers(profile.answers || {});
+      } else if (parsedProfiles.length > 0) {
+        // Set first profile as default if no current profile
+        setCurrentProfileId(parsedProfiles[0].id);
+        setAnswers(parsedProfiles[0].answers || {});
+      }
     }
   }, []);
 
   const handleAnswer = (answer, questionId = null) => {
     const id = questionId || questions[currentQuestion].id;
-    setAnswers(prev => ({ ...prev, [id]: answer }));
+    const newAnswers = { ...answers, [id]: answer };
+    setAnswers(newAnswers);
+
+    // Update the current profile's answers in profiles array
+    if (currentProfileId) {
+      const updatedProfiles = profiles.map(profile => 
+        profile.id === currentProfileId 
+          ? { ...profile, answers: newAnswers }
+          : profile
+      );
+      setProfiles(updatedProfiles);
+      localStorage.setItem('profiles', JSON.stringify(updatedProfiles));
+    }
   };
 
   const handleSaveAndNext = () => {
-    const newAnswers = { ...answers, [questions[currentQuestion].id]: answers[questions[currentQuestion].id] || '' };
-    localStorage.setItem('productQuestionnaire', JSON.stringify(newAnswers));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1000);
-
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1000);
   };
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(prev => prev - 1);
+    }
+  };
+
+  const handleCreateProfile = () => {
+    const profileName = prompt('Enter profile name:');
+    if (profileName) {
+      const newProfile = {
+        id: Date.now().toString(),
+        name: profileName,
+        answers: {}
+      };
+      
+      const newProfiles = [...profiles, newProfile];
+      setProfiles(newProfiles);
+      setCurrentProfileId(newProfile.id);
+      setAnswers({});
+      localStorage.setItem('profiles', JSON.stringify(newProfiles));
+      localStorage.setItem('currentProfileId', newProfile.id);
+    }
+  };
+
+  const handleSwitchProfile = (profileId) => {
+    setCurrentProfileId(profileId);
+    const profile = profiles.find(p => p.id === profileId);
+    setAnswers(profile.answers || {});
+    localStorage.setItem('currentProfileId', profileId);
+    setCurrentQuestion(0);
+  };
+
+  const handleDeleteProfile = (profileId) => {
+    if (confirm('Are you sure you want to delete this profile?')) {
+      const updatedProfiles = profiles.filter(p => p.id !== profileId);
+      setProfiles(updatedProfiles);
+      localStorage.setItem('profiles', JSON.stringify(updatedProfiles));
+      
+      if (currentProfileId === profileId) {
+        if (updatedProfiles.length > 0) {
+          handleSwitchProfile(updatedProfiles[0].id);
+        } else {
+          setCurrentProfileId(null);
+          setAnswers({});
+          localStorage.removeItem('currentProfileId');
+        }
+      }
     }
   };
 
@@ -100,6 +170,36 @@ const ProductQuestionnaire = () => {
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
+  const ProfileSelector = () => (
+    <div className="mb-6 flex flex-wrap items-center gap-2 justify-between mt-4 mb-4 border-t border-b pt-4 pb-4">
+      <select
+        value={currentProfileId || ''}
+        onChange={(e) => handleSwitchProfile(e.target.value)}
+        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        {profiles.map(profile => (
+          <option key={profile.id} value={profile.id}>
+            {profile.name}
+          </option>
+        ))}
+      </select>
+      <button
+        onClick={handleCreateProfile}
+        className="px-4 py-2 bg-gray-300 text-gray-600 rounded-lg hover:bg-gray-400"
+      >
+        New Company or Service
+      </button>
+      {currentProfileId && (
+        <button
+          onClick={() => handleDeleteProfile(currentProfileId)}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+        >
+          Delete Profile
+        </button>
+      )}
+    </div>
+  );
+
   const renderCardView = () => (
     <div className="bg-white shadow-lg rounded-xl overflow-hidden transition-all duration-500 ease-out transform hover:scale-105">
       <div className="p-8">
@@ -119,7 +219,7 @@ const ProductQuestionnaire = () => {
         </button>
         <button
           onClick={handleSaveAndNext}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition duration-200 ease-in-out flex items-center"
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out flex items-center"
         >
           {currentQuestion === questions.length - 1 ? 'Finish' : 'Save & Next'}
           {saved && (
@@ -142,23 +242,6 @@ const ProductQuestionnaire = () => {
           {getInputComponent(q.type, q.limit, q.id)}
         </div>
       ))}
-      <div className="px-8 py-4 bg-gray-50 flex justify-end">
-        <button
-          onClick={() => {
-            localStorage.setItem('productQuestionnaire', JSON.stringify(answers));
-            setSaved(true);
-            setTimeout(() => setSaved(false), 1000);
-          }}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition duration-200 ease-in-out flex items-center"
-        >
-          Save All
-          {saved && (
-            <svg className="w-5 h-5 ml-2 text-green-300" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-              <path d="M5 13l4 4L19 7"></path>
-            </svg>
-          )}
-        </button>
-      </div>
     </div>
   );
 
@@ -166,6 +249,7 @@ const ProductQuestionnaire = () => {
     <div className="w-full max-w-2xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl text-center mb-4 text-blue-800">Tell our personal journey AI about your offerings</h2>
+        <ProfileSelector />
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setDisplayMode('card')}

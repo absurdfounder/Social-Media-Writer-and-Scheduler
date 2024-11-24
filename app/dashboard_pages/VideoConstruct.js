@@ -1,22 +1,24 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { 
-  PlusCircle, 
-  X, 
-  Camera, 
-  Mic, 
-  Wand2, 
-  Loader, 
-  ArrowLeft, 
+import {
+  PlusCircle,
+  X,
+  Camera,
+  Mic,
+  Wand2,
+  Loader,
+  ArrowLeft,
   ArrowRight,
-  UserCircle2, 
+  UserCircle2,
   Video,
   Megaphone,
   Circle,
   CircleCheckBig,
   Blocks,
-  BicepsFlexed
+  BicepsFlexed,
+  Download,
+  Timer
 } from 'lucide-react';
 
 const SCREEN_SIZES = {
@@ -151,9 +153,9 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   };
 
   const updateSceneContent = (id, content) => {
-    setScenes(prev => prev.map(scene => 
-      scene.id === id ? { 
-        ...scene, 
+    setScenes(prev => prev.map(scene =>
+      scene.id === id ? {
+        ...scene,
         content,
         previewUrl: getPreviewUrl({ ...scene, content }, prev.findIndex(s => s.id === id))
       } : scene
@@ -161,7 +163,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   };
 
   const updateAIPrompt = (id, tool, prompt) => {
-    setScenes(prev => prev.map(scene => 
+    setScenes(prev => prev.map(scene =>
       scene.id === id ? {
         ...scene,
         aiPrompts: { ...scene.aiPrompts, [tool]: prompt }
@@ -177,7 +179,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
       let promptContent = overallPrompt;
       let sceneDuration;
       let numberOfScenes;
-      
+
       switch (videoType) {
         case 'short':
           sceneDuration = 5;
@@ -212,9 +214,9 @@ Follow these viral content guidelines:
 
 2. PLATFORM-SPECIFIC OPTIMIZATION:
 Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
-${screenSize === 'VERTICAL' ? '- Optimize for mobile viewing and scrolling behavior' : 
-  screenSize === 'SQUARE' ? '- Focus on center-weighted composition for feed stopping power' :
-  '- Use cinematic wide-format composition for immersive viewing'}
+${screenSize === 'VERTICAL' ? '- Optimize for mobile viewing and scrolling behavior' :
+          screenSize === 'SQUARE' ? '- Focus on center-weighted composition for feed stopping power' :
+            '- Use cinematic wide-format composition for immersive viewing'}
 
 3. VIRAL TRIGGERS:
 - Emotional Resonance: Focus on universally relatable moments
@@ -285,9 +287,9 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 1500,
-          messages: [{ 
-            role: "user", 
-            content: `Generate a detailed ${videoType} video script for: "${promptContent}". Create ${numberOfScenes} scenes, each with scene description, visual prompts for Runway.ai, avatar directions for Heygen, and voice instructions for ElevenLabs. Focus on creating highly memeable and shareable moments.` 
+          messages: [{
+            role: "user",
+            content: `Generate a detailed ${videoType} video script for: "${promptContent}". Create ${numberOfScenes} scenes, each with scene description, visual prompts for Runway.ai, avatar directions for Heygen, and voice instructions for ElevenLabs. Focus on creating highly memeable and shareable moments.`
           }],
           system: systemPrompt,
           model: "claude-3-5-sonnet-20240620",
@@ -304,7 +306,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
       // Parse the generated content into scenes
       const newScenes = [];
       const sceneBlocks = generatedContent.split('SCENE');
-      
+
       sceneBlocks.forEach((block, index) => {
         if (block.trim()) {
           const scene = {
@@ -358,7 +360,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
                   </option>
                 ))}
               </select>
-              
+
               <select
                 value={videoType}
                 onChange={(e) => setVideoType(e.target.value)}
@@ -368,7 +370,7 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
                 <option value="standard">Standard (1-2min)</option>
                 <option value="long">Long Form (3-5min)</option>
               </select>
-              
+
               <select
                 value={contentMood}
                 onChange={(e) => setContentMood(e.target.value)}
@@ -396,302 +398,304 @@ ELEVENLABS: [Voice direction with potential sound bite moments]`;
               </select>
             </div>
 
+          </div>
+
+          <textarea
+            className="w-full p-4 rounded-md bg-blue-50 text-blue-900 text-sm mb-4"
+            value={overallPrompt}
+            onChange={(e) => setOverallPrompt(e.target.value)}
+            placeholder="Describe your video concept. What's the main hook or message? Include any specific meme formats or trends you want to reference..."
+            rows={4}
+          />
+
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => {
+                  setIncludeProduct(!includeProduct);
+                  playSound(toggleSound);
+                }}
+                className="flex items-center text-blue-500 hover:text-blue-500 text-sm gap-2"
+              >
+                {includeProduct ? <CircleCheckBig size={20} /> : <Circle size={20} />}
+                <span className="flex items-center gap-2 text-slate-500">
+                Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
+                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
+                    <Blocks size={16} />product/service
+                  </i> with my 
+                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
+                    <BicepsFlexed size={16} />personal journey
+                  </i>
+                </span>
+              </span>
+              </button>
+              <button
+                className="flex gap-2 bg-blue-100 text-blue-600 px-4 py-2 rounded-2xl text-sm"
+                onClick={onConfigureTrainingData}
+              >
+                Training Data
+              </button>
             </div>
 
-<textarea
-  className="w-full p-4 rounded-md bg-blue-50 text-blue-900 text-sm mb-4"
-  value={overallPrompt}
-  onChange={(e) => setOverallPrompt(e.target.value)}
-  placeholder="Describe your video concept. What's the main hook or message? Include any specific meme formats or trends you want to reference..."
-  rows={4}
-/>
+            <button
+              className="bg-blue-500 text-white px-6 py-2 rounded-md flex items-center gap-2 text-sm w-full sm:w-auto"
+              onClick={generateVideoScript}
+              disabled={isGenerating}
+            >
+              {isGenerating ? <Loader size={16} className="animate-spin" /> : <Wand2 size={16} />}
+              Generate Viral Script
+            </button>
+          </div>
 
-<div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-  <div className="flex items-center gap-4">
-    <button
-      onClick={() => {
-        setIncludeProduct(!includeProduct);
-        playSound(toggleSound);
-      }}
-      className="flex items-center text-blue-500 hover:text-blue-500 text-sm gap-2"
-    >
-      {includeProduct ? <CircleCheckBig size={20} /> : <Circle size={20} />}
-      <span className="flex items-center gap-2 text-slate-500">
-        Include my
-        <span className="flex gap-2">
-          <i className="flex gap-2 text-blue-500">
-            <Blocks size={16} />product/service
-          </i>
-          info
-        </span>
-      </span>
-    </button>
-    <button 
-      className="flex gap-2 bg-blue-100 text-blue-600 px-4 py-2 rounded-2xl text-sm"
-      onClick={onConfigureTrainingData}
-    >
-      Training Data
-    </button>
-  </div>
+          {/* Format Info */}
+          <div className="mt-4 text-sm text-gray-500">
+            Format: {SCREEN_SIZES[screenSize].description} • {SCREEN_SIZES[screenSize].aspectRatio}
+          </div>
+        </div>
+      </div>
 
-  <button
-    className="bg-blue-500 text-white px-6 py-2 rounded-md flex items-center gap-2 text-sm w-full sm:w-auto"
-    onClick={generateVideoScript}
-    disabled={isGenerating}
-  >
-    {isGenerating ? <Loader size={16} className="animate-spin" /> : <Wand2 size={16} />}
-    Generate Viral Script
-  </button>
-</div>
+      {/* Generated Script Display */}
+      {scenes.length > 0 && (
+        <div className="bg-blue-200 p-2 sm:p-4">
+          <div className="max-w-6xl mx-auto">
+            {/* Scene Timeline */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Scene Timeline</h2>
+                {/* Export Options */}
+                <div className="flex justify-end gap-4 items-center">
 
-{/* Format Info */}
-<div className="mt-4 text-sm text-gray-500">
-  Format: {SCREEN_SIZES[screenSize].description} • {SCREEN_SIZES[screenSize].aspectRatio}
-</div>
-</div>
-</div>
+                  <button
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                    onClick={() => {
+                      const scriptData = {
+                        videoType,
+                        contentMood,
+                        contentType,
+                        screenSize,
+                        overallPrompt,
+                        scenes
+                      };
+                      const blob = new Blob([JSON.stringify(scriptData, null, 2)], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'viral-video-script.json';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    <Download size={16} />
+                  </button>
 
-{/* Generated Script Display */}
-{scenes.length > 0 && (
-<div className="bg-blue-200 p-2 sm:p-4">
-<div className="max-w-6xl mx-auto">
-  {/* Scene Timeline */}
-  <div className="mb-6">
-    <div className="flex justify-between items-center mb-4">
-      <h2 className="text-lg font-semibold">Scene Timeline</h2>
-      <span className="text-sm text-gray-600">
-        Total Duration: {scenes.reduce((acc, scene) => acc + parseInt(scene.duration), 0)}s
-      </span>
-    </div>
-    <div className="flex gap-4 overflow-x-auto pb-4 px-2">
-      <div className="flex gap-4">
-        {scenes.map((scene, index) => (
-          <div
-            key={scene.key}
-            onClick={() => setCurrentScene(index)}
-            className={`flex-shrink-0 w-64 bg-white rounded-lg shadow-sm border-2 cursor-pointer transition-all ${
-              currentScene === index ? 'border-blue-500 shadow-md' : 'border-transparent'
-            }`}
-          >
-            {/* Video Preview */}
-            <div className={`w-full overflow-hidden relative group rounded-t-lg ${
-              screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
-              screenSize === 'SQUARE' ? 'aspect-square' :
-              screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
-            }`}>
-              <img 
-                src={scene.previewUrl?.replace('.mp4', '')}
-                alt={`Scene ${index + 1} preview`}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-200" />
-            </div>
-            
-            <div className="p-3">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-semibold">Scene {index + 1}</span>
-                <span className="text-xs text-gray-500">{scene.duration}s</span>
+                  <span className="flex gap-2 text-sm text-gray-600">
+                  <Timer size={16} /> Total Duration: {scenes.reduce((acc, scene) => acc + parseInt(scene.duration), 0)}s
+                  </span>
+
+                </div>
+
               </div>
-              <div className="text-xs text-gray-600 line-clamp-2">{scene.content}</div>
+              <div className="flex gap-4 overflow-x-auto pb-4 px-2">
+                <div className="flex gap-4">
+                  {scenes.map((scene, index) => (
+                    <div
+                      key={scene.key}
+                      onClick={() => setCurrentScene(index)}
+                      className={`flex-shrink-0 w-64 bg-white rounded-lg shadow-sm border-2 cursor-pointer transition-all ${currentScene === index ? 'border-blue-500 shadow-md' : 'border-transparent'
+                        }`}
+                    >
+                      {/* Video Preview */}
+                      <div className={`w-full overflow-hidden relative group rounded-t-lg ${screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
+                        screenSize === 'SQUARE' ? 'aspect-square' :
+                          screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
+                        }`}>
+                        <img
+                          src={scene.previewUrl?.replace('.mp4', '')}
+                          alt={`Scene ${index + 1} preview`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-200" />
+                      </div>
+
+                      <div className="p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-semibold">Scene {index + 1}</span>
+                          <span className="text-xs text-gray-500">{scene.duration}s</span>
+                        </div>
+                        <div className="text-xs text-gray-600 line-clamp-2">{scene.content}</div>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    onClick={addNewScene}
+                    className={`flex-shrink-0 w-64 rounded-lg border-2 border-dashed border-blue-400 flex items-center justify-center hover:border-blue-500 hover:bg-blue-100 transition-colors ${screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
+                      screenSize === 'SQUARE' ? 'aspect-square' :
+                        screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
+                      }`}
+                  >
+                    <div className="flex flex-col items-center text-blue-500 hover:shadow-md">
+                      <PlusCircle className="w-6 h-6 mb-1" />
+                      <span className="text-sm">Add Scene</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
             </div>
+
+            {/* Current Scene Editor */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-lg font-semibold">Scene {currentScene + 1}</h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        if (currentScene > 0) setCurrentScene(currentScene - 1);
+                      }}
+                      disabled={currentScene === 0}
+                      className="p-1 rounded hover:bg-gray-100 disabled:opacity-50"
+                    >
+                      <ArrowLeft size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (currentScene < scenes.length - 1) setCurrentScene(currentScene + 1);
+                      }}
+                      disabled={currentScene === scenes.length - 1}
+                      className="p-1 rounded hover:bg-gray-100 disabled:opacity-50"
+                    >
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-600">Duration:</span>
+                    <input
+                      type="number"
+                      value={scenes[currentScene].duration}
+                      onChange={(e) => {
+                        const newScenes = [...scenes];
+                        newScenes[currentScene].duration = e.target.value;
+                        setScenes(newScenes);
+                      }}
+                      className="w-20 p-1 border rounded text-center"
+                      min="1"
+                    />
+                    <span className="text-gray-600">seconds</span>
+                  </label>
+                  {scenes.length > 1 && (
+                    <button
+                      onClick={() => removeScene(scenes[currentScene].id)}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+
+                {/* Scene Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Scene Description
+                  </label>
+                  <textarea
+                    value={scenes[currentScene].content}
+                    onChange={(e) => updateSceneContent(scenes[currentScene].id, e.target.value)}
+                    className="w-full p-3 border rounded-md text-sm"
+                    rows={3}
+                    placeholder="Describe what happens in this scene..."
+                  />
+                </div>
+
+
+                {/* AI Tool Prompts */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Runway Prompt */}
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-sm font-medium mb-3">
+                      <img
+                        src={AI_TOOL_LOGOS.runway}
+                        alt="Runway"
+                        className="w-6 h-6 rounded"
+                      />
+                      <span>Runway (AI Visual)</span>
+                    </div>
+                    <textarea
+                      value={scenes[currentScene].aiPrompts.runwayPrompt}
+                      onChange={(e) => updateAIPrompt(scenes[currentScene].id, 'runwayPrompt', e.target.value)}
+                      className="w-full p-2 border rounded-md text-sm"
+                      rows={4}
+                      placeholder="Describe the visual scene, lighting, and composition..."
+                    />
+                  </div>
+
+                  {/* Heygen Prompt */}
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-sm font-medium mb-3">
+                      <img
+                        src={AI_TOOL_LOGOS.heygen}
+                        alt="Heygen"
+                        className="w-6 h-6 rounded"
+                      />
+                      <span>HeyGen : Your Digital Clone</span>
+                    </div>
+                    <textarea
+                      value={scenes[currentScene].aiPrompts.heygenPrompt}
+                      onChange={(e) => updateAIPrompt(scenes[currentScene].id, 'heygenPrompt', e.target.value)}
+                      className="w-full p-2 border rounded-md text-sm"
+                      rows={4}
+                      placeholder="Describe your digital clone's expressions and actions..."
+                    />
+                  </div>
+
+                  {/* ElevenLabs Prompt */}
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-sm font-medium mb-3">
+                      <img
+                        src={AI_TOOL_LOGOS.elevenlabs}
+                        alt="ElevenLabs"
+                        className="w-6 h-6 rounded"
+                      />
+                      <span>ElevenLabs (AI Voice)</span>
+                    </div>
+                    <textarea
+                      value={scenes[currentScene].aiPrompts.elevenLabsPrompt}
+                      onChange={(e) => updateAIPrompt(scenes[currentScene].id, 'elevenLabsPrompt', e.target.value)}
+                      className="w-full p-2 border rounded-md text-sm"
+                      rows={4}
+                      placeholder="Describe voice tone, pace, and emotional quality..."
+                    />
+                  </div>
+                </div>
+
+
+                {/* Video Preview */}
+                <div className={`rounded-lg overflow-hidden bg-gray-100 ${screenSize === 'VERTICAL' ? 'aspect-[9/16] max-w-[540px] mx-auto' :
+                  screenSize === 'SQUARE' ? 'aspect-square max-w-[720px] mx-auto' :
+                    screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
+                  }`}>
+                  <img
+                    src={scenes[currentScene].previewUrl?.replace('.mp4', '')}
+                    alt={`Scene ${currentScene + 1} preview`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+              </div>
+            </div>
+
+
           </div>
-        ))}
-        <button
-          onClick={addNewScene}
-          className={`flex-shrink-0 w-64 rounded-lg border-2 border-dashed border-blue-400 flex items-center justify-center hover:border-blue-500 transition-colors ${
-            screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
-            screenSize === 'SQUARE' ? 'aspect-square' :
-            screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
-          }`}
-        >
-          <div className="flex flex-col items-center text-blue-500 hover:shadow-md">
-            <PlusCircle className="w-6 h-6 mb-1" />
-            <span className="text-sm">Add Scene</span>
-          </div>
-        </button>
-      </div>
+        </div>
+      )}
     </div>
-  </div>
-
-  {/* Current Scene Editor */}
-  <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-    <div className="flex justify-between items-center mb-4">
-      <div className="flex items-center gap-4">
-        <h3 className="text-lg font-semibold">Scene {currentScene + 1}</h3>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              if (currentScene > 0) setCurrentScene(currentScene - 1);
-            }}
-            disabled={currentScene === 0}
-            className="p-1 rounded hover:bg-gray-100 disabled:opacity-50"
-          >
-            <ArrowLeft size={16} />
-          </button>
-          <button
-            onClick={() => {
-              if (currentScene < scenes.length - 1) setCurrentScene(currentScene + 1);
-            }}
-            disabled={currentScene === scenes.length - 1}
-            className="p-1 rounded hover:bg-gray-100 disabled:opacity-50"
-          >
-            <ArrowRight size={16} />
-          </button>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <label className="flex items-center gap-2 text-sm">
-          <span className="text-gray-600">Duration:</span>
-          <input
-            type="number"
-            value={scenes[currentScene].duration}
-            onChange={(e) => {
-              const newScenes = [...scenes];
-              newScenes[currentScene].duration = e.target.value;
-              setScenes(newScenes);
-            }}
-            className="w-20 p-1 border rounded text-center"
-            min="1"
-          />
-          <span className="text-gray-600">seconds</span>
-        </label>
-        {scenes.length > 1 && (
-          <button
-            onClick={() => removeScene(scenes[currentScene].id)}
-            className="text-red-500 hover:text-red-600"
-          >
-            <X size={16} />
-          </button>
-        )}
-      </div>
-    </div>
-
-    <div className="space-y-6">
-
-      {/* Scene Description */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Scene Description
-        </label>
-        <textarea
-          value={scenes[currentScene].content}
-          onChange={(e) => updateSceneContent(scenes[currentScene].id, e.target.value)}
-          className="w-full p-3 border rounded-md text-sm"
-          rows={3}
-          placeholder="Describe what happens in this scene..."
-        />
-      </div>
-
-
-      {/* AI Tool Prompts */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Runway Prompt */}
-        <div className="border rounded-lg p-4">
-          <div className="flex items-center gap-2 text-sm font-medium mb-3">
-            <img 
-              src={AI_TOOL_LOGOS.runway} 
-              alt="Runway" 
-              className="w-6 h-6 rounded"
-            />
-            <span>Runway (AI Visual)</span>
-          </div>
-          <textarea
-            value={scenes[currentScene].aiPrompts.runwayPrompt}
-            onChange={(e) => updateAIPrompt(scenes[currentScene].id, 'runwayPrompt', e.target.value)}
-            className="w-full p-2 border rounded-md text-sm"
-            rows={4}
-            placeholder="Describe the visual scene, lighting, and composition..."
-          />
-        </div>
-
-        {/* Heygen Prompt */}
-        <div className="border rounded-lg p-4">
-          <div className="flex items-center gap-2 text-sm font-medium mb-3">
-            <img 
-              src={AI_TOOL_LOGOS.heygen} 
-              alt="Heygen" 
-              className="w-6 h-6 rounded"
-            />
-            <span>HeyGen : Your Digital Clone</span>
-          </div>
-          <textarea
-            value={scenes[currentScene].aiPrompts.heygenPrompt}
-            onChange={(e) => updateAIPrompt(scenes[currentScene].id, 'heygenPrompt', e.target.value)}
-            className="w-full p-2 border rounded-md text-sm"
-            rows={4}
-            placeholder="Describe your digital clone's expressions and actions..."
-          />
-        </div>
-
-        {/* ElevenLabs Prompt */}
-        <div className="border rounded-lg p-4">
-          <div className="flex items-center gap-2 text-sm font-medium mb-3">
-            <img 
-              src={AI_TOOL_LOGOS.elevenlabs} 
-              alt="ElevenLabs" 
-              className="w-6 h-6 rounded"
-            />
-            <span>ElevenLabs (AI Voice)</span>
-          </div>
-          <textarea
-            value={scenes[currentScene].aiPrompts.elevenLabsPrompt}
-            onChange={(e) => updateAIPrompt(scenes[currentScene].id, 'elevenLabsPrompt', e.target.value)}
-            className="w-full p-2 border rounded-md text-sm"
-            rows={4}
-            placeholder="Describe voice tone, pace, and emotional quality..."
-          />
-        </div>
-      </div>
-
-
-      {/* Video Preview */}
-      <div className={`rounded-lg overflow-hidden bg-gray-100 ${
-        screenSize === 'VERTICAL' ? 'aspect-[9/16] max-w-[540px] mx-auto' :
-        screenSize === 'SQUARE' ? 'aspect-square max-w-[720px] mx-auto' :
-        screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
-      }`}>
-        <img 
-          src={scenes[currentScene].previewUrl?.replace('.mp4', '')}
-          alt={`Scene ${currentScene + 1} preview`}
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-    </div>
-  </div>
-
-  {/* Export Options */}
-  <div className="flex justify-end gap-4">
-    <button
-      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-      onClick={() => {
-        const scriptData = {
-          videoType,
-          contentMood,
-          contentType,
-          screenSize,
-          overallPrompt,
-          scenes
-        };
-        const blob = new Blob([JSON.stringify(scriptData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'viral-video-script.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }}
-    >
-      Export Script
-    </button>
-  </div>
-</div>
-</div>
-)}
-</div>
-);
+  );
 };
 
 export default VideoScriptConstructor;

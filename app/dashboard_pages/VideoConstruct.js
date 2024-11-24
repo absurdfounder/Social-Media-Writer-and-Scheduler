@@ -26,25 +26,25 @@ const SCREEN_SIZES = {
     name: 'Horizontal (YouTube/Web)',
     dimensions: '1920x1080',
     aspectRatio: '16:9',
-    description: 'Best for desktop viewing and cinematic content'
+    description: 'Desktop Video'
   },
   VERTICAL: {
     name: 'Vertical (TikTok/Shorts)',
     dimensions: '1080x1920',
     aspectRatio: '9:16',
-    description: 'Optimized for mobile and short-form content'
+    description: 'Optimized for short-form'
   },
   SQUARE: {
     name: 'Square (Instagram)',
     dimensions: '1080x1080',
     aspectRatio: '1:1',
-    description: 'Perfect for social media feeds'
+    description: 'Social Feeds'
   },
   WIDE: {
     name: 'Ultra-Wide',
     dimensions: '2560x1080',
     aspectRatio: '21:9',
-    description: 'Cinematic format for immersive content'
+    description: 'Cinematic content'
   }
 };
 

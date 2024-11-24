@@ -136,7 +136,7 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
   const isEmpty = !note.trim();
 
   return (
-    <div className={`mt-4 bg-yellow-100 p-4 rounded-lg shadow-md transform -rotate-2 transition-all duration-300 hover:rotate-0 hover:shadow-lg ${isEmpty ? 'grayscale hover:grayscale-0' : ''}`}>
+    <div className={`mt-4 bg-yellow-200 p-4 rounded-lg shadow-md transform -rotate-2 transition-all duration-300 hover:rotate-0 hover:shadow-lg ${isEmpty ? 'grayscale hover:grayscale-0' : ''}`}>
       {isEditing ? (
         <div>
           <textarea
@@ -287,7 +287,7 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
           />
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="flex gap-2 items-center mt-4 p-2 bg-red-100 text-red-400 rounded-full hover:bg-red-500 transition-colors duration-300"
+            className="flex gap-2 items-center mt-4 p-2 px-6 bg-red-100 text-red-400 rounded-full hover:bg-red-200 transition-colors duration-300"
           >
             <Trash2 size={16} />
             Remove Tweet

@@ -128,7 +128,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
             <div className="p-6 text-center mt-8 space-y-4">
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center space-x-2 w-full m-auto">
-                  <img src="/logo.png" alt="Fetch Kitty logo" className="w-fit h-18 m-auto" />
+                  <img src="/logo.png" alt="big mouth logo" className="w-fit h-32 m-auto" />
                 </div>
                 {user && (
                   <button
@@ -142,12 +142,19 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
 
               <div>
 
-                <h2 className="text-4xl mb-2 max-w-2xl m-auto leading-normal"><span className='font-normal'>The easiest way to </span> <br /> <span className='font-bold text-orange-500 border-b border-b-orange-500 border-b-4'>Fetch</span> , <span className='font-bold text-yellow-500 border-b border-b-yellow-500 border-b-4'>Clean</span> and <span className='font-bold text-green-600 border-b border-b-green-500 border-b-4'> Publish</span> <br /> data from any website.</h2>
+                <h2 className="text-5xl mb-2 max-w-2xl m-auto leading-normal mb-4 text-slate-500">
+                  <span className="font-normal border-b border-b-4">Social Media AI-Toolkit</span> <span className="font-normal">for</span> <br />
+                  <span className="font-bold text-blue-400 border-b border-b-blue-400 border-b-4">X</span>, {" "}
+                  <span className="font-bold text-pink-500 border-b border-b-pink-500 border-b-4">IG</span>, {" "}
+                  <span className="font-bold text-gray-600 border-b border-b-gray-800 border-b-4">TikTok</span> and {" "}
+                  <span className="font-bold text-red-500 border-b border-b-red-400 border-b-4">Reddit</span> <br />
+                  trained on your brand.
+                </h2>
+
 
                 <p className="text-lg text-gray-500 mb-8 flex gap-4 m-auto justify-center mt-2">
                   <CheckCircle2 size={18} className='m-auto mx-0 text-green-500' />Train a robot in 2 mins
                   <CheckCircle2 size={18} className='m-auto mx-0 text-green-500' /> No-Code Required
-                  <CheckCircle2 size={18} className='m-auto mx-0 text-green-500' /> Works with Notion
                 </p>
               </div>
 
@@ -155,14 +162,6 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
 
 
                 <Login />
-
-                <div>
-                  <button className="w-64 h-16 bg-orange-600 text-white rounded-full py-4 px-4 flex items-center justify-center space-x-2 hover:bg-orange-700 hover:text-white transition-colors">
-                    <span className='leading-loose'>Get Lifetime Deal for <b>$64</b></span>
-                  </button>
-                  <span className='top-0 bg-yellow-300 text-black p-2 px-4 rounded-lg'>
-                    192 passes left <b className='animate-pulse text-red-700 text-lg pl-2 font-bold'> ⏺ </b></span>
-                </div>
 
 
               </div>
@@ -219,59 +218,12 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
               <div className="relative max-w-6xl mx-auto px-8 sm:px-6">
 
                 <div className='p-4'>
-                  <div className="relative w-fit mx-auto mt-6 mb-6">
-
-                    <div className="absolute -top-8 left-4 text-yellow-300/70 animate-bounce delay-100">✦</div>
-                    <div className="absolute -top-4 left-8 text-yellow-300/70 animate-pulse delay-300">✧</div>
-                    <div className="absolute top-0 right-4 text-yellow-300/70 animate-ping delay-500">⋆</div>
-                    <div className="absolute -top-6 right-8 text-yellow-300/70 animate-bounce delay-700">✦</div>
-                    <div className="absolute top-8 -left-4 text-yellow-300/70 animate-pulse delay-200">⋆</div>
-                    <div className="absolute bottom-8 -left-8 text-yellow-300/70 animate-bounce delay-400">✧</div>
-                    <div className="absolute -bottom-4 left-4 text-yellow-300/70 animate-ping delay-600">✦</div>
-                    <div className="absolute bottom-0 right-8 text-yellow-300/70 animate-pulse delay-800">⋆</div>
-                    <div className="absolute -bottom-8 right-4 text-yellow-300/70 animate-bounce delay-1000">✧</div>
-                    <div className="absolute bottom-12 -right-4 text-yellow-300/70 animate-ping delay-100">✦</div>
-
-                    <div className="group relative">
-                      <div className="relative bg-slate-800/90 text-white backdrop-blur-md hover:bg-yellow-200 hover:text-black 
-                transition-all duration-500 ease-in-out p-3 px-8 rounded-lg 
-                shadow-lg hover:shadow-2xl group-hover:scale-105 z-10">
-                        <div className="absolute inset-0 rounded-lg opacity-0">
-                        </div>
-
-                        <div className="flex items-center gap-3 relative z-20">
-                          <span className="text-slate-600 transition-transform duration-500 
-                      inline-block">
-                            <GithubIcon size={18} className='m-auto mx-0 text-slate-500' />
-                          </span>
-
-                          <span className="font-medium text-lg">
-                            Proudly Open Source
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="absolute top-2 left-2 text-yellow-400 animate-pulse delay-150 z-20 text-lg">✦</div>
-                    <div className="absolute -top-2 right-6 text-yellow-400 animate-pulse delay-350 z-20 text-lg">⋆</div>
-                    <div className="absolute -bottom-2 right-2 text-yellow-400 animate-pulse delay-750 z-20 text-lg">✦</div>
-                    <div className="absolute top-6 -right-4 text-yellow-400 animate-pulse delay-250 z-20 text-lg">⋆</div>
-                    <div className="absolute bottom-8 -left-6 text-yellow-400 animate-ping delay-450 z-20 text-lg">✧</div>
-
-                    <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-yellow-300/60 rounded-full animate-ping z-5"></div>
-                    <div className="absolute top-1/3 left-1/4 w-1 h-1 bg-purple-300/60 rounded-full animate-ping delay-300 z-5"></div>
-                    <div className="absolute bottom-1/3 right-1/4 w-1 h-1 bg-pink-300/60 rounded-full animate-ping delay-500 z-5"></div>
-                    <div className="absolute bottom-1/2 right-1/3 w-2 h-2 bg-blue-300/60 rounded-full animate-ping delay-700 z-5"></div>
-                  </div>
-
-
-
 
 
                   <section className="py-12 mt-8 mb-8 md:flex sm:grid">
                     <div className="md:w-1/2 sm:w-full">
                       <div className="text-start mt-6 w-full p-4">
-                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Finds & extracts urls <span className="font-source-serif-4 font-normal text-orange-600 border-b-4 border-orange-200">in seconds.</span></h2>
+                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Finds & extracts urls <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">in seconds.</span></h2>
                         <p className="text-gray-700">
                           Moving your Blog or Directory to another CMS like <a href='boringsites.com'>BoringSites</a> or Ghost , we got you covered just dump the whole sitemap with all the urls, it will structure all the urls.
                         </p>
@@ -291,7 +243,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   <section className="py-12 mt-8 mb-8 md:flex sm:grid">
                     <div className="md:w-1/2 sm:w-full">
                       <div className="text-start mt-6 w-full p-4">
-                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Scrape content <span className="font-source-serif-4 font-normal text-orange-600 border-b-4 border-orange-200">without worrying about bots.</span></h2>
+                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Scrape content <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">without worrying about bots.</span></h2>
                         <p className="text-gray-700">
                           With JavaScript rendering, no worries all the scraping is done in your own browser. No need for a headless browser. Or worried about getting blocked by Bot Protection. Making sure your data pipeline is unhindered.
                         </p>
@@ -311,7 +263,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   <section className="py-12 mt-8 mb-8 md:flex sm:grid">
                     <div className="md:w-1/2 sm:w-full">
                       <div className="text-start mt-6 w-full p-4">
-                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Cleaning AI agent <span className="font-source-serif-4 font-normal text-orange-600 border-b-4 border-orange-200">that follows what you asked.</span></h2>
+                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Cleaning AI agent <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">that follows what you asked.</span></h2>
                         <p className="text-gray-700">
                           Focus on extracting the data you need, not dealing with inefficient formatting in data.  We use OpenAI Assistants so that you can control what you want to extract and how you want it to be written for you.
                         </p>
@@ -330,7 +282,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   <section className="py-12 mt-8 mb-8 md:flex sm:grid">
                     <div className="md:w-1/2 sm:w-full">
                       <div className="text-start mt-6 w-full p-4">
-                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">World-class <span className="font-source-serif-4 font-normal text-orange-600 border-b-4 border-orange-200">Speed & Performance</span></h2>
+                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">World-class <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">Speed & Performance</span></h2>
                         <p className="text-gray-700">
                           As we use your own browser to scrape, which is why there is zero latency and everyhting is blazingly fast.
                         </p>
@@ -348,7 +300,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   <section className="py-12 mt-8 mb-8 md:flex sm:grid">
                     <div className="md:w-1/2 sm:w-full">
                       <div className="text-start mt-6 w-full p-4">
-                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Publish cleaned content <span className="font-source-serif-4 font-normal text-orange-600 border-b-4 border-orange-200">on <b className='font-bold text-gray-900'>Notion</b> with a click.</span></h2>
+                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Publish cleaned content <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">on <b className='font-bold text-gray-900'>Notion</b> with a click.</span></h2>
                         <p className="text-gray-700">
                           After cleaning the data accordingly to specifications, pulish content directly on a notion database and build your own listicles or curated database and share it with the world.
                         </p>
@@ -370,13 +322,13 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   <section className="py-12 mt-8 mb-8 md:flex sm:grid">
                     <div className="md:w-1/2 sm:w-full">
                       <div className="text-start mt-6 w-full p-4">
-                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Download  <span className="font-source-serif-4 font-normal text-orange-600 border-b-4 border-orange-200">or <b className='text-gray-900'>Export data</b> wherever you want.</span></h2>
+                        <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">Download  <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">or <b className='text-gray-900'>Export data</b> wherever you want.</span></h2>
                         <p className="text-gray-700">
-                          With fetch kitty you can either have the data on notion and host it on Boring Sites, or export and host it on other website builders like Unicorn Platform, Webflow, or even move to Google Sheets.
+                          With big mouth you can either have the data on notion and host it on Boring Sites, or export and host it on other website builders like Unicorn Platform, Webflow, or even move to Google Sheets.
                         </p>
                         <p className="text-lg text-gray-500 mb-8 grid gap-4 m-auto justify-start mt-4">
                           <span className='flex gap-4'><CheckCircle2 size={18} className='m-auto mx-0 text-green-500' />Download Scrapped Content</span>
-                          <span className='flex gap-4'><CheckCircle2 size={18} className='m-auto mx-0 text-green-500' /><span>Host your curation on <a href="boringsites.com" className='text-orange-600'>BoringSites</a>.</span></span>
+                          <span className='flex gap-4'><CheckCircle2 size={18} className='m-auto mx-0 text-green-500' /><span>Host your curation on <a href="boringsites.com" className='text-blue-600'>BoringSites</a>.</span></span>
                         </p>
 
                         <div className="max-w-xs mx-auto sm:max-w-none sm:flex aos-init aos-animate mt-6" data-aos="zoom-y-out" data-aos-delay="300">
@@ -394,7 +346,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     {/* Content */}
                     <div className="p-6">
                       <div className="text-center mb-8">
-                        <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-700">
+                        <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
                           Choose Your Purrfect Plan
                         </h3>
                         <p className="text-gray-600 mt-2">Unlimited AI-Powered Web Scraping</p>
@@ -405,10 +357,10 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                           <div
                             key={plan.name}
                             className={`relative rounded-lg border p-6 transition-all hover:shadow-lg bg-white
-                                 ${plan.popular ? 'border-2 border-orange-500' : ''}`}
+                                 ${plan.popular ? 'border-2 border-blue-500' : ''}`}
                           >
                             {plan.popular && (
-                              <div className="absolute top-4 right-4 flex items-center gap-1 bg-gradient-to-r from-orange-500 to-orange-700 text-white px-3 py-1 rounded-full">
+                              <div className="absolute top-4 right-4 flex items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white px-3 py-1 rounded-full">
                                 <Sparkles className="h-4 w-4" />
                                 <span className="text-sm font-medium">Most Popular</span>
                               </div>
@@ -417,7 +369,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                             <div className="mb-4">
                               <h3 className="text-xl font-semibold flex items-center gap-2">
                                 {plan.name}
-                                <Infinity className="h-5 w-5 text-orange-500" />
+                                <Infinity className="h-5 w-5 text-blue-500" />
                               </h3>
                               <p className="text-gray-500">{plan.description}</p>
                             </div>
@@ -430,8 +382,8 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                             <ul className="space-y-3 mb-6">
                               {plan.features.map((feature) => (
                                 <li key={feature} className="flex items-center gap-2">
-                                  <div className="h-5 w-5 rounded-full bg-orange-100 flex items-center justify-center">
-                                    <Check className="h-3 w-3 text-orange-600" />
+                                  <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <Check className="h-3 w-3 text-blue-600" />
                                   </div>
                                   <span>{feature}</span>
                                 </li>
@@ -441,8 +393,8 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                             <button
                               className={`w-full py-2 px-4 rounded-lg font-medium transition-colors
                                   ${plan.popular
-                                  ? 'bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-500 hover:to-orange-800 text-white'
-                                  : 'bg-orange-100 hover:bg-orange-200 text-orange-700'}`}
+                                  ? 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-500 hover:to-blue-800 text-white'
+                                  : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
                             >
                               Get Started
                             </button>
@@ -462,10 +414,10 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                 <div className="grid sm:grid-cols-12 gap-8 py-8 md:py-12 border-t border-gray-200 p-8">
                   <div className="sm:col-span-12 lg:col-span-4">
                     <a className="mb-2 bg-slate-700 rounded-full" href="0">
-                      <img src="/logo.png" alt="Fetch Kitty logo" className="w-fit h-12" />
+                      <img src="/logo.png" alt="big mouth logo" className="w-fit h-12" />
 
-                      <p className="text-sm text-gray-600 mt-4 mb-4">Fetch Kitty is an easy-to-use scapper and cleaner for busy founders. Lead by <a className="text-orange-600" href="https://twitter.com/absurdfounder">@absurdfounder</a>.</p>
-                      <p className="mb-2 text-sm text-gray-400">Fetch Kitty is not related with Notion™ the company in any way.</p>
+                      <p className="text-sm text-gray-600 mt-4 mb-4">big mouth is an easy-to-use scapper and cleaner for busy founders. Lead by <a className="text-blue-600" href="https://twitter.com/absurdfounder">@absurdfounder</a>.</p>
+                      <p className="mb-2 text-sm text-gray-400">big mouth is not related with Notion™ the company in any way.</p>
                     </a>
                     <div className="text-sm text-gray-600">
                       <a className="text-gray-600 hover:text-gray-900 hover:underline transition duration-150 ease-in-out" href="/terms">Terms</a> ·
@@ -475,9 +427,9 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   <div className="sm:col-span-6 md:col-span-3 lg:col-span-3">
                     <h6 className="text-gray-800 font-medium mb-2">Product</h6>
                     <ul className="text-sm">
-                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="https://FetchKitty.com">Fetch Kitty App</a></li>
-                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="https://Fetch Kitty.com/blog">Blog</a></li>
-                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="https://Fetch Kitty.com/changelog">Changelog</a></li>
+                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="https://bigmouth.dev">big mouth App</a></li>
+                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="https://bigmouth.dev/blog">Blog</a></li>
+                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="https://bigmouth.dev/changelog">Changelog</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/integration">Pre-Built Robo Agents</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/pricing">Pricing</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/pricing">Helpdesk</a></li>
@@ -487,7 +439,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <h6 className="text-gray-800 font-medium mb-2">Use Cases</h6>
                     <ul className="text-sm">
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/agency">Extract data from any website just point and click</a></li>
-                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/migrating-to-Fetch Kitty">Migrate data to Boring Sites</a></li>
+                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/migrating-to-big mouth">Migrate data to Boring Sites</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/agency">Turn websites into APIs</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/create-a-blog-notion">Price monitoring</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/create-a-directory-notion">Product data extraction</a></li>
@@ -537,7 +489,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       </a>
                     </li>
                   </ul>
-                  <div className="text-sm text-gray-600 mr-4">© Fetch Kitty LLC. All rights reserved.</div>
+                  <div className="text-sm text-gray-600 mr-4">© Boring Sites LLC. All rights reserved.</div>
                 </div>
               </div>
             </footer>

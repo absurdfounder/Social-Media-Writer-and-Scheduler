@@ -11,7 +11,10 @@ import AgingReport from './dashboard_pages/AgingReport';
 import CollectionThisWeek from './dashboard_pages/CollectionThisWeek';
 import ThreadWriter from './dashboard_pages/ThreadReply';
 import VideoScriptConstructor from './dashboard_pages/VideoConstruct';
-
+import OnBoardingPopup from './Components/OnBoardingPopup';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+import UserProfileSection from './Components/UserProfileSection';
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${
@@ -80,6 +83,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
+      
+      <ToastContainer />
       <div className="flex h-screen overflow-hidden">
         {/* Overlay */}
         {isMobileMenuOpen && (
@@ -91,55 +96,39 @@ export default function Dashboard() {
 
         {/* Sidebar */}
         <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
-          <div className="p-6 flex justify-between items-center">
-            <Image 
-              src={logoSrc}
-              alt="Logo"
-              width={200}
-              height={50}
-              onError={() => {
-                console.error(`Failed to load image: ${logoSrc}`);
-                setLogoSrc('logo.png'); // Fallback to default logo
-              }}
-            />
-            <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-500">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          <nav className="mt-6 px-6 space-y-1 flex-grow">
-            {navItems.map((item) => (
-              <NavItem
-                key={item.id}
-                icon={item.icon}
-                label={item.label}
-                active={activeTab === item.id}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  setIsMobileMenuOpen(false);
-                }}
-              />
-            ))}
-          </nav>
+  <div className="p-6 flex justify-between items-center">
+    <Image 
+      src={logoSrc}
+      alt="Logo"
+      width={200}
+      height={50}
+      onError={() => {
+        console.error(`Failed to load image: ${logoSrc}`);
+        setLogoSrc('logo.png');
+      }}
+    />
+    <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-500">
+      <X className="h-6 w-6" />
+    </button>
+  </div>
+  <nav className="mt-6 px-6 space-y-1 flex-grow">
+    {navItems.map((item) => (
+      <NavItem
+        key={item.id}
+        icon={item.icon}
+        label={item.label}
+        active={activeTab === item.id}
+        onClick={() => {
+          setActiveTab(item.id);
+          setIsMobileMenuOpen(false);
+        }}
+      />
+    ))}
+  </nav>
 
-          {/* User profile moved to sidebar */}
-          <div className="p-4 border-t">
-            <button className="flex items-center space-x-2 w-full text-left">
-              <Image 
-                src="/userimage.png" 
-                alt="User avatar" 
-                width={32} 
-                height={32} 
-                className="rounded-full"
-              />
-              <div className="flex-grow">
-                <span className="block font-medium text-sm">Big Mouth</span>
-                <span className="block text-xs text-gray-500">john@example.com</span>
-              </div>
-              <ChevronDown className="h-4 w-4 text-gray-400" />
-            </button>
-          </div>
-        </aside>
-
+  {/* Replace the old user profile section with the new component */}
+  <UserProfileSection />
+</aside>
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 rounded-md">
           {/* Page content */}

@@ -735,7 +735,7 @@ Copy- Style guide creation
       
       `;
   
-      const response = await fetch('/api/anthropic', {
+      const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

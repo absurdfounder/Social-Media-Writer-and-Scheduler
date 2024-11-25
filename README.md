@@ -5,7 +5,7 @@ This repository can generate AI-based tweets and threads using the Anthropic API
 # Features
 
 - Generate AI-based tweets and threads using Anthropic API.
-- Handle API requests to generate tweets with `app/api/anthropic/route.js` and `app/pages/api/anthropic.js`.
+- Handle API requests to generate tweets with `app/api/openai/route.js` and `app/pages/api/openai.js`.
 - Create and manage tweet threads with the `ThreadWriter` component in `app/dashboard_pages/MainDashboard.js`.
 - Compose tweets using the `TipTapEditor` component in `app/dashboard_pages/MainDashboard.js`.
 - Support for image and video uploads for tweets.

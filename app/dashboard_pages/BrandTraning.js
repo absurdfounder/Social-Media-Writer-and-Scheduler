@@ -27,26 +27,43 @@ const ProductQuestionnaire = () => {
   const [displayMode, setDisplayMode] = useState('card');
   const [profiles, setProfiles] = useState([]);
   const [currentProfileId, setCurrentProfileId] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(null);
+  const [newProfileName, setNewProfileName] = useState('');
 
   useEffect(() => {
     // Load profiles and current profile from localStorage
     const savedProfiles = localStorage.getItem('profiles');
-    const currentId = localStorage.getItem('currentProfileId');
+    let currentId = localStorage.getItem('currentProfileId');
     
+    let parsedProfiles = [];
     if (savedProfiles) {
-      const parsedProfiles = JSON.parse(savedProfiles);
-      setProfiles(parsedProfiles);
-      
-      // If there's a current profile ID, load its answers
-      if (currentId && parsedProfiles.find(p => p.id === currentId)) {
-        setCurrentProfileId(currentId);
-        const profile = parsedProfiles.find(p => p.id === currentId);
-        setAnswers(profile.answers || {});
-      } else if (parsedProfiles.length > 0) {
-        // Set first profile as default if no current profile
-        setCurrentProfileId(parsedProfiles[0].id);
-        setAnswers(parsedProfiles[0].answers || {});
-      }
+      parsedProfiles = JSON.parse(savedProfiles);
+    }
+
+    // Create default profile if no profiles exist
+    if (parsedProfiles.length === 0) {
+      const defaultProfile = {
+        id: Date.now().toString(),
+        name: 'Default Profile',
+        answers: {}
+      };
+      parsedProfiles = [defaultProfile];
+      localStorage.setItem('profiles', JSON.stringify(parsedProfiles));
+      localStorage.setItem('currentProfileId', defaultProfile.id);
+      currentId = defaultProfile.id;
+    }
+
+    setProfiles(parsedProfiles);
+    
+    // Set current profile
+    if (currentId && parsedProfiles.find(p => p.id === currentId)) {
+      setCurrentProfileId(currentId);
+      const profile = parsedProfiles.find(p => p.id === currentId);
+      setAnswers(profile.answers || {});
+    } else {
+      setCurrentProfileId(parsedProfiles[0].id);
+      setAnswers(parsedProfiles[0].answers || {});
     }
   }, []);
 
@@ -55,7 +72,6 @@ const ProductQuestionnaire = () => {
     const newAnswers = { ...answers, [id]: answer };
     setAnswers(newAnswers);
 
-    // Update the current profile's answers in profiles array
     if (currentProfileId) {
       const updatedProfiles = profiles.map(profile => 
         profile.id === currentProfileId 
@@ -82,11 +98,10 @@ const ProductQuestionnaire = () => {
   };
 
   const handleCreateProfile = () => {
-    const profileName = prompt('Enter profile name:');
-    if (profileName) {
+    if (newProfileName.trim()) {
       const newProfile = {
         id: Date.now().toString(),
-        name: profileName,
+        name: newProfileName,
         answers: {}
       };
       
@@ -96,6 +111,8 @@ const ProductQuestionnaire = () => {
       setAnswers({});
       localStorage.setItem('profiles', JSON.stringify(newProfiles));
       localStorage.setItem('currentProfileId', newProfile.id);
+      setNewProfileName('');
+      setIsProfileModalOpen(false);
     }
   };
 
@@ -105,23 +122,41 @@ const ProductQuestionnaire = () => {
     setAnswers(profile.answers || {});
     localStorage.setItem('currentProfileId', profileId);
     setCurrentQuestion(0);
+    setIsProfileModalOpen(false);
   };
 
   const handleDeleteProfile = (profileId) => {
-    if (confirm('Are you sure you want to delete this profile?')) {
-      const updatedProfiles = profiles.filter(p => p.id !== profileId);
+    let updatedProfiles = profiles.filter(p => p.id !== profileId);
+    
+    // If deleting last profile, create a new default profile
+    if (updatedProfiles.length === 0) {
+      const defaultProfile = {
+        id: Date.now().toString(),
+        name: 'Default Profile',
+        answers: {}
+      };
+      updatedProfiles = [defaultProfile];
+      handleSwitchProfile(defaultProfile.id);
+    } else if (currentProfileId === profileId) {
+      handleSwitchProfile(updatedProfiles[0].id);
+    }
+    
+    setProfiles(updatedProfiles);
+    localStorage.setItem('profiles', JSON.stringify(updatedProfiles));
+    setIsProfileModalOpen(false);
+  };
+
+  const handleEditProfile = () => {
+    if (editingProfile && newProfileName.trim()) {
+      const updatedProfiles = profiles.map(profile =>
+        profile.id === editingProfile.id
+          ? { ...profile, name: newProfileName }
+          : profile
+      );
       setProfiles(updatedProfiles);
       localStorage.setItem('profiles', JSON.stringify(updatedProfiles));
-      
-      if (currentProfileId === profileId) {
-        if (updatedProfiles.length > 0) {
-          handleSwitchProfile(updatedProfiles[0].id);
-        } else {
-          setCurrentProfileId(null);
-          setAnswers({});
-          localStorage.removeItem('currentProfileId');
-        }
-      }
+      setEditingProfile(null);
+      setNewProfileName('');
     }
   };
 
@@ -170,35 +205,108 @@ const ProductQuestionnaire = () => {
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
-  const ProfileSelector = () => (
-    <div className="mb-6 flex flex-wrap items-center gap-2 justify-between mt-4 mb-4 border-t border-b pt-4 pb-4">
-      <select
-        value={currentProfileId || ''}
-        onChange={(e) => handleSwitchProfile(e.target.value)}
-        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {profiles.map(profile => (
-          <option key={profile.id} value={profile.id}>
-            {profile.name}
-          </option>
-        ))}
-      </select>
-      <button
-        onClick={handleCreateProfile}
-        className="px-4 py-2 bg-gray-300 text-gray-600 rounded-lg hover:bg-gray-400"
-      >
-        New Company or Service
-      </button>
-      {currentProfileId && (
-        <button
-          onClick={() => handleDeleteProfile(currentProfileId)}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-        >
-          Delete Profile
-        </button>
-      )}
-    </div>
-  );
+  const currentProfile = profiles.find(p => p.id === currentProfileId);
+
+  const ProfileModal = () => {
+    if (!isProfileModalOpen) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="flex items-center justify-center min-h-screen px-4 pb-20 text-center">
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+            onClick={() => setIsProfileModalOpen(false)}
+          ></div>
+
+          {/* Modal */}
+          <div className="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+            {/* Header */}
+            <div className="mb-4">
+              <h3 className="text-lg font-medium leading-6 text-gray-900">
+                Profile Management
+              </h3>
+              <button
+                onClick={() => setIsProfileModalOpen(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Profile List */}
+            <div className="space-y-2 mb-6">
+              {profiles.map(profile => (
+                <div key={profile.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  <span className="font-medium">{profile.name}</span>
+                  <div className="space-x-2">
+                    <button
+                      onClick={() => handleSwitchProfile(profile.id)}
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                    >
+                      Select
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingProfile(profile);
+                        setNewProfileName(profile.name);
+                      }}
+                      className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-200"
+                    >
+                      Edit
+                    </button>
+                    {profiles.length > 1 && (
+                      <button
+                        onClick={() => handleDeleteProfile(profile.id)}
+                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-200"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Create/Edit Profile Form */}
+            <div className="pt-4 border-t border-gray-200">
+              <h3 className="text-lg font-medium mb-2">
+                {editingProfile ? 'Edit Profile' : 'Create New Profile'}
+              </h3>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newProfileName}
+                  onChange={(e) => setNewProfileName(e.target.value)}
+                  placeholder="Enter profile name"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={editingProfile ? handleEditProfile : handleCreateProfile}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                >
+                  {editingProfile ? 'Save' : 'Create'}
+                </button>
+                {editingProfile && (
+                  <button
+                    onClick={() => {
+                      setEditingProfile(null);
+                      setNewProfileName('');
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-200"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderCardView = () => (
     <div className="bg-white shadow-lg rounded-xl overflow-hidden transition-all duration-500 ease-out transform hover:scale-105">
@@ -249,24 +357,38 @@ const ProductQuestionnaire = () => {
     <div className="w-full max-w-2xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl text-center mb-4 text-blue-800">Tell our personal journey AI about your offerings</h2>
-        <ProfileSelector />
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-2 p-2 px-6 bg-gray-50 border rounded-md">
+            <span className="text-blue-600">{currentProfile?.name}</span>
+          </div>
+          <button
+            onClick={() => setIsProfileModalOpen(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
+          >
+            Manage Profiles
+          </button>
+        </div>
+        <ProfileModal />
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setDisplayMode('card')}
-            className={`px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'}`}
+            className={`px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
           >
             Card View
           </button>
           <button
             onClick={() => setDisplayMode('list')}
-            className={`px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'}`}
+            className={`px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
           >
             List View
           </button>
         </div>
         {displayMode === 'card' && (
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-blue-500 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
+            <div 
+              className="bg-blue-500 h-2 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            ></div>
           </div>
         )}
       </div>

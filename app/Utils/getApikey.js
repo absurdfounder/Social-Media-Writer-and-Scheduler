@@ -5,7 +5,7 @@ export const getOpenAIKey = () => {
         return localKey;
       }
     }
-    return process.env.NEXT_PUBLIC_OPENAI_API_KEY || '';
+    return  '';
   };
   
   export const getAnthropicKey = () => {
@@ -15,5 +15,5 @@ export const getOpenAIKey = () => {
         return localKey;
       }
     }
-    return process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '';
+    return '';
   };

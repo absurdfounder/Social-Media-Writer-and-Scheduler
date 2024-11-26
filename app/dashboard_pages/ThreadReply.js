@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, use } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { PlusCircle, X, Smile, Image as ImageIcon, Link as LinkIcon, Wand2, FileText, Video, Loader, ToggleLeft, ToggleRight, Circle, CircleCheck, Blocks, BicepsFlexed, CircleCheckBig } from 'lucide-react';
+import { PlusCircle, X, Smile, Image as ImageIcon, Link as LinkIcon, Wand2, FileText, Video, Loader, ToggleLeft, ToggleRight, Circle, CircleCheck, Blocks, BicepsFlexed, CircleCheckBig, InfoIcon } from 'lucide-react';
+import { getAnthropicKey } from '../Utils/getApikey';
 
 const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkAdd }) => {
   const [isClient, setIsClient] = useState(false);
@@ -152,6 +153,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [productInfo, setProductInfo] = useState(null);
   const [mode, setMode] = useState('share');
   const [feeling, setFeeling] = useState('not_specified');
+  const [apikeyAdded, setApikeyAdded] = useState(false);
 
   useEffect(() => {
     setIsBrowser(true);
@@ -290,7 +292,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     return { content: content.trim(), images, links, videos };
   };
 
- 
+
 
   const generateAIThread = async () => {
     playSound(sentSound);
@@ -308,9 +310,9 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
         default:
           maxTweets = 10;
       }
-  
+
       let promptContent = overallPrompt;
-      
+
       if (includeProduct) {
         const storedProductInfo = localStorage.getItem('productQuestionnaire');
         if (storedProductInfo) {
@@ -319,9 +321,9 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
           promptContent += JSON.stringify(productData, null, 2);
         }
       }
-  
+
       const feelingPrompt = getFeelingPrompt(feeling);
-  
+
       const systemPrompt = `You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
   
       ${mode === 'reply' ? `
@@ -734,7 +736,7 @@ Copy- Style guide creation
 
       
       `;
-  
+
       const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
@@ -743,22 +745,23 @@ Copy- Style guide creation
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 1000,
-          messages: [{ 
-            role: "user", 
+          messages: [{
+            role: "user",
             content: `${mode === 'reply' ? 'Generate a reply' : 'Generate a new tweet or thread'} ${threadType === 'single' ? '(single tweet)' : `(thread of ${maxTweets} tweets)`} ${mode === 'reply' ? 'in response to' : 'about'} the following ${mode === 'share' ? 'update' : 'tweet'}: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet content without any extra text. Don't use emojis unless specifically requested. Don't write numbers in front of each tweet. Include one media suggestion (image or video) per tweet. In the URL, provide text describing what the image or video should show. Use spacing and line breaks to make the tweet stand out.`
           }],
           system: systemPrompt,
           model: "claude-3-5-sonnet-20240620",
+          claudapikey: getAnthropicKey()
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const data = await response.json();
       const generatedThreadContent = data.content[0].text.split('/endtweet').filter(tweet => tweet.trim() !== '');
-  
+
       const generatedThread = generatedThreadContent.map((tweetContent) => {
         const { content, images, links, videos } = parseAIResponse(tweetContent);
         return {
@@ -770,7 +773,7 @@ Copy- Style guide creation
           key: Date.now() + Math.random()
         };
       });
-  
+
       setTweets(generatedThread);
       playSound(receivedSound);
     } catch (error) {
@@ -852,25 +855,38 @@ Copy- Style guide creation
     return feelingPrompts[feeling]?.prompt || "";
   };
 
+  useEffect(() => {
+    if (getAnthropicKey() !== '') {
+      setApikeyAdded(true);
+    }
+  }, [apikeyAdded]);
 
   return (
     <div className="bg-white rounded-md overflow-hidden">
       <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
         <div className='bg-white rounded-md p-2 sm:p-4'>
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
+
+
+            {!apikeyAdded ? <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'><InfoIcon size={20} />Claud Api Key Not Added </div> : null}
+
+
+
+
+
             <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
 
-            <div className="flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit">
+            <div className={`  flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
               <button
                 onClick={() => {
                   setMode('share');
                   playSound(toggleSound);
                 }}
-                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                  mode === 'share'
+
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'share'
                     ? 'text-white bg-blue-500'
                     : 'text-gray-500 hover:text-gray-500'
-                }`}
+                  }`}
                 aria-pressed={mode === 'share'}
               >
                 <span className="relative z-10">Share</span>
@@ -883,11 +899,10 @@ Copy- Style guide creation
                   setMode('reply');
                   playSound(toggleSound);
                 }}
-                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                  mode === 'reply'
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'reply'
                     ? 'text-white bg-blue-500'
                     : 'text-gray-500 hover:text-gray-500'
-                }`}
+                  }`}
                 aria-pressed={mode === 'reply'}
               >
                 <span className="relative z-10">Reply</span>
@@ -934,14 +949,14 @@ Copy- Style guide creation
               </select>
             </div>
 
-            <button
+            {apikeyAdded ? <button
               className='bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm w-full sm:w-auto'
               onClick={generateAIThread}
               disabled={isGenerating}
             >
               {isGenerating ? <Loader size={14} className="animate-spin" /> : <Wand2 size={14} />}
               Generate {threadType === 'single' ? 'Tweet' : 'Thread'}
-            </button>
+            </button> : ''}
           </div>
           <div className="flex flex-col sm:flex-row items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 gap-2 mt-4">
             <button
@@ -953,14 +968,14 @@ Copy- Style guide creation
                 Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
                   <i className='flex gap-1 sm:gap-2 text-blue-500'>
                     <Blocks size={16} />product/service
-                  </i> with my 
+                  </i> with my
                   <i className='flex gap-1 sm:gap-2 text-blue-500'>
                     <BicepsFlexed size={16} />personal journey
                   </i>
                 </span>
               </span>
             </button>
-            <button 
+            <button
               className='flex gap-2 bg-blue-100 text-blue-600 p-1 px-2 sm:px-4 rounded-2xl text-xs sm:text-sm'
               onClick={onConfigureTrainingData}
             >

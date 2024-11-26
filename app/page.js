@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,TrendingUp, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
+import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, TrendingUp, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
 import BuyerList from './dashboard_pages/BuyerList';
 import Ledger from './dashboard_pages/Ledger';
 import Commissions from './dashboard_pages/BrandTraning';
@@ -15,13 +15,13 @@ import OnBoardingPopup from './Components/OnBoardingPopup';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import UserProfileSection from './Components/UserProfileSection';
+import ApiKeyManager from './Components/ApiKeyManager';
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
-    className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${
-      active 
-        ? 'bg-blue-100 text-blue-500' 
+    className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${active
+        ? 'bg-blue-100 text-blue-500'
         : 'text-gray-500 hover:bg-gray-100'
-    }`}
+      }`}
     onClick={onClick}
   >
     <Icon className="mr-3 h-5 w-5" />
@@ -31,9 +31,8 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
 
 const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
-    className={`flex flex-col items-center justify-center p-2 ${
-      active ? 'text-blue-500' : 'text-gray-500'
-    }`}
+    className={`flex flex-col items-center justify-center p-2 ${active ? 'text-blue-500' : 'text-gray-500'
+      }`}
     onClick={onClick}
   >
     <Icon size={20} />
@@ -63,7 +62,7 @@ export default function Dashboard() {
       case 'dashboard':
         return <ThreadWriter onConfigureTrainingData={handleConfigureTrainingData} />;
       case 'videoconstructor':
-        return <VideoScriptConstructor />;        
+        return <VideoScriptConstructor />;
       case 'partylist-db':
         return <BuyerList />;
       case 'ledger-db':
@@ -83,12 +82,12 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
-      
+
       <ToastContainer />
       <div className="flex h-screen overflow-hidden">
         {/* Overlay */}
         {isMobileMenuOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
@@ -96,39 +95,43 @@ export default function Dashboard() {
 
         {/* Sidebar */}
         <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
-  <div className="p-6 flex justify-between items-center">
-    <Image 
-      src={logoSrc}
-      alt="Logo"
-      width={200}
-      height={50}
-      onError={() => {
-        console.error(`Failed to load image: ${logoSrc}`);
-        setLogoSrc('logo.png');
-      }}
-    />
-    <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-500">
-      <X className="h-6 w-6" />
-    </button>
-  </div>
-  <nav className="mt-6 px-6 space-y-1 flex-grow">
-    {navItems.map((item) => (
-      <NavItem
-        key={item.id}
-        icon={item.icon}
-        label={item.label}
-        active={activeTab === item.id}
-        onClick={() => {
-          setActiveTab(item.id);
-          setIsMobileMenuOpen(false);
-        }}
-      />
-    ))}
-  </nav>
+          <div className="p-6 flex justify-between items-center">
+            <Image
+              src={logoSrc}
+              alt="Logo"
+              width={200}
+              height={50}
+              onError={() => {
+                console.error(`Failed to load image: ${logoSrc}`);
+                setLogoSrc('logo.png');
+              }}
+            />
+            <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-500">
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          <nav className="mt-6 px-6 space-y-1 flex-grow">
+            {navItems.map((item) => (
+              <NavItem
+                key={item.id}
+                icon={item.icon}
+                label={item.label}
+                active={activeTab === item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsMobileMenuOpen(false);
+                }}
+              />
+            ))}
 
-  {/* Replace the old user profile section with the new component */}
-  <UserProfileSection />
-</aside>
+
+          </nav>
+
+         <div className='mb-2'>
+         <ApiKeyManager />
+         </div>
+          <UserProfileSection />
+        </aside>
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 rounded-md">
           {/* Page content */}

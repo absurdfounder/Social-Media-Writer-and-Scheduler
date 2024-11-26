@@ -39,7 +39,8 @@ export const QuestionnaireManager = ({ currentProfile }) => {
     }
   }, [currentProfile]);
 
-  const loadAnswers = async () => {
+
+const loadAnswers = async () => {
     if (!auth.currentUser || !currentProfile) return;
 
     try {
@@ -47,7 +48,22 @@ export const QuestionnaireManager = ({ currentProfile }) => {
       const answersDoc = await getDoc(answersRef);
 
       if (answersDoc.exists()) {
-        setAnswers(answersDoc.data().answers || {});
+        const profileData = answersDoc.data().answers || {};
+        setAnswers(profileData);
+        
+        // Save both questions and answers to localStorage
+        const storedData = localStorage.getItem('getTweetGenData') || '{}';
+        const allProfilesData = JSON.parse(storedData);
+        allProfilesData[currentProfile.id] = {
+          answers: profileData,
+          questions: questions.map(q => ({
+            id: q.id,
+            question: q.question,
+            type: q.type,
+            limit: q.limit
+          }))
+        };
+        localStorage.setItem('getTweetGenData', JSON.stringify(allProfilesData));
       } else {
         setAnswers({});
       }
@@ -55,7 +71,8 @@ export const QuestionnaireManager = ({ currentProfile }) => {
       console.error('Error loading answers:', error);
       toast.error('Failed to load answers');
     }
-  };
+};
+
 
   const saveAnswers = async (newAnswers) => {
     if (!auth.currentUser || !currentProfile) return;

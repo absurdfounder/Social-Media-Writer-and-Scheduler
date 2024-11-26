@@ -2,19 +2,20 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 export async function POST(request) {
+  const { temperature, max_tokens, messages, system, model,openaikey } = await request.json();
+
   console.log('API route called (App Router)');
 
-  if (!process.env.OPENAI_API_KEY) {
+  if (!openaikey) {
     console.error('OPENAI_API_KEY is not set');
     return NextResponse.json({ error: 'OPENAI_API_KEY is not set' }, { status: 500 });
   }
 
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: openaikey,
   });
 
   try {
-    const { temperature, max_tokens, messages, system, model } = await request.json();
 
     console.log('Received request:', { temperature, max_tokens, system, messages, model });
 

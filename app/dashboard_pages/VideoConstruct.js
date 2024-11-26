@@ -25,6 +25,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import { getAnthropicKey } from '../Utils/getApikey';
 
 const TOOL_SETTINGS = {
   AI_VISUALS: {
@@ -458,6 +459,7 @@ Important Guidelines:
           }],
           system: systemPrompt,
           model: "claude-3-opus-20240229",
+          claudapikey: getAnthropicKey()
         }),
       });
 

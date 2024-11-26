@@ -154,6 +154,14 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [mode, setMode] = useState('share');
   const [feeling, setFeeling] = useState('not_specified');
   const [apikeyAdded, setApikeyAdded] = useState(false);
+  const [TrainingData , setTraningData] =useState({});
+  
+
+  useEffect(()=>{
+
+      setTraningData(localStorage.getItem("getTweetGenData"))
+      console.log('Traning data ',TrainingData);
+  },[TrainingData])
 
   useEffect(() => {
     setIsBrowser(true);
@@ -324,7 +332,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
 
       const feelingPrompt = getFeelingPrompt(feeling);
 
-      const systemPrompt = `You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
+      let systemPrompt = `You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
   
       ${mode === 'reply' ? `
       For reply mode, consider these additional guidelines:
@@ -736,6 +744,13 @@ Copy- Style guide creation
 
       
       `;
+
+
+
+      systemPrompt = `${systemPrompt}  Here Training Data for this reponse  ${TrainingData}`;
+
+
+      console.log('Sending System Prompt' ,systemPrompt);
 
       const response = await fetch('/api/anthropic', {
         method: 'POST',

@@ -8,6 +8,7 @@ import {
   TrendingUp, Shuffle, Eye, MessageCircle,
   AlertTriangle, ExternalLink
 } from 'lucide-react';
+import { getOpenAIKey } from '../Utils/getApikey';
 
 const Tab = ({ label, active, onClick, icon: Icon }) => (
   <button
@@ -848,7 +849,7 @@ const RedditExplorer = () => {
     const topPosts = posts.sort((a, b) => b.score - a.score).slice(0, 5);
 
     try {
-      const response = await fetch('/api/anthropic', {
+      const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -877,6 +878,7 @@ Provide 5 post ideas in the following format:
    [Brief description and engagement prompt]
 ...` }],
           model: "claude-3-5-sonnet-20240620",
+          openaikey:getOpenAIKey()
         }),
       });
 
@@ -899,7 +901,7 @@ Provide 5 post ideas in the following format:
     if (!productInfo) return;
 
     try {
-      const response = await fetch('/api/anthropic', {
+      const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -923,6 +925,7 @@ ${JSON.stringify(productInfo, null, 2)}
 
 Provide a comment suggestion that follows these guidelines and naturally fits the context of the post.` }],
           model: "claude-3-5-sonnet-20240620",
+          openaikey:getOpenAIKey()
         }),
       });
 
@@ -940,7 +943,7 @@ Provide a comment suggestion that follows these guidelines and naturally fits th
 
   const analyzePostContent = async (post) => {
     try {
-      const response = await fetch('/api/anthropic', {
+      const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -960,6 +963,7 @@ Categories: [comma-separated list of categories from the following options: Hot 
 
 Ensure that your analysis is concise and accurately captures the essence of the post. Assign categories based on the content and tone of the post, and you may assign multiple categories if appropriate.`,
           model: "claude-3-5-sonnet-20240620",
+          openaikey:getOpenAIKey()
         }),
       });
 

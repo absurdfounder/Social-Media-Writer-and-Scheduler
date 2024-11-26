@@ -14,26 +14,47 @@ export async function POST(request) {
   });
 
   try {
-    const { temperature, max_tokens, messages, system } = await request.json();
+    const { temperature, max_tokens, messages, system, model } = await request.json();
 
-    console.log('Received request:', { temperature, max_tokens, system, messages });
+    console.log('Received request:', { temperature, max_tokens, system, messages, model });
 
     // Prepare messages array with system message if provided
     const messageArray = system
       ? [{ role: 'system', content: system }, ...messages]
       : messages;
 
-    const response = await openai.chat.completions.create({
-      model:"gpt-4o-mini", // Latest GPT-4 model, please verify the exact model name in OpenAI docs
+    const completion = await openai.chat.completions.create({
+      model:"gpt-4o-mini",
       messages: messageArray,
-      max_tokens:  16384, // Adjusted max tokens to be more conservative
-      temperature: temperature || 0.7,
+      max_tokens: 16384,
+      temperature: 0.7,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
     });
 
-    console.log('OpenAI API response:', response);
+    // Restructure the OpenAI response to match Anthropic's format
+    const response = {
+      id: completion.id,
+      type: 'message',
+      role: 'assistant',
+      model: completion.model,
+      content: [
+        {
+          type: 'text',
+          text: completion.choices[0].message.content
+        }
+      ],
+      stop_reason: completion.choices[0].finish_reason,
+      stop_sequence: null,
+      usage: {
+        input_tokens: completion.usage.prompt_tokens,
+        output_tokens: completion.usage.completion_tokens,
+        total_tokens: completion.usage.total_tokens
+      }
+    };
+
+    console.log('Formatted OpenAI API response:', response);
 
     return NextResponse.json(response);
   } catch (error) {

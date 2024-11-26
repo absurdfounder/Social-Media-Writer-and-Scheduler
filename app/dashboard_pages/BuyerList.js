@@ -848,7 +848,7 @@ const RedditExplorer = () => {
     const topPosts = posts.sort((a, b) => b.score - a.score).slice(0, 5);
 
     try {
-      const response = await fetch('/api/openai', {
+      const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -899,7 +899,7 @@ Provide 5 post ideas in the following format:
     if (!productInfo) return;
 
     try {
-      const response = await fetch('/api/openai', {
+      const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -940,7 +940,7 @@ Provide a comment suggestion that follows these guidelines and naturally fits th
 
   const analyzePostContent = async (post) => {
     try {
-      const response = await fetch('/api/openai', {
+      const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

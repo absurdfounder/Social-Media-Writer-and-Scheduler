@@ -444,7 +444,7 @@ Important Guidelines:
 - Ensure smooth transitions between scenes
 - Maintain consistent style and pacing`;
 
-      const response = await fetch('/api/openai', {
+      const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

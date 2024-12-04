@@ -119,6 +119,46 @@ const LinkPreview = ({ url }) => {
 };
 
 
+const TweetContent = ({ images, links, videos }) => {
+  return (
+    <div className="mb-4">
+      {images.map((img, i) => (
+        <img key={i} src={img} alt={`Tweet image ${i + 1}`} className="mb-2 mt-2 rounded-md max-w-full h-auto" />
+      ))}
+      {videos.map((video, i) => (
+        <div key={i} className="mb-2 mt-2 rounded-md overflow-hidden">
+          <iframe
+            src={video}
+            title={`Tweet video ${i + 1}`}
+            className="w-full aspect-video"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </div>
+      ))}
+      {links.map((link, i) => (
+        <LinkPreview key={i} url={link} />
+      ))}
+    </div>
+  );
+};
+
+const ThreadWriter = ({ onConfigureTrainingData }) => {
+  const [isBrowser, setIsBrowser] = useState(false);
+  const [tweets, setTweets] = useState([{ id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [overallPrompt, setOverallPrompt] = useState('');
+  const [rewritingTweetId, setRewritingTweetId] = useState(null);
+  const [threadType, setThreadType] = useState('single');
+  const [includeProduct, setIncludeProduct] = useState(false);
+  const [productInfo, setProductInfo] = useState(null);
+  const [mode, setMode] = useState('share');
+  const [feeling, setFeeling] = useState('not_specified');
+  const [apikeyAdded, setApikeyAdded] = useState(false);
+  const [TrainingData , setTraningData] =useState({});
+  const [isValidatingKey, setIsValidatingKey] = useState(false);
+const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
+  
 // Update the apiKey effect
 useEffect(() => {
   const validateApiKey = async () => {
@@ -171,46 +211,7 @@ const getStatusMessage = () => {
   }
 };
 
-const TweetContent = ({ images, links, videos }) => {
-  return (
-    <div className="mb-4">
-      {images.map((img, i) => (
-        <img key={i} src={img} alt={`Tweet image ${i + 1}`} className="mb-2 mt-2 rounded-md max-w-full h-auto" />
-      ))}
-      {videos.map((video, i) => (
-        <div key={i} className="mb-2 mt-2 rounded-md overflow-hidden">
-          <iframe
-            src={video}
-            title={`Tweet video ${i + 1}`}
-            className="w-full aspect-video"
-            frameBorder="0"
-            allowFullScreen
-          ></iframe>
-        </div>
-      ))}
-      {links.map((link, i) => (
-        <LinkPreview key={i} url={link} />
-      ))}
-    </div>
-  );
-};
 
-const ThreadWriter = ({ onConfigureTrainingData }) => {
-  const [isBrowser, setIsBrowser] = useState(false);
-  const [tweets, setTweets] = useState([{ id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [overallPrompt, setOverallPrompt] = useState('');
-  const [rewritingTweetId, setRewritingTweetId] = useState(null);
-  const [threadType, setThreadType] = useState('single');
-  const [includeProduct, setIncludeProduct] = useState(false);
-  const [productInfo, setProductInfo] = useState(null);
-  const [mode, setMode] = useState('share');
-  const [feeling, setFeeling] = useState('not_specified');
-  const [apikeyAdded, setApikeyAdded] = useState(false);
-  const [TrainingData , setTraningData] =useState({});
-  const [isValidatingKey, setIsValidatingKey] = useState(false);
-const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
-  
 
   useEffect(()=>{
 
@@ -821,7 +822,7 @@ Copy- Style guide creation
             content: `${mode === 'reply' ? 'Generate a reply' : 'Generate a new tweet or thread'} ${threadType === 'single' ? '(single tweet)' : `(thread of ${maxTweets} tweets)`} ${mode === 'reply' ? 'in response to' : 'about'} the following ${mode === 'share' ? 'update' : 'tweet'}: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet content without any extra text. Don't use emojis unless specifically requested. Don't write numbers in front of each tweet. Include one media suggestion (image or video) per tweet. In the URL, provide text describing what the image or video should show. Use spacing and line breaks to make the tweet stand out.`
           }],
           system: systemPrompt,
-          model: "claude-3-5-sonnet-20240620",
+          model: "claude-3-5-sonnet-20241022",
           claudapikey: getAnthropicKey()
         }),
       });

@@ -877,7 +877,7 @@ Provide 5 post ideas in the following format:
 2. [Post Title]
    [Brief description and engagement prompt]
 ...` }],
-          model: "claude-3-5-sonnet-20240620",
+          model: "claude-3-5-sonnet-20241022",
           openaikey:getOpenAIKey()
         }),
       });
@@ -924,7 +924,7 @@ Product Info:
 ${JSON.stringify(productInfo, null, 2)}
 
 Provide a comment suggestion that follows these guidelines and naturally fits the context of the post.` }],
-          model: "claude-3-5-sonnet-20240620",
+          model: "claude-3-5-sonnet-20241022",
           openaikey:getOpenAIKey()
         }),
       });
@@ -962,7 +962,7 @@ Summary: [A brief 1-2 sentence summary of the post]
 Categories: [comma-separated list of categories from the following options: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas]
 
 Ensure that your analysis is concise and accurately captures the essence of the post. Assign categories based on the content and tone of the post, and you may assign multiple categories if appropriate.`,
-          model: "claude-3-5-sonnet-20240620",
+          model: "claude-3-5-sonnet-20241022",
           openaikey:getOpenAIKey()
         }),
       });

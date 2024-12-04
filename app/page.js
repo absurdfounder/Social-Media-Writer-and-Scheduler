@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, TrendingUp, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
 import BuyerList from './dashboard_pages/BuyerList';
@@ -13,15 +13,15 @@ import ThreadWriter from './dashboard_pages/ThreadReply';
 import VideoScriptConstructor from './dashboard_pages/VideoConstruct';
 import OnBoardingPopup from './Components/OnBoardingPopup';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'
+import 'react-toastify/dist/ReactToastify.css';
 import UserProfileSection from './Components/UserProfileSection';
 import ApiKeyManager from './Components/ApiKeyManager';
+
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
-    className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${active
-        ? 'bg-blue-100 text-blue-500'
-        : 'text-gray-500 hover:bg-gray-100'
-      }`}
+    className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${
+      active ? 'bg-blue-100 text-blue-500' : 'text-gray-500 hover:bg-gray-100'
+    }`}
     onClick={onClick}
   >
     <Icon className="mr-3 h-5 w-5" />
@@ -31,8 +31,9 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
 
 const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
-    className={`flex flex-col items-center justify-center p-2 ${active ? 'text-blue-500' : 'text-gray-500'
-      }`}
+    className={`flex flex-col items-center justify-center p-2 ${
+      active ? 'text-blue-500' : 'text-gray-500'
+    }`}
     onClick={onClick}
   >
     <Icon size={20} />
@@ -44,6 +45,31 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoSrc, setLogoSrc] = useState('/logo.png');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkLoginState = async () => {
+      try {
+        setIsLoading(true);
+        // Check localStorage immediately
+        const key = localStorage.getItem('anthropicKey');
+        const isValid = key && key.startsWith('sk-');
+        setIsAuthenticated(isValid);
+        
+        // Minimal delay for UX
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error('Error checking login state:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    // Run immediately
+    checkLoginState();
+  }, []);
 
   const navItems = [
     { icon: Twitter, label: 'Build On X', id: 'dashboard' },
@@ -80,9 +106,19 @@ export default function Dashboard() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your workspace...Time to Outshine</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
-
       <ToastContainer />
       <div className="flex h-screen overflow-hidden">
         {/* Overlay */}
@@ -94,7 +130,11 @@ export default function Dashboard() {
         )}
 
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
+        <aside 
+          className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${
+            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          } md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}
+        >
           <div className="p-6 flex justify-between items-center">
             <Image
               src={logoSrc}
@@ -106,7 +146,10 @@ export default function Dashboard() {
                 setLogoSrc('logo.png');
               }}
             />
-            <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-500">
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="md:hidden text-gray-500 hover:text-gray-500"
+            >
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -123,20 +166,20 @@ export default function Dashboard() {
                 }}
               />
             ))}
-
-
           </nav>
 
-         <div className='mb-2'>
-         <ApiKeyManager />
-         </div>
+          <div className='mb-2'>
+            <ApiKeyManager />
+          </div>
           <UserProfileSection />
         </aside>
+
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 rounded-md">
-          {/* Page content */}
           <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">{navItems.find(item => item.id === activeTab)?.label}</h2>
+            <h2 className="text-2xl font-bold mb-6">
+              {navItems.find(item => item.id === activeTab)?.label}
+            </h2>
             {renderContent()}
           </div>
         </main>

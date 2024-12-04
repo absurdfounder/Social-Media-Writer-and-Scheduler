@@ -22,7 +22,7 @@ export async function POST(request) {
     console.log('Received request:', { temperature, max_tokens, system, messages, model });
 
     const response = await anthropic.messages.create({
-      model: model || 'claude-3-5-sonnet-20240620',
+      model: model || 'claude-3-5-sonnet-20241022',
       max_tokens: max_tokens || 8192,
       temperature: temperature || 0.7,
       system: system,

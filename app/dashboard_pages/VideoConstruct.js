@@ -168,6 +168,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   const [isBrowser, setIsBrowser] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [error, setError] = useState(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Tool Settings State
   const [toolSettings, setToolSettings] = useState({
@@ -197,6 +199,26 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
       setProductInfo(JSON.parse(storedProductInfo));
     }
   }, []);
+
+  // Update initial useEffect
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        setIsAuthChecking(true);
+        const key = localStorage.getItem('anthropicKey');
+        console.log('Retrieved key:', key ? 'exists' : 'not found');
+        const isValid = key && key.startsWith('sk-');
+        setIsAuthenticated(isValid);
+      } catch (error) {
+        console.error('Auth check error:', error);
+      } finally {
+        setIsAuthChecking(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
 
   // Safety check for current scene
   useEffect(() => {
@@ -445,11 +467,14 @@ Important Guidelines:
 - Ensure smooth transitions between scenes
 - Maintain consistent style and pacing`;
 
-      const response = await fetch('/api/anthropic', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+const apiKey = localStorage.getItem('anthropicKey');
+        const response = await fetch('/api/anthropic', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey
+          },
+
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 1500,
@@ -458,7 +483,7 @@ Important Guidelines:
             content: `Generate a detailed ${videoType} video script for: "${overallPrompt}". Create ${numberOfScenes} scenes, optimized for ${SCREEN_SIZES[screenSize].name} format with appropriate scene distribution between AI visuals and avatar presence.`
           }],
           system: systemPrompt,
-          model: "claude-3-opus-20240229",
+          model: "claude-3-5-sonnet-20241022",
           claudapikey: getAnthropicKey()
         }),
       });
@@ -515,6 +540,27 @@ Important Guidelines:
     return match ? match[1].trim() : '';
   };
 
+
+  // Add loading state to return
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center">
+        <div className="flex items-center gap-2 text-blue-500">
+          <Loader className="animate-spin" size={20} />
+          <span>Checking authentication...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center">
+        <div className="text-red-500">Please add your Claude API key in settings</div>
+      </div>
+    );
+  }
+  
   // Settings Dialog Component
   const SettingsDialog = ({ show, onClose }) => {
     if (!show) return null;
@@ -716,6 +762,7 @@ Important Guidelines:
                 <span>Include product/brand story - Be Real & Authentic</span>
               </button>
             </div>
+            
 
             <button
               className={`flex items-center gap-2 px-6 py-2 rounded-md text-sm transition-colors

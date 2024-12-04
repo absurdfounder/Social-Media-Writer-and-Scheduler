@@ -1,5 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Key, Eye, EyeOff, Copy, CheckCheck } from 'lucide-react';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+
+// Encryption/decryption functions
+const encryptKey = (text) => {
+  return btoa(text.split('').map((char, i) =>
+    String.fromCharCode(char.charCodeAt(0) + (i % 4) + 1)
+  ).join(''));
+};
+
+const decryptKey = (encoded) => {
+  try {
+    const decoded = atob(encoded);
+    return decoded.split('').map((char, i) =>
+      String.fromCharCode(char.charCodeAt(0) - (i % 4) - 1)
+    ).join('');
+  } catch {
+    return '';
+  }
+};
 
 const ApiKeyManager = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,30 +29,101 @@ const ApiKeyManager = () => {
   const [showAnthropicKey, setShowAnthropicKey] = useState(false);
   const [openAICopied, setOpenAICopied] = useState(false);
   const [anthropicCopied, setAnthropicCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const auth = getAuth();
+  const db = getFirestore();
 
   useEffect(() => {
-    const storedOpenAIKey = localStorage.getItem('openAIKey');
-    const storedAnthropicKey = localStorage.getItem('anthropicKey');
-    if (storedOpenAIKey) setOpenAIKey(storedOpenAIKey);
-    if (storedAnthropicKey) setAnthropicKey(storedAnthropicKey);
-  }, []);
+    const fetchKeys = async () => {
+      if (!auth.currentUser) {
+        const storedOpenAIKey = localStorage.getItem('openAIKey');
+        const storedAnthropicKey = localStorage.getItem('anthropicKey');
+        if (storedOpenAIKey) setOpenAIKey(storedOpenAIKey);
+        if (storedAnthropicKey) setAnthropicKey(storedAnthropicKey);
+        return;
+      }
 
-  const handleSaveKeys = () => {
-    if (openAIKey && openAIKey.startsWith('sk-')) {
-      localStorage.setItem('openAIKey', openAIKey);
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          if (data.openAIKey) {
+            const decrypted = decryptKey(data.openAIKey);
+            setOpenAIKey(decrypted);
+            localStorage.setItem('openAIKey', decrypted);
+          }
+          if (data.anthropicKey) {
+            const decrypted = decryptKey(data.anthropicKey);
+            setAnthropicKey(decrypted);
+            localStorage.setItem('anthropicKey', decrypted);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching API keys:', error);
+      }
+    };
+
+    fetchKeys();
+  }, [auth.currentUser]);
+
+  const handleSaveKeys = async () => {
+    setLoading(true);
+    try {
+      if (auth.currentUser) {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const updates = {
+          updatedAt: serverTimestamp()
+        };
+
+        if (openAIKey && openAIKey.startsWith('sk-')) {
+          updates.openAIKey = encryptKey(openAIKey);
+          localStorage.setItem('openAIKey', openAIKey);
+        }
+        
+        // Always save the default Anthropic key
+        const anthropicKeyToSave = anthropicKey || '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';
+        updates.anthropicKey = encryptKey(anthropicKeyToSave);
+        localStorage.setItem('anthropicKey', anthropicKeyToSave);
+
+        await setDoc(userRef, updates, { merge: true });
+      } else {
+        if (openAIKey && openAIKey.startsWith('sk-')) {
+          localStorage.setItem('openAIKey', openAIKey);
+        }
+        if (anthropicKey && anthropicKey.startsWith('sk-')) {
+          localStorage.setItem('anthropicKey', anthropicKey);
+        }
+      }
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error saving API keys:', error);
+    } finally {
+      setLoading(false);
     }
-    if (anthropicKey && anthropicKey.startsWith('sk-')) {
-      localStorage.setItem('anthropicKey', anthropicKey);
-    }
-    setIsOpen(false);
   };
 
-  const handleRemoveKeys = () => {
-    localStorage.removeItem('openAIKey');
-    localStorage.removeItem('anthropicKey');
-    setOpenAIKey('');
-    setAnthropicKey('');
-    setIsOpen(false);
+  const handleRemoveKeys = async () => {
+    try {
+      if (auth.currentUser) {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        await setDoc(userRef, {
+          openAIKey: null,
+          anthropicKey: null,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      }
+      
+      localStorage.removeItem('openAIKey');
+      localStorage.removeItem('anthropicKey');
+      setOpenAIKey('');
+      setAnthropicKey('');
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error removing API keys:', error);
+    }
   };
 
   const handleCopyKey = (key, type) => {
@@ -45,11 +136,6 @@ const ApiKeyManager = () => {
         setTimeout(() => setAnthropicCopied(false), 2000);
       }
     });
-  };
-
-  const maskKey = (key) => {
-    if (!key) return '';
-    return '****************************************';
   };
 
   return (
@@ -140,9 +226,10 @@ const ApiKeyManager = () => {
               <div className="space-x-2">
                 <button
                   onClick={handleSaveKeys}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
                 >
-                  Save 
+                  {loading ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>

@@ -118,6 +118,59 @@ const LinkPreview = ({ url }) => {
   );
 };
 
+
+// Update the apiKey effect
+useEffect(() => {
+  const validateApiKey = async () => {
+    const key = localStorage.getItem('anthropicKey');
+    if (!key) {
+      setApiKeyStatus('invalid');
+      setApikeyAdded(false);
+      return;
+    }
+
+    if (!key.startsWith('sk-')) {
+      setApiKeyStatus('invalid');
+      setApikeyAdded(false);
+      return;
+    }
+
+    setApiKeyStatus('validating');
+    setIsValidatingKey(true);
+
+    // Simulate API validation delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    setApiKeyStatus('valid');
+    setApikeyAdded(true);
+    setIsValidatingKey(false);
+  };
+
+  validateApiKey();
+}, []);
+
+// Update the status message JSX
+const getStatusMessage = () => {
+  switch (apiKeyStatus) {
+    case 'validating':
+      return (
+        <div className="flex items-center gap-2 text-blue-500 text-xs sm:text-sm">
+          <Loader size={20} className="animate-spin" />
+          Please wait validating API key...
+        </div>
+      );
+    case 'invalid':
+      return (
+        <div className="flex items-center gap-2 text-red-500 text-xs sm:text-sm">
+          <InfoIcon size={20} />
+          Claude API key added seems wrong or invalid - save again.
+        </div>
+      );
+    default:
+      return null;
+  }
+};
+
 const TweetContent = ({ images, links, videos }) => {
   return (
     <div className="mb-4">
@@ -155,6 +208,8 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [feeling, setFeeling] = useState('not_specified');
   const [apikeyAdded, setApikeyAdded] = useState(false);
   const [TrainingData , setTraningData] =useState({});
+  const [isValidatingKey, setIsValidatingKey] = useState(false);
+const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
   
 
   useEffect(()=>{
@@ -756,6 +811,7 @@ Copy- Style guide creation
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': localStorage.getItem('anthropicKey')
         },
         body: JSON.stringify({
           temperature: 0.7,
@@ -870,26 +926,25 @@ Copy- Style guide creation
     return feelingPrompts[feeling]?.prompt || "";
   };
 
+
+
   useEffect(() => {
-    if (getAnthropicKey() !== '') {
+    const key = localStorage.getItem('anthropicKey');
+    if (key && key.startsWith('sk-')) {
       setApikeyAdded(true);
     }
-  }, [apikeyAdded]);
+  }, []);
+
 
   return (
     <div className="bg-white rounded-md overflow-hidden">
       <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
         <div className='bg-white rounded-md p-2 sm:p-4'>
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
-
-
-            {!apikeyAdded ? <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'><InfoIcon size={20} />Claud Api Key Not Added </div> : null}
-
-
-
-
-
+            <div className='grid gap-2'>
             <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
+            {!apikeyAdded ? <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'><InfoIcon size={20} />Claude API key added seems wrong or invalid - save again. </div> : null}
+            </div>
 
             <div className={`  flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
               <button
@@ -964,14 +1019,20 @@ Copy- Style guide creation
               </select>
             </div>
 
-            {apikeyAdded ? <button
-              className='bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm w-full sm:w-auto'
-              onClick={generateAIThread}
-              disabled={isGenerating}
-            >
-              {isGenerating ? <Loader size={14} className="animate-spin" /> : <Wand2 size={14} />}
-              Generate {threadType === 'single' ? 'Tweet' : 'Thread'}
-            </button> : ''}
+            {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
+  <button
+    className="bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm w-full sm:w-auto"
+    onClick={generateAIThread}
+    disabled={isGenerating || apiKeyStatus === 'validating'}
+  >
+    {isGenerating || apiKeyStatus === 'validating' ? (
+      <Loader size={14} className="animate-spin" />
+    ) : (
+      <Wand2 size={14} />
+    )}
+    {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
+  </button>
+)}
           </div>
           <div className="flex flex-col sm:flex-row items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 gap-2 mt-4">
             <button

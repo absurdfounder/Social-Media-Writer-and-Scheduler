@@ -1,25 +1,24 @@
+// app/api/anthropic/route.js
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { getAnthropicKey } from '@/app/Utils/getApikey';
 
 export async function POST(request) {
+  const { temperature, max_tokens, messages, system, model } = await request.json();
 
-  const { temperature, max_tokens, messages, system, model ,claudapikey } = await request.json();
+  // Get API key from request headers
+  const apiKey = request.headers.get('x-api-key');
 
-  console.log('API route called (App Router)');
-
-  if (!claudapikey) {
-    console.error('ANTHROPIC_API_KEY is not set');
-    return NextResponse.json({ error: 'ANTHROPIC_API_KEY is not set' }, { status: 500 });
+  if (!apiKey) {
+    console.error('Anthropic API key not provided');
+    return NextResponse.json({ error: 'Anthropic API key not provided' }, { status: 500 });
   }
 
   const anthropic = new Anthropic({
-    apiKey: claudapikey,
+    apiKey: apiKey,
   });
-  
 
   try {
-  
-
     console.log('Received request:', { temperature, max_tokens, system, messages, model });
 
     const response = await anthropic.messages.create({
@@ -31,7 +30,6 @@ export async function POST(request) {
     });
 
     console.log('Anthropic API response:', response);
-
     return NextResponse.json(response);
   } catch (error) {
     console.error('Anthropic API error:', error);

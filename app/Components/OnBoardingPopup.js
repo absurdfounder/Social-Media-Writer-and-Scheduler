@@ -128,7 +128,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
             <div className="p-6 text-center mt-8 space-y-4">
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center space-x-2 w-full m-auto">
-                  <img src="/logo.png" alt="big mouth logo" className="w-fit h-32 m-auto" />
+                  <img src="/logo.png" alt="big mouth logo" className="w-fit h-16 m-auto" />
                 </div>
                 {user && (
                   <button
@@ -142,7 +142,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
 
               <div>
 
-                <h2 className="text-5xl mb-2 max-w-2xl m-auto leading-normal mb-4 text-slate-500">
+                <h2 className="sm:text-2xl md:text-5xl lh-4  mb-2 max-w-2xl m-auto leading-loose mb-4 text-slate-500">
                   <span className="font-normal border-b border-b-4">Social Media AI-Toolkit</span> <span className="font-normal">for</span> <br />
                   <span className="font-bold text-blue-400 border-b border-b-blue-400 border-b-4">X</span>, {" "}
                   <span className="font-bold text-pink-500 border-b border-b-pink-500 border-b-4">IG</span>, {" "}

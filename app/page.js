@@ -131,7 +131,7 @@ export default function Dashboard() {
 
         {/* Sidebar */}
         <aside 
-          className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${
+          className={`fixed inset-y-0 left-0 z-10 w-64 bg-white transform ${
             isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           } md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}
         >

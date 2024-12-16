@@ -51,17 +51,15 @@ export const Login = () => {
   const saveUserToFirestore = async (userData) => {
     try {
       const userRef = doc(db, 'users', userData.uid);
-
-      // First check if user already exists to preserve subscription data
       const userDoc = await getDoc(userRef);
       const existingData = userDoc.exists() ? userDoc.data() : null;
-
+  
       await setDoc(userRef, {
         email: userData.email,
         displayName: userData.displayName,
         photoURL: userData.photoURL,
         lastLogin: serverTimestamp(),
-        createdAt: userDoc.exists() ? existingData.createdAt : serverTimestamp(),
+        createdAt: existingData?.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp(),
         status: 'active',
         subscription: existingData?.subscription || {
@@ -72,16 +70,15 @@ export const Login = () => {
           endDate: null
         }
       }, { merge: true });
-
-      // Fetch the updated subscription status
+  
       await fetchSubscriptionStatus(userData.uid);
-
       console.log('User data saved to Firestore');
     } catch (error) {
       console.error('Error saving user to Firestore:', error);
       toast.error('Error updating user profile');
     }
   };
+  
 
   const getErrorMessage = (error) => {
     // Clean up the error code by removing the 'auth/' prefix

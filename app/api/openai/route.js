@@ -2,39 +2,51 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 export async function POST(request) {
-  const { temperature, max_tokens, messages, system, model,openaikey } = await request.json();
-
-  console.log('API route called (App Router)');
-
-  if (!openaikey) {
-    console.error('OPENAI_API_KEY is not set');
-    return NextResponse.json({ error: 'OPENAI_API_KEY is not set' }, { status: 500 });
-  }
-
-  const openai = new OpenAI({
-    apiKey: openaikey,
-  });
-
   try {
+    const { temperature, max_tokens, messages, system } = await request.json();
 
-    console.log('Received request:', { temperature, max_tokens, system, messages, model });
+    console.log('API route called (App Router)');
 
-    // Prepare messages array with system message if provided
+    // Get API key from Authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('No Authorization header or invalid format');
+      return NextResponse.json({ error: 'Missing or invalid Authorization header' }, { status: 401 });
+    }
+
+    const openaiKey = authHeader.split(' ')[1];
+    if (!openaiKey) {
+      console.error('OPENAI_API_KEY is not set');
+      return NextResponse.json({ error: 'OPENAI_API_KEY is not set' }, { status: 500 });
+    }
+
+    const openai = new OpenAI({
+      apiKey: openaiKey,
+    });
+
+    console.log('Received request:', { temperature, max_tokens, system, messages });
+
+    // Format messages array with proper roles
     const messageArray = system
-      ? [{ role: 'system', content: system }, ...messages]
+      ? [{ role: 'developer', content: system }, ...messages]
       : messages;
 
     const completion = await openai.chat.completions.create({
-      model:"gpt-4o-mini",
-      messages: messageArray,
-      max_tokens: 16384,
-      temperature: 0.7,
+      model: "gpt-4o-mini",
+      messages: messageArray.map(msg => ({
+        role: msg.role === 'developer' ? 'developer' : msg.role,
+        content: Array.isArray(msg.content) 
+          ? msg.content
+          : [{ type: 'text', text: msg.content }]
+      })),
+      max_tokens: max_tokens || 16384,
+      temperature: temperature || 0.7,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
     });
 
-    // Restructure the OpenAI response to match Anthropic's format
+    // Restructure the response
     const response = {
       id: completion.id,
       type: 'message',
@@ -56,14 +68,24 @@ export async function POST(request) {
     };
 
     console.log('Formatted OpenAI API response:', response);
-
     return NextResponse.json(response);
+    
   } catch (error) {
     console.error('OpenAI API error:', error);
-    return NextResponse.json({
+    
+    const errorResponse = {
       error: 'An error occurred while processing your request',
       details: error.message,
-      stack: error.stack,
-    }, { status: 500 });
+      type: error.constructor.name
+    };
+
+    if (error.response) {
+      errorResponse.status = error.response.status;
+      errorResponse.data = error.response.data;
+    }
+
+    return NextResponse.json(errorResponse, { 
+      status: error.response?.status || 500 
+    });
   }
 }

@@ -845,147 +845,172 @@ const RedditExplorer = () => {
 
   const generatePostIdeas = async (posts) => {
     if (!productInfo) return;
-
+  
     const topPosts = posts.sort((a, b) => b.score - a.score).slice(0, 5);
-
+    const openaiKey = localStorage.getItem('openAIKey');
+  
+    if (!openaiKey) {
+      setErrorMessage('OpenAI API key not found. Please set your API key.');
+      return;
+    }
+  
     try {
+      setIsGeneratingIdeas(true);
       const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiKey}`
         },
         body: JSON.stringify({
           temperature: 0.7,
-          max_tokens: 8192,
-          messages: [{ role: "user", content: `Generate 5 engaging post ideas for Reddit based on these top-performing posts and our product information. Follow these guidelines:
-
-1. Add value: Focus on sharing insights, asking questions, or providing useful information.
-2. Stay humble: Don't oversell or claim superiority.
-3. Share your process: Consider "How I do it" style posts that provide value to the community.
-4. Be slightly controversial (but not offensive): Present unique perspectives to spark discussion.
-5. Encourage engagement: End with a question or call for opinions.
-
-Top Posts:
-${topPosts.map(post => `- ${post.title}`).join('\n')}
-
-Product Info:
-${JSON.stringify(productInfo, null, 2)}
-
-Provide 5 post ideas in the following format:
-1. [Post Title]
-   [Brief description and engagement prompt]
-2. [Post Title]
-   [Brief description and engagement prompt]
-...` }],
-          model: "claude-3-5-sonnet-20241022",
-          openaikey:getOpenAIKey()
-        }),
+          max_tokens: 4000,
+          messages: [{ 
+            role: "user", 
+            content: `Generate 5 engaging post ideas for Reddit based on these top-performing posts: ${JSON.stringify(topPosts)} 
+            and our product information: ${JSON.stringify(productInfo)}` 
+          }],
+          model: "gpt-4o-mini"
+        })
       });
-
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
       }
-
+  
       const data = await response.json();
-      const ideas = data.content[0].text.split('\n\n').filter(idea => idea.trim() !== '').map(idea => {
-        const [title, description] = idea.split('\n');
-        return { title: title.substring(3), description };
-      });
+      const ideas = data.content[0].text.split('\n\n')
+        .filter(idea => idea.trim() !== '')
+        .map(idea => {
+          const [title, description] = idea.split('\n');
+          return { title: title.substring(3), description };
+        });
       setPostIdeas(ideas);
     } catch (error) {
       console.error('Error generating post ideas:', error);
+      setErrorMessage(`Error generating post ideas: ${error.message}`);
+    } finally {
+      setIsGeneratingIdeas(false);
     }
   };
+  
 
+  
   const generateCommentSuggestion = async (postId, postTitle, postContent) => {
     if (!productInfo) return;
-
+  
+    const openaiKey = localStorage.getItem('openAIKey');
+    if (!openaiKey) {
+      setErrorMessage('OpenAI API key not found. Please set your API key.');
+      return;
+    }
+  
     try {
       const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiKey}`
         },
         body: JSON.stringify({
           temperature: 0.7,
-          max_tokens: 8192,
-          messages: [{ role: "user", content: `Generate an engaging comment for this Reddit post that subtly promotes our product. Follow these guidelines:
-
-1. Add value: Focus on contributing to the discussion genuinely.
-2. Stay humble: Don't oversell or claim superiority.
-3. Be relevant: Ensure the comment naturally fits the context of the post.
-4. Encourage further engagement: End with a question or call for opinions.
-5. Subtle promotion: Mention the product only if it's highly relevant and adds value to the discussion.
-
-Post Title: ${postTitle}
-Post Content: ${postContent}
-
-Product Info:
-${JSON.stringify(productInfo, null, 2)}
-
-Provide a comment suggestion that follows these guidelines and naturally fits the context of the post.` }],
-          model: "claude-3-5-sonnet-20241022",
-          openaikey:getOpenAIKey()
-        }),
+          max_tokens: 4000,
+          messages: [{ 
+            role: "user", 
+            content: `Generate an engaging comment for this Reddit post that subtly promotes our product. Follow these guidelines:
+  
+  1. Add value: Focus on contributing to the discussion genuinely.
+  2. Stay humble: Don't oversell or claim superiority.
+  3. Be relevant: Ensure the comment naturally fits the context of the post.
+  4. Encourage further engagement: End with a question or call for opinions.
+  5. Subtle promotion: Mention the product only if it's highly relevant and adds value to the discussion.
+  
+  Post Title: ${postTitle}
+  Post Content: ${postContent}
+  
+  Product Info:
+  ${JSON.stringify(productInfo, null, 2)}
+  
+  Provide a comment suggestion that follows these guidelines and naturally fits the context of the post.` 
+          }],
+          model: "gpt-4o-mini"
+        })
       });
-
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
       }
-
+  
       const data = await response.json();
       const suggestion = data.content[0].text.trim();
       setCommentSuggestions(prev => ({ ...prev, [postId]: suggestion }));
     } catch (error) {
       console.error('Error generating comment suggestion:', error);
+      setErrorMessage(`Error generating comment suggestion: ${error.message}`);
     }
   };
+  
 
   const analyzePostContent = async (post) => {
     try {
+      const openaiKey = localStorage.getItem('openAIKey');
+      
+      if (!openaiKey) {
+        setErrorMessage('OpenAI API key not found. Please set your API key.');
+        return post;
+      }
+  
+      console.log('Analyzing post content...');
       const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiKey}`
         },
         body: JSON.stringify({
           temperature: 0.7,
-          max_tokens: 8192,
-          messages: [{ role: "user", content: `Analyze the following Reddit post. Extract keywords, provide a brief summary, and categorize it into one or more of the following categories: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas.
-
-Title: ${post.title}
-Content: ${post.selftext}` }],
-          system: `You are an AI assistant that analyzes Reddit posts. Your task is to extract keywords, provide a brief summary, and categorize each post into one or more predefined categories. Use the following format for your response:
-
-Keywords: [comma-separated list of keywords]
-Summary: [A brief 1-2 sentence summary of the post]
-Categories: [comma-separated list of categories from the following options: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas]
-
-Ensure that your analysis is concise and accurately captures the essence of the post. Assign categories based on the content and tone of the post, and you may assign multiple categories if appropriate.`,
-          model: "claude-3-5-sonnet-20241022",
-          openaikey:getOpenAIKey()
-        }),
+          max_tokens: 4000,
+          messages: [{ 
+            role: "user", 
+            content: `Analyze the following Reddit post. Extract keywords, provide a brief summary, and categorize it into one or more of the following categories: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas.
+  
+  Title: ${post.title}
+  Content: ${post.selftext}` 
+          }],
+          model: "gpt-4o-mini"
+        })
       });
-
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
       }
-
+  
       const data = await response.json();
+      console.log('Raw API response:', data); // Debug log
+  
+      // Get the text from the response
       const analysisResult = data.content[0].text;
-
-      const keywordsMatch = analysisResult.match(/Keywords: (.*)/);
-      const summaryMatch = analysisResult.match(/Summary: (.*)/);
-      const categoriesMatch = analysisResult.match(/Categories: (.*)/);
-
+      console.log('Analysis result:', analysisResult); // Debug log
+  
+      // Parse the analysis text using more flexible matching
+      const keywords = analysisResult.match(/\*\*Keywords:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(k => k.trim()) || [];
+      const summary = analysisResult.match(/\*\*Summary:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
+      const categories = analysisResult.match(/\*\*Categories:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(c => c.trim()) || [];
+  
+      console.log('Parsed results:', { keywords, summary, categories }); // Debug log
+  
       return {
         ...post,
-        keywords: keywordsMatch ? keywordsMatch[1].split(',').map(k => k.trim()) : [],
-        summary: summaryMatch ? summaryMatch[1].trim() : '',
-        categories: categoriesMatch ? categoriesMatch[1].split(',').map(c => c.trim()) : [],
+        keywords,
+        summary,
+        categories,
       };
     } catch (error) {
       console.error('Error analyzing post:', error);
+      setErrorMessage(`Error analyzing post: ${error.message}`);
       return post;
     }
   };

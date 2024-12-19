@@ -40,36 +40,58 @@ export const QuestionnaireManager = ({ currentProfile }) => {
   }, [currentProfile]);
 
 
-const loadAnswers = async () => {
-    if (!auth.currentUser || !currentProfile) return;
+  const loadAnswers = async () => {
+    console.log('Loading answers - Initial state:', {
+        currentProfile,
+        authUser: auth.currentUser?.uid
+    });
+
+    if (!auth.currentUser || !currentProfile) {
+        console.log('Missing requirements:', {
+            hasUser: !!auth.currentUser,
+            hasProfile: !!currentProfile
+        });
+        return;
+    }
 
     try {
-      const answersRef = doc(db, 'questionnaire_answers', `${currentProfile.id}_${auth.currentUser.uid}`);
-      const answersDoc = await getDoc(answersRef);
-
-      if (answersDoc.exists()) {
-        const profileData = answersDoc.data().answers || {};
-        setAnswers(profileData);
+        const docId = `${currentProfile.id}_${auth.currentUser.uid}`;
+        console.log('Attempting to load document:', docId);
         
-        // Save both questions and answers to localStorage
-        const storedData = localStorage.getItem('getTweetGenData') || '{}';
-        const allProfilesData = JSON.parse(storedData);
-        allProfilesData[currentProfile.id] = {
-          answers: profileData,
-          questions: questions.map(q => ({
-            id: q.id,
-            question: q.question,
-            type: q.type,
-            limit: q.limit
-          }))
-        };
-        localStorage.setItem('getTweetGenData', JSON.stringify(allProfilesData));
-      } else {
-        setAnswers({});
-      }
+        const answersRef = doc(db, 'questionnaire_answers', docId);
+        const answersDoc = await getDoc(answersRef);
+
+        console.log('Document exists?', answersDoc.exists());
+
+        if (answersDoc.exists()) {
+            const profileData = answersDoc.data().answers || {};
+            console.log('Loaded data:', profileData);
+            setAnswers(profileData);
+            
+            // Save to localStorage
+            const storedData = localStorage.getItem('getTweetGenData') || '{}';
+            const allProfilesData = JSON.parse(storedData);
+            allProfilesData[currentProfile.id] = {
+                answers: profileData,
+                questions: questions.map(q => ({
+                    id: q.id,
+                    question: q.question,
+                    type: q.type,
+                    limit: q.limit
+                }))
+            };
+            localStorage.setItem('getTweetGenData', JSON.stringify(allProfilesData));
+        } else {
+            console.log('No existing answers found');
+            setAnswers({});
+        }
     } catch (error) {
-      console.error('Error loading answers:', error);
-      toast.error('Failed to load answers');
+        console.error('Error details:', {
+            error,
+            currentProfile,
+            userId: auth.currentUser?.uid
+        });
+        toast.error('Failed to load answers');
     }
 };
 

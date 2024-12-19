@@ -9,7 +9,7 @@ export const ProfileManager = ({ onProfileSelect }) => {
   const [newProfileName, setNewProfileName] = useState('');
   const [editingProfile, setEditingProfile] = useState(null);
   const [currentProfileId, setCurrentProfileId] = useState(null);
-  
+
   const auth = getAuth();
   const db = getFirestore();
 
@@ -24,7 +24,7 @@ export const ProfileManager = ({ onProfileSelect }) => {
       const profilesRef = collection(db, 'profiles');
       const q = query(profilesRef, where('userId', '==', auth.currentUser.uid));
       const querySnapshot = await getDocs(q);
-      
+
       const loadedProfiles = [];
       querySnapshot.forEach((doc) => {
         loadedProfiles.push({ id: doc.id, ...doc.data() });
@@ -43,7 +43,7 @@ export const ProfileManager = ({ onProfileSelect }) => {
       }
 
       setProfiles(loadedProfiles);
-      
+
       // Set current profile
       const savedProfileId = localStorage.getItem('currentProfileId');
       const validProfile = loadedProfiles.find(p => p.id === savedProfileId) || loadedProfiles[0];
@@ -56,19 +56,41 @@ export const ProfileManager = ({ onProfileSelect }) => {
   };
 
   const createProfileInFirebase = async (profileData) => {
-    try {
-      const profileRef = doc(db, 'profiles', profileData.id);
-      await setDoc(profileRef, {
-        name: profileData.name,
-        userId: auth.currentUser.uid,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error creating profile:', error);
-      throw error;
+    console.log('Starting profile creation with data:', profileData);
+    
+    if (!auth.currentUser) {
+        console.error('No authenticated user found');
+        throw new Error('User must be authenticated to create profile');
     }
-  };
+
+    try {
+        console.log('Creating profile with ID:', profileData.id);
+        
+        const profileRef = doc(db, 'profiles', profileData.id);
+        const data = {
+            name: profileData.name,
+            userId: auth.currentUser.uid,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        console.log('Profile data to be saved:', data);
+        
+        await setDoc(profileRef, data);
+        console.log('Profile created successfully');
+        
+        return data;
+    } catch (error) {
+        console.error('Detailed error creating profile:', {
+            error,
+            errorCode: error.code,
+            errorMessage: error.message,
+            userId: auth.currentUser?.uid,
+            profileId: profileData.id
+        });
+        throw error;
+    }
+};
 
   const handleCreateProfile = async () => {
     if (!newProfileName.trim()) return;
@@ -82,12 +104,12 @@ export const ProfileManager = ({ onProfileSelect }) => {
       };
 
       await createProfileInFirebase(newProfile);
-      
+
       setProfiles([...profiles, newProfile]);
       setCurrentProfileId(newProfile.id);
       onProfileSelect(newProfile);
       localStorage.setItem('currentProfileId', newProfile.id);
-      
+
       setNewProfileName('');
       setIsModalOpen(false);
       toast.success('Profile created successfully');
@@ -177,7 +199,7 @@ export const ProfileManager = ({ onProfileSelect }) => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pb-20 text-center">
-            <div 
+            <div
               className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
               onClick={() => setIsModalOpen(false)}
             />

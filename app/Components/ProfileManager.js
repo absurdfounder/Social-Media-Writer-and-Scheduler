@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
+import {
+  X, CheckCircle2, Check, Sparkles,
+  GithubIcon, Infinity,
+  UserPen,
+  SquareUserRound,
+  User
+} from 'lucide-react';
 
 export const ProfileManager = ({ onProfileSelect }) => {
   const [profiles, setProfiles] = useState([]);
@@ -184,15 +191,16 @@ export const ProfileManager = ({ onProfileSelect }) => {
     <div className="mb-6">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2 p-2 px-6 bg-gray-50 border rounded-md">
-          <span className="text-blue-600">
+          <span className="items-center text-blue-600 flex gap-2">
+          <User className="h-4 w-4" />
             {profiles.find(p => p.id === currentProfileId)?.name || 'Select Profile'}
           </span>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
+          className="items-center flex gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
         >
-          Manage Profiles
+          <UserPen className="h-4 w-4" /> Manage Profiles
         </button>
       </div>
 

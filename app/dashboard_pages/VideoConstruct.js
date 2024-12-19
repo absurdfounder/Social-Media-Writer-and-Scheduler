@@ -759,7 +759,19 @@ const apiKey = localStorage.getItem('anthropicKey');
                 ) : (
                   <Circle size={20} />
                 )}
-                <span>Include product/brand story - Be Real & Authentic</span>
+
+              <span className="flex items-center gap-2 text-slate-500">
+                Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
+                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
+                    <Blocks size={16} />product/service
+                  </i> with my
+                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
+                    <BicepsFlexed size={16} />personal journey
+                  </i>
+                </span>
+              </span>
+
+
               </button>
             </div>
             

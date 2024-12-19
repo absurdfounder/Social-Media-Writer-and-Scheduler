@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
+import {
+  X, CheckCircle2, Check, Sparkles,
+  GithubIcon, Infinity,
+  WalletCards,
+  ListCheckIcon
+} from 'lucide-react';
 
 const questions = [
     { id: 'name', question: "What is the name of your product/service?", type: "short", limit: 50 },
@@ -244,15 +250,15 @@ export const QuestionnaireManager = ({ currentProfile }) => {
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setDisplayMode('card')}
-            className={`px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
+            className={`items-center flex gap-2 px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
           >
-            Card View
+            <WalletCards className="h-4 w-4" /> Card View
           </button>
           <button
             onClick={() => setDisplayMode('list')}
-            className={`px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
+            className={`items-center flex gap-2 px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
           >
-            List View
+            <ListCheckIcon className="h-4 w-4" /> List View
           </button>
         </div>
 

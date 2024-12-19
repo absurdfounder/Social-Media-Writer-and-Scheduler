@@ -1184,6 +1184,10 @@ const RedditExplorer = () => {
 
   const filterBadges = [
     { label: 'All', icon: Home, description: 'All posts' },
+
+    { label: 'Competitor Keywords Included', icon: Flame, description: 'Popular discussions this week' },
+    { label: 'My Brand Mentions', icon: Flame, description: 'Popular discussions this week' },
+
     { label: 'Hot Discussions', icon: Flame, description: 'Popular discussions this week' },
     { label: 'Top Content', icon: Trophy, description: 'Best-performing content of past month' },
     { label: 'Advice Requests', icon: HelpCircle, description: 'People asking for advice & resources' },
@@ -1465,10 +1469,10 @@ const RedditExplorer = () => {
                       <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
                         <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
                           <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
-                          <span>{post.created}</span>
+                          <span><b className='text-blue-300'>Relevance Score : <span className='text-blue-600'>90</span>/100</b> &nbsp; {post.created}</span>
                         </div>
                         <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">{post.title}</h3>
-                        {post.summary && <p className="text-xs sm:text-sm text-gray-500 mb-2">{post.summary}</p>}
+                        <b className='text-blue-500 font-bold'>Why Relevant : </b> {post.summary && <p className="text-xs sm:text-sm text-gray-500 mb-2">{post.summary}</p>}
                         {post.categories && (
                           <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
                             {post.categories.map((category, index) => (

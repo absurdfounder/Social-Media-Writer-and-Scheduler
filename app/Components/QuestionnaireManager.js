@@ -69,7 +69,7 @@ export const QuestionnaireManager = ({ currentProfile }) => {
             setAnswers(profileData);
             
             // Save to localStorage
-            const storedData = localStorage.getItem('getTweetGenData') || '{}';
+            const storedData = localStorage.getItem('getTrainingData') || '{}';
             const allProfilesData = JSON.parse(storedData);
             allProfilesData[currentProfile.id] = {
                 answers: profileData,
@@ -80,7 +80,7 @@ export const QuestionnaireManager = ({ currentProfile }) => {
                     limit: q.limit
                 }))
             };
-            localStorage.setItem('getTweetGenData', JSON.stringify(allProfilesData));
+            localStorage.setItem('getTrainingData', JSON.stringify(allProfilesData));
         } else {
             console.log('No existing answers found');
             setAnswers({});

@@ -215,7 +215,7 @@ const getStatusMessage = () => {
 
   useEffect(()=>{
 
-      setTraningData(localStorage.getItem("getTweetGenData"))
+      setTraningData(localStorage.getItem("getTrainingData"))
       console.log('Traning data ',TrainingData);
   },[TrainingData])
 

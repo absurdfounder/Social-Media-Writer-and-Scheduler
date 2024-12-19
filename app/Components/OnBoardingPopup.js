@@ -247,7 +247,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       <Check className="w-5 h-5" />
                     </span>
                     <span>
-                      It's challenging to maintain your authentic voice while scaling content. Most AI tools produce <span className="border-b-4 border-blue-200 pb-0.5">generic, robotic content</span>. Our AI learns your unique style and voice to create content that truly sounds like you.
+                      It is challenging to maintain your authentic voice while scaling content. Most AI tools produce <span className="border-b-4 border-blue-200 pb-0.5">generic, robotic content</span>. Our AI learns your unique style and voice to create content that truly sounds like you.
                     </span>
                   </li>
 

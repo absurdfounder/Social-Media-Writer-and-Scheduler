@@ -171,7 +171,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     </span>
                   </div>
                   <h2 className="mt-4 text-center text-slate-700 max-w-2xl mx-auto sm:text-3xl md:text-5xl mb-6">
-                    using <b className="text-blue-500">AI trained</b> on <b className="text-blue-500">your brand.</b>
+                    using <b className="text-blue-500">AI trained</b> on <b className="text-blue-500">your brand</b>.
                   </h2>
                 </section>
 

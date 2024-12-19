@@ -345,7 +345,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 sm:w-full">
                       <div className="text-start mt-6 w-full p-4">
                         <h2 className="h2 text-4xl font-semibold mb-4 font-bold font-normal">
-                          Turn Reddit discussions into <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">traffic and leads.</span>
+                          Turn Reddit discussions into <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">traffic & leads.</span>
                         </h2>
                         <p className="text-gray-700">
                           Never run out of content ideas. Our AI helps you discover trending discussions in your niche and create valuable responses that establish your expertise. Turn real user questions into content that resonates.

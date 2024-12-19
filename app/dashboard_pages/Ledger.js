@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Pencil, Check, X, Plus, Trash2 } from 'lucide-react';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { toast } from 'react-toastify';
 
 const Tweet = ({ url }) => {
   useEffect(() => {
@@ -101,7 +104,7 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
           />
           <button
             onClick={handleAddTag}
-            className="px-2 py-1 bg-blue-500 text-white rounded-r-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-2 py-1 bg-blue-500 text-white rounded-r-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
           >
             <Check size={16} />
           </button>
@@ -109,7 +112,7 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
       ) : (
         <button
           onClick={() => setIsAdding(true)}
-          className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           <Plus size={16} />
         </button>
@@ -148,13 +151,13 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
           />
           <div className="flex justify-end mt-2 space-x-2">
             <button
-              className="p-1 rounded-full bg-green-500 text-white hover:bg-green-500 transition-colors duration-300"
+              className="p-1 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300"
               onClick={handleSave}
             >
               <Check size={16} />
             </button>
             <button
-              className="p-1 rounded-full bg-red-500 text-white hover:bg-red-500 transition-colors duration-300"
+              className="p-1 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors duration-300"
               onClick={handleCancel}
             >
               <X size={16} />
@@ -165,7 +168,7 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
         <div>
           <p className="text-gray-800 font-handwriting">{note || "No note added yet."}</p>
           <button
-            className="mt-2 p-1 rounded-full bg-blue-500 text-white hover:bg-blue-500 transition-colors duration-300"
+            className="mt-2 p-1 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-300"
             onClick={() => setIsEditing(true)}
           >
             <Pencil size={16} />
@@ -178,12 +181,21 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
 
 const AddTweetForm = ({ onAdd }) => {
   const [url, setUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (url.trim()) {
-      onAdd(url.trim());
-      setUrl('');
+      setIsLoading(true);
+      try {
+        await onAdd(url.trim());
+        setUrl('');
+        toast.success('Tweet added successfully');
+      } catch (error) {
+        toast.error('Failed to add tweet');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -196,12 +208,16 @@ const AddTweetForm = ({ onAdd }) => {
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Enter Tweet URL"
           className="flex-grow px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+          disabled={isLoading}
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className={`px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+            isLoading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={isLoading}
         >
-          Embed Tweet
+          {isLoading ? 'Adding...' : 'Embed Tweet'}
         </button>
       </div>
     </form>
@@ -225,7 +241,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, message }) => {
           </button>
           <button 
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500"
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
             Confirm
           </button>
@@ -235,7 +251,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, message }) => {
   );
 };
 
-const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, onRemove, index }) => {
+const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, onNoteChange, onRemove, index }) => {
   const [note, setNote] = useState(initialNote);
   const [tags, setTags] = useState(initialTags);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -261,6 +277,11 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
     onTagsChange(updatedTags);
   };
 
+  const handleNoteChange = (newNote) => {
+    setNote(newNote);
+    onNoteChange(newNote);
+  };
+
   return (
     <Draggable draggableId={`tweet-${index}`} index={index}>
       {(provided, snapshot) => (
@@ -268,7 +289,7 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`rounded-xl overflow-hidden p-4 transition-all duration-300  ${
+          className={`rounded-xl overflow-hidden p-4 transition-all duration-300 ${
             snapshot.isDragging ? 'shadow-lg' : ''
           }`}
         >
@@ -282,7 +303,7 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
           <PostItNote
             note={note}
             onEdit={() => {}}
-            onSave={(newNote) => setNote(newNote)}
+            onSave={handleNoteChange}
             onCancel={() => {}}
           />
           <button
@@ -308,26 +329,83 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
 };
 
 const TweetGrid = () => {
-  const [tweets, setTweets] = useState(() => {
-    const savedTweets = localStorage.getItem('tweets');
-    return savedTweets ? JSON.parse(savedTweets) : [
-      { url: 'https://twitter.com/trunarla/status/1817988695167025597', note: 'Record daily shorts like this... ', tags: ['Video', 'Inspiration'] },
-      { url: 'https://twitter.com/mikeginleyseo/status/1822732460397932808', note: 'Record raw video intro like this', tags: ['Video', 'SEO'] },
-      { url: 'https://twitter.com/mikeginleyseo/status/1823424084618666439', note: '', tags: ['SEO', 'Performance'] },
-      { url: 'https://twitter.com/tibo_maker/status/1823365147382984796', note: '', tags: ['Research', 'Inspiration'] },
-      { url: 'https://twitter.com/marc_louvion/status/1822977595006492694', note: '', tags: ['Video', 'SEO'] },
-      { url: 'https://twitter.com/johnrushx/status/1822403351025160511', note: '', tags: ['Performance', 'Research'] },
-    ];
-  });
-
+  const [tweets, setTweets] = useState([]);
   const [tagSummary, setTagSummary] = useState({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [tweetToDelete, setTweetToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const auth = getAuth();
+  const db = getFirestore();
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      loadTweets();
+    }
+  }, [auth.currentUser]);
+
+  const loadTweets = async () => {
+    if (!auth.currentUser) {
+        setIsLoading(false);
+        return;
+    }
+
+    try {
+        console.log('Loading tweets for user:', auth.currentUser.uid);
+        const tweetsRef = doc(db, 'embeds', auth.currentUser.uid);
+        const tweetsDoc = await getDoc(tweetsRef);
+
+        if (tweetsDoc.exists()) {
+            const loadedTweets = tweetsDoc.data().tweets || [];
+            console.log('Loaded tweets:', loadedTweets);
+            setTweets(loadedTweets);
+        } else {
+            console.log('No existing tweets, setting defaults');
+            const defaultTweets = [
+                { url: 'https://twitter.com/trunarla/status/1817988695167025597', note: 'Record daily shorts like this... ', tags: ['Video', 'Inspiration'] },
+                { url: 'https://twitter.com/mikeginleyseo/status/1822732460397932808', note: 'Record raw video intro like this', tags: ['Video', 'SEO'] },
+                { url: 'https://twitter.com/mikeginleyseo/status/1823424084618666439', note: '', tags: ['SEO', 'Performance'] },
+                { url: 'https://twitter.com/tibo_maker/status/1823365147382984796', note: '', tags: ['Research', 'Inspiration'] },
+                { url: 'https://twitter.com/marc_louvion/status/1822977595006492694', note: '', tags: ['Video', 'SEO'] },
+                { url: 'https://twitter.com/johnrushx/status/1822403351025160511', note: '', tags: ['Performance', 'Research'] }
+            ];
+            await saveTweets(defaultTweets);
+            setTweets(defaultTweets);
+        }
+    } catch (error) {
+        console.error('Error loading tweets:', error);
+        toast.error('Failed to load tweets');
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const saveTweets = async (updatedTweets) => {
+    if (!auth.currentUser) return false;
+
+    try {
+        console.log('Saving tweets for user:', auth.currentUser.uid);
+        const tweetsRef = doc(db, 'embeds', auth.currentUser.uid);
+        await setDoc(tweetsRef, {
+            tweets: updatedTweets,
+            userId: auth.currentUser.uid,
+            updatedAt: new Date().toISOString()
+        });
+        console.log('Tweets saved successfully');
+        return true;
+    } catch (error) {
+        console.error('Error saving tweets:', error);
+        toast.error('Failed to save tweets');
+        return false;
+    }
+  };
 
   useEffect(() => {
     updateTagSummary();
-    localStorage.setItem('tweets', JSON.stringify(tweets));
-  }, [tweets]);
+    if (tweets.length > 0 && !isLoading) {
+      saveTweets(tweets);
+    }
+  }, [tweets, isLoading]);
 
   const updateTagSummary = () => {
     const summary = {};
@@ -345,8 +423,20 @@ const TweetGrid = () => {
     setTweets(updatedTweets);
   };
 
-  const handleAddTweet = (url) => {
-    setTweets([...tweets, { url, note: '', tags: [] }]);
+  const handleNoteChange = (index, newNote) => {
+    const updatedTweets = [...tweets];
+    updatedTweets[index].note = newNote;
+    setTweets(updatedTweets);
+  };
+
+  const handleAddTweet = async (url) => {
+    const newTweets = [...tweets, { url, note: '', tags: [] }];
+    const success = await saveTweets(newTweets);
+    if (success) {
+      setTweets(newTweets);
+      return true;
+    }
+    return false;
   };
 
   const handleRemoveTweet = (index) => {
@@ -354,19 +444,20 @@ const TweetGrid = () => {
     setShowDeleteConfirm(true);
   };
 
-  const confirmDeleteTweet = () => {
+  const confirmDeleteTweet = async () => {
     const updatedTweets = tweets.filter((_, i) => i !== tweetToDelete);
-    setTweets(updatedTweets);
-    setShowDeleteConfirm(false);
-    setTweetToDelete(null);
+    const success = await saveTweets(updatedTweets);
+    if (success) {
+      setTweets(updatedTweets);
+      setShowDeleteConfirm(false);
+      setTweetToDelete(null);
+    }
   };
 
-  const onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+  const onDragEnd = async (result) => {
+    const { destination, source } = result;
 
-    if (!destination) {
-      return;
-    }
+    if (!destination) return;
 
     if (
       destination.droppableId === source.droppableId &&
@@ -384,36 +475,55 @@ const TweetGrid = () => {
     const [reorderedTweet] = newTweets.splice(source.index, 1);
     newTweets.splice(destination.index, 0, reorderedTweet);
 
-    setTweets(newTweets);
+    const success = await saveTweets(newTweets);
+    if (success) {
+      setTweets(newTweets);
+    }
   };
+
+  if (!auth.currentUser) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-lg text-gray-500">Please sign in to start organizing tweets.</p>
+      </div>
+    );
+  }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="container mx-auto p-8 bg-gray-100 min-h-screen">
         <AddTweetForm onAdd={handleAddTweet} />
         <TagSummary tags={tagSummary} />
-        <Droppable droppableId="tweet-list">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {tweets.map((tweet, index) => (
-                <TweetCard
-                  key={`tweet-${index}`}
-                  index={index}
-                  url={tweet.url}
-                  note={tweet.note}
-                  tags={tweet.tags}
-                  onTagsChange={(newTags) => handleTagsChange(index, newTags)}
-                  onRemove={() => handleRemoveTweet(index)}
-                />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+        
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <Droppable droppableId="tweet-list">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {tweets.map((tweet, index) => (
+                  <TweetCard
+                    key={`tweet-${index}`}
+                    index={index}
+                    url={tweet.url}
+                    note={tweet.note}
+                    tags={tweet.tags}
+                    onTagsChange={(newTags) => handleTagsChange(index, newTags)}
+                    onNoteChange={(newNote) => handleNoteChange(index, newNote)}
+                    onRemove={() => handleRemoveTweet(index)}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        )}
 
         <ConfirmDialog
           isOpen={showDeleteConfirm}

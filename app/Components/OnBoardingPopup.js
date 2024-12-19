@@ -142,14 +142,55 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
 
               <div>
 
-              <h2 style={{ lineHeight: "1.5" }} className="sm:text-2xl md:text-5xl mb-4 max-w-2xl m-auto text-slate-500">
-              <span className="font-normal border-b border-b-4">Social Media AI-Toolkit</span> <span className="font-normal">for</span> <br />
-                  <span className="font-bold text-blue-400 border-b border-b-blue-400 border-b-4">X</span>, {" "}
-                  <span className="font-bold text-pink-500 border-b border-b-pink-500 border-b-4">IG</span>, {" "}
-                  <span className="font-bold text-gray-600 border-b border-b-gray-800 border-b-4">TikTok</span> and {" "}
-                  <span className="font-bold text-red-500 border-b border-b-red-400 border-b-4">Reddit</span> <br />
-                  trained on your brand.
-                </h2>
+<section>
+  <h2
+    className="text-center text-slate-700 max-w-2xl mx-auto sm:text-3xl md:text-5xl"
+    style={{ lineHeight: "1.5" }}
+  >
+    <span>
+      Get <b className="text-blue-500">more customers</b>
+    </span>
+    <span> from</span>
+    <br />
+  </h2>
+  <div className="flex flex-wrap justify-center gap-4 mt-4 ">
+    <span className="font-bold text-blue-400 bg-blue-100 border-blue-400 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/X_logo.jpg/768px-X_logo.jpg"
+        alt="X logo"
+        className="w-8 h-8 rounded-lg mr-2"
+      />
+      X
+    </span>
+    <span className="font-bold text-pink-500 bg-pink-100 border-pink-500 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/1200px-Instagram_icon.png"
+        alt="Instagram logo"
+        className="w-8 h-8 rounded-lg mr-2"
+      />
+      IG
+    </span>
+    <span className="font-bold text-gray-600 bg-gray-200 border-gray-800 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+      <img
+        src="https://p16-va-tiktok.ibyteimg.com/obj/musically-maliva-obj/a45cf75986e5f90595049b68725bfd87.png"
+        alt="TikTok logo"
+        className="w-8 h-8 rounded-lg mr-2"
+      />
+      TikTok
+    </span>
+    <span className="font-bold text-red-500 bg-red-100 border-red-400 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+      <img
+        src="https://seeklogo.com/images/R/reddit-logo-23F13F6A6A-seeklogo.com.png"
+        alt="Reddit logo"
+        className="w-8 h-8 rounded-lg mr-2"
+      />
+      Reddit
+    </span>
+  </div>
+  <h2 className="mt-4 text-center text-slate-700 max-w-2xl mx-auto sm:text-3xl md:text-5xl mb-6">
+    using <b className="text-blue-500">AI trained</b> on <b className="text-blue-500">your brand</b>.
+  </h2>
+</section>
 
 
                 <p className="text-lg text-gray-500 mb-8 flex gap-4 m-auto justify-center mt-2">
@@ -211,6 +252,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
 
               </div>
             </div>
+
 
 
 

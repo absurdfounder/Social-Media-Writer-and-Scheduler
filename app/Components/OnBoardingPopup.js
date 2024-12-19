@@ -238,7 +238,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       <Check className="w-5 h-5" />
                     </span>
                     <span>
-                      Creating consistent, high-quality content across multiple platforms takes hours each day. Most creators spend <span className="border-b-4 border-blue-200 pb-0.5">20+ hours per week</span> just on content creation. Our AI helps you create a week's worth of content in minutes.
+                      Creating consistent, high-quality content across multiple platforms takes hours each day. Most creators spend <span className="border-b-4 border-blue-200 pb-0.5">20+ hours per week</span> just on content creation. Our AI helps you create a weeks worth of content in minutes.
                     </span>
                   </li>
 
@@ -376,7 +376,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                           Build your content strategy like a <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">pro creator</span>
                         </h2>
                         <p className="text-gray-700">
-                          Get a bird's-eye view of your content strategy. Our AI helps you plan, schedule, and optimize content across all platforms while maintaining your unique voice and expertise in every post.
+                          Get a birds-eye view of your content strategy. Our AI helps you plan, schedule, and optimize content across all platforms while maintaining your unique voice and expertise in every post.
                         </p>
                         <p className="text-lg text-gray-500 mb-8 grid gap-4 m-auto justify-start mt-4">
                           <span className='flex gap-4'>
@@ -482,7 +482,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <ul className="text-sm">
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/dashboard">Dashboard</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/blog">Creator Blog</a></li>
-                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/changelog">What's New</a></li>
+                      <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/changelog">Whats New</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/templates">Content Templates</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/pricing">Pricing</a></li>
                       <li className="mb-2"><a className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out" href="/support">Help Center</a></li>

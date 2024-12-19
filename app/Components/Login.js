@@ -3,6 +3,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAvm-GVWRRFZIjD_wui9N3buRbgsEU7_Sw",
@@ -20,6 +21,7 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 export const Login = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
@@ -78,10 +80,8 @@ export const Login = () => {
       toast.error('Error updating user profile');
     }
   };
-  
 
   const getErrorMessage = (error) => {
-    // Clean up the error code by removing the 'auth/' prefix
     const errorCode = error.code?.replace('auth/', '') || '';
 
     switch (errorCode) {
@@ -128,7 +128,6 @@ export const Login = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
   
-      // Basic user data from Google Auth
       const userData = {
         uid: user.uid,
         email: user.email,
@@ -137,29 +136,23 @@ export const Login = () => {
         lastLogin: new Date().toISOString()
       };
   
-      // Save auth token
       const token = await user.getIdToken();
       localStorage.setItem('authToken', token);
   
-      // Save user data to Firestore first
       await saveUserToFirestore(userData);
   
-      // Fetch complete user data from Firestore
       const userRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
-        // Combine Firestore data with auth data
         const firestoreData = userDoc.data();
         const completeUserData = {
           ...userData,
           ...firestoreData,
-          // Convert Firestore Timestamps to ISO strings for localStorage
           lastLogin: new Date().toISOString(),
           createdAt: firestoreData.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
           updatedAt: firestoreData.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
           lastSeen: firestoreData.lastSeen?.toDate?.()?.toISOString() || new Date().toISOString(),
-          // Ensure subscription data is included
           subscription: firestoreData.subscription || {
             status: 'free',
             planType: null,
@@ -169,7 +162,6 @@ export const Login = () => {
           }
         };
   
-        // Save complete user data to localStorage
         localStorage.setItem('userData', JSON.stringify(completeUserData));
         setUser(completeUserData);
         setSubscription(completeUserData.subscription);
@@ -177,18 +169,23 @@ export const Login = () => {
         console.log('Complete user data saved:', completeUserData);
         toast.success(`Welcome${user.displayName ? ` ${user.displayName}` : ''}! 👋`);
   
-        // Check if user has an active subscription
         if (completeUserData.subscription?.status === 'active') {
           toast.success(`Active ${completeUserData.subscription.planName || 'subscription'} found! 🎉`);
         }
+
+        // Trigger refresh after successful login
+        window.dispatchEvent(new Event('userLoggedIn'));
+        router.refresh();
+        
       } else {
-        // If no Firestore document exists yet
         localStorage.setItem('userData', JSON.stringify(userData));
         setUser(userData);
         toast.success(`Welcome${user.displayName ? ` ${user.displayName}` : ''}! 👋`);
+        
+        // Trigger refresh even if no Firestore document exists
+        window.dispatchEvent(new Event('userLoggedIn'));
+        router.refresh();
       }
-  
-      window.dispatchEvent(new Event('userLoggedIn'));
   
     } catch (err) {
       console.error('Login error:', err);
@@ -216,6 +213,9 @@ export const Login = () => {
       setUser(null);
       setSubscription(null);
       toast.success('You have been signed out successfully. See you again soon! 👋');
+      
+      // Refresh after logout
+      router.refresh();
     } catch (err) {
       console.error('Logout error:', err);
       toast.error('Failed to logout. Please try again.');

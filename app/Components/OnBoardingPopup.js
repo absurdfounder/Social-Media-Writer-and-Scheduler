@@ -142,8 +142,8 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
 
               <div>
 
-                <h2 className="sm:text-2xl md:text-5xl lh-4  mb-2 max-w-2xl m-auto leading-loose mb-4 text-slate-500">
-                  <span className="font-normal border-b border-b-4">Social Media AI-Toolkit</span> <span className="font-normal">for</span> <br />
+              <h2 style={{ lineHeight: "1.5" }} className="sm:text-2xl md:text-5xl mb-4 max-w-2xl m-auto text-slate-500">
+              <span className="font-normal border-b border-b-4">Social Media AI-Toolkit</span> <span className="font-normal">for</span> <br />
                   <span className="font-bold text-blue-400 border-b border-b-blue-400 border-b-4">X</span>, {" "}
                   <span className="font-bold text-pink-500 border-b border-b-pink-500 border-b-4">IG</span>, {" "}
                   <span className="font-bold text-gray-600 border-b border-b-gray-800 border-b-4">TikTok</span> and {" "}

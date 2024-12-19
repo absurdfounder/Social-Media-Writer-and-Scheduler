@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, TrendingUp, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
-import BuyerList from './dashboard_pages/BuyerList';
+import Reddit_hub from './dashboard_pages/Reddit_hub';
 import Ledger from './dashboard_pages/Ledger';
-import Commissions from './dashboard_pages/BrandTraning';
+import BrandTraning from './dashboard_pages/BrandTraning';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
 import CollectionThisWeek from './dashboard_pages/CollectionThisWeek';
@@ -52,12 +52,14 @@ export default function Dashboard() {
     const checkLoginState = async () => {
       try {
         setIsLoading(true);
-        // Check localStorage immediately
+        
+        // Check both localStorage items
         const key = localStorage.getItem('anthropicKey');
-        const isValid = key && key.startsWith('sk-');
+        const userData = localStorage.getItem('userData');
+        
+        const isValid = key && key.startsWith('sk-') && userData;
         setIsAuthenticated(isValid);
         
-        // Minimal delay for UX
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (error) {
         console.error('Error checking login state:', error);
@@ -69,6 +71,12 @@ export default function Dashboard() {
   
     // Run immediately
     checkLoginState();
+  
+    // Add listener for login events
+    const handleLogin = () => checkLoginState();
+    window.addEventListener('userLoggedIn', handleLogin);
+    
+    return () => window.removeEventListener('userLoggedIn', handleLogin);
   }, []);
 
   const navItems = [
@@ -76,11 +84,11 @@ export default function Dashboard() {
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
-    { icon: Shapes, label: 'Trained On', id: 'commissions' },
+    { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
   ];
 
   const handleConfigureTrainingData = () => {
-    setActiveTab('commissions');
+    setActiveTab('BrandTraning');
   };
 
   const renderContent = () => {
@@ -90,11 +98,11 @@ export default function Dashboard() {
       case 'videoconstructor':
         return <VideoScriptConstructor />;
       case 'partylist-db':
-        return <BuyerList />;
+        return <Reddit_hub />;
       case 'ledger-db':
         return <Ledger />;
-      case 'commissions':
-        return <Commissions />;
+      case 'BrandTraning':
+        return <BrandTraning />;
       case 'ledger-check':
         return <LedgerCheck />;
       case 'aging-report':

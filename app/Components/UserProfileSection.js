@@ -36,7 +36,7 @@ const UserProfileSection = () => {
       });
 
       // Use window.location for hard refresh to login page
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

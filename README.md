@@ -9,7 +9,7 @@ This repository can generate AI-based tweets and threads using the Anthropic API
 - Create and manage tweet threads with the `ThreadWriter` component in `app/dashboard_pages/MainDashboard.js`.
 - Compose tweets using the `TipTapEditor` component in `app/dashboard_pages/MainDashboard.js`.
 - Support for image and video uploads for tweets.
-- Collect product information for personalized tweet generation with the `Commissions` component in `app/dashboard_pages/Commissions.js`.
+- Collect product information for personalized tweet generation with the `BrandTraning` component in `app/dashboard_pages/BrandTraning.js`.
 - Use Tailwind CSS for styling, as seen in `app/globals.css` and `tailwind.config.js`.
 
 # Installation
@@ -44,7 +44,7 @@ To get started with this project, follow these steps:
 2. Use the `ThreadWriter` component to create and manage tweet threads.
 3. Utilize the `TipTapEditor` component to compose tweets with rich text formatting.
 4. Upload images and videos to enhance your tweets.
-5. Collect product information using the `Commissions` component for personalized tweet generation.
+5. Collect product information using the `BrandTraning` component for personalized tweet generation.
 
 # Contributing
 

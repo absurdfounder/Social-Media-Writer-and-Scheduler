@@ -5,17 +5,152 @@ import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
 
-const Tweet = ({ url }) => {
+// EmbedContent Component
+const EmbedContent = ({ url }) => {
+  const [embedType, setEmbedType] = useState('');
+  const [error, setError] = useState(null);
+
   useEffect(() => {
+    determineEmbedType(url);
+  }, [url]);
+
+  const determineEmbedType = (url) => {
+    try {
+      const urlObj = new URL(url);
+      
+      if (urlObj.hostname.includes('twitter.com')) {
+        setEmbedType('twitter');
+      } else if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+        setEmbedType('youtube');
+      } else if (urlObj.hostname.includes('vimeo.com')) {
+        setEmbedType('vimeo');
+      } else if (isImageUrl(url)) {
+        setEmbedType('image');
+      } else {
+        setEmbedType('link');
+      }
+    } catch (err) {
+      setError('Invalid URL');
+      setEmbedType('error');
+    }
+  };
+
+  const isImageUrl = (url) => {
+    return /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+  };
+
+  const getYoutubeId = (url) => {
+    const urlObj = new URL(url);
+    if (urlObj.hostname.includes('youtu.be')) {
+      return urlObj.pathname.slice(1);
+    }
+    return urlObj.searchParams.get('v');
+  };
+
+  const getVimeoId = (url) => {
+    const urlObj = new URL(url);
+    return urlObj.pathname.split('/').pop();
+  };
+
+  const renderEmbed = () => {
+    switch (embedType) {
+      case 'twitter':
+        return <TwitterEmbed url={url} />;
+      
+      case 'youtube':
+        const youtubeId = getYoutubeId(url);
+        return (
+          <div className="aspect-w-16 aspect-h-9">
+            <iframe
+              src={`https://www.youtube.com/embed/${youtubeId}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full rounded-lg"
+            />
+          </div>
+        );
+      
+      case 'vimeo':
+        const vimeoId = getVimeoId(url);
+        return (
+          <div className="aspect-w-16 aspect-h-9">
+            <iframe
+              src={`https://player.vimeo.com/video/${vimeoId}`}
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full rounded-lg"
+            />
+          </div>
+        );
+      
+      case 'image':
+        return (
+          <img
+            src={url}
+            alt="Embedded content"
+            className="w-full h-auto rounded-lg"
+          />
+        );
+      
+      case 'link':
+        return (
+          <div className="border rounded-lg p-4 bg-white">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-700 break-all"
+            >
+              {url}
+            </a>
+          </div>
+        );
+      
+      case 'error':
+        return (
+          <div className="border rounded-lg p-4 bg-red-50 text-red-500">
+            {error}
+          </div>
+        );
+      
+      default:
+        return (
+          <div className="border rounded-lg p-4 bg-gray-50">
+            Loading...
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="w-full">
+      {renderEmbed()}
+    </div>
+  );
+};
+
+// Twitter embed component
+const TwitterEmbed = ({ url }) => {
+  useEffect(() => {
+    // Remove any existing Twitter script
+    const existingScript = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Add new Twitter script
     const script = document.createElement('script');
     script.src = 'https://platform.twitter.com/widgets.js';
     script.async = true;
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      // Cleanup script on unmount
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
-  }, []);
+  }, [url]);
 
   return (
     <div className="w-full rounded-lg">
@@ -26,6 +161,7 @@ const Tweet = ({ url }) => {
   );
 };
 
+// Tag Summary Component
 const TagSummary = ({ tags }) => {
   return (
     <div className="mb-8">
@@ -41,6 +177,7 @@ const TagSummary = ({ tags }) => {
   );
 };
 
+// Tag List Component
 const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTag, setNewTag] = useState('');
@@ -121,6 +258,7 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
   );
 };
 
+// Post-it Note Component
 const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentNote, setCurrentNote] = useState(note);
@@ -179,7 +317,8 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
   );
 };
 
-const AddTweetForm = ({ onAdd }) => {
+// Add Content Form Component
+const AddContentForm = ({ onAdd }) => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -190,9 +329,9 @@ const AddTweetForm = ({ onAdd }) => {
       try {
         await onAdd(url.trim());
         setUrl('');
-        toast.success('Tweet added successfully');
+        toast.success('Content added successfully');
       } catch (error) {
-        toast.error('Failed to add tweet');
+        toast.error('Failed to add content');
       } finally {
         setIsLoading(false);
       }
@@ -206,7 +345,7 @@ const AddTweetForm = ({ onAdd }) => {
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter Tweet URL"
+          placeholder="Enter URL to embed (Twitter, YouTube, Vimeo, Images, etc.)"
           className="flex-grow px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
           disabled={isLoading}
         />
@@ -217,13 +356,14 @@ const AddTweetForm = ({ onAdd }) => {
           }`}
           disabled={isLoading}
         >
-          {isLoading ? 'Adding...' : 'Embed Tweet'}
+          {isLoading ? 'Adding...' : 'Embed Content'}
         </button>
       </div>
     </form>
   );
 };
 
+// Confirm Dialog Component
 const ConfirmDialog = ({ isOpen, onClose, onConfirm, message }) => {
   if (!isOpen) return null;
 
@@ -251,10 +391,10 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, message }) => {
   );
 };
 
-const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, onNoteChange, onRemove, index }) => {
+// Content Card Component
+const ContentCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, onNoteChange, onRemove, index }) => {
   const [note, setNote] = useState(initialNote);
   const [tags, setTags] = useState(initialTags);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleAddTag = (newTag) => {
     if (!tags.includes(newTag)) {
@@ -283,7 +423,7 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
   };
 
   return (
-    <Draggable draggableId={`tweet-${index}`} index={index}>
+    <Draggable draggableId={`content-${index}`} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
@@ -293,7 +433,7 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
             snapshot.isDragging ? 'shadow-lg' : ''
           }`}
         >
-          <Tweet url={url} />
+          <EmbedContent url={url} />
           <TagList
             tags={tags}
             onAddTag={handleAddTag}
@@ -307,32 +447,22 @@ const TweetCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, on
             onCancel={() => {}}
           />
           <button
-            onClick={() => setShowDeleteConfirm(true)}
+            onClick={() => onRemove(index)}
             className="flex gap-2 items-center mt-4 p-2 px-6 bg-red-100 text-red-400 rounded-full hover:bg-red-200 transition-colors duration-300"
           >
             <Trash2 size={16} />
-            Remove Tweet
+            Remove Content
           </button>
-          <ConfirmDialog
-            isOpen={showDeleteConfirm}
-            onClose={() => setShowDeleteConfirm(false)}
-            onConfirm={() => {
-              setShowDeleteConfirm(false);
-              onRemove(index);
-            }}
-            message="Are you sure you want to delete this tweet?"
-          />
         </div>
       )}
     </Draggable>
   );
 };
 
-const TweetGrid = () => {
-  const [tweets, setTweets] = useState([]);
+// Main Content Grid Component
+const ContentGrid = () => {
+  const [contents, setContents] = useState([]);
   const [tagSummary, setTagSummary] = useState({});
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [tweetToDelete, setTweetToDelete] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   
   const auth = getAuth();
@@ -340,77 +470,70 @@ const TweetGrid = () => {
 
   useEffect(() => {
     if (auth.currentUser) {
-      loadTweets();
+      loadContents();
     }
   }, [auth.currentUser]);
 
-  const loadTweets = async () => {
+  const loadContents = async () => {
     if (!auth.currentUser) {
-        setIsLoading(false);
-        return;
+      setIsLoading(false);
+      return;
     }
 
     try {
-        console.log('Loading tweets for user:', auth.currentUser.uid);
-        const tweetsRef = doc(db, 'embeds', auth.currentUser.uid);
-        const tweetsDoc = await getDoc(tweetsRef);
+      const contentsRef = doc(db, 'embeds', auth.currentUser.uid);
+      const contentsDoc = await getDoc(contentsRef);
 
-        if (tweetsDoc.exists()) {
-            const loadedTweets = tweetsDoc.data().tweets || [];
-            console.log('Loaded tweets:', loadedTweets);
-            setTweets(loadedTweets);
-        } else {
-            console.log('No existing tweets, setting defaults');
-            const defaultTweets = [
-                { url: 'https://twitter.com/trunarla/status/1817988695167025597', note: 'Record daily shorts like this... ', tags: ['Video', 'Inspiration'] },
-                { url: 'https://twitter.com/mikeginleyseo/status/1822732460397932808', note: 'Record raw video intro like this', tags: ['Video', 'SEO'] },
-                { url: 'https://twitter.com/mikeginleyseo/status/1823424084618666439', note: '', tags: ['SEO', 'Performance'] },
-                { url: 'https://twitter.com/tibo_maker/status/1823365147382984796', note: '', tags: ['Research', 'Inspiration'] },
-                { url: 'https://twitter.com/marc_louvion/status/1822977595006492694', note: '', tags: ['Video', 'SEO'] },
-                { url: 'https://twitter.com/johnrushx/status/1822403351025160511', note: '', tags: ['Performance', 'Research'] }
-            ];
-            await saveTweets(defaultTweets);
-            setTweets(defaultTweets);
-        }
+      if (contentsDoc.exists()) {
+        const loadedContents = contentsDoc.data().tweets || [];
+        setContents(loadedContents);
+      } else {
+        const defaultContents = [
+          { url: 'https://twitter.com/trunarla/status/1817988695167025597', note: 'Record daily shorts like this... ', tags: ['Video', 'Inspiration'] },
+          { url: 'https://twitter.com/mikeginleyseo/status/1822732460397932808', note: 'Record raw video intro like this', tags: ['Video', 'SEO'] },
+          { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', note: 'Example YouTube video', tags: ['Video', 'Example'] },
+          { url: 'https://vimeo.com/148751763', note: 'Example Vimeo video', tags: ['Video', 'Example'] }
+        ];
+        await saveContents(defaultContents);
+        setContents(defaultContents);
+      }
     } catch (error) {
-        console.error('Error loading tweets:', error);
-        toast.error('Failed to load tweets');
+      console.error('Error loading contents:', error);
+      toast.error('Failed to load contents');
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const saveTweets = async (updatedTweets) => {
+  const saveContents = async (updatedContents) => {
     if (!auth.currentUser) return false;
 
     try {
-        console.log('Saving tweets for user:', auth.currentUser.uid);
-        const tweetsRef = doc(db, 'embeds', auth.currentUser.uid);
-        await setDoc(tweetsRef, {
-            tweets: updatedTweets,
-            userId: auth.currentUser.uid,
-            updatedAt: new Date().toISOString()
-        });
-        console.log('Tweets saved successfully');
-        return true;
+      const contentsRef = doc(db, 'embeds', auth.currentUser.uid);
+      await setDoc(contentsRef, {
+        tweets: updatedContents,
+        userId: auth.currentUser.uid,
+        updatedAt: new Date().toISOString()
+      });
+      return true;
     } catch (error) {
-        console.error('Error saving tweets:', error);
-        toast.error('Failed to save tweets');
-        return false;
+      console.error('Error saving contents:', error);
+      toast.error('Failed to save contents');
+      return false;
     }
   };
 
   useEffect(() => {
     updateTagSummary();
-    if (tweets.length > 0 && !isLoading) {
-      saveTweets(tweets);
+    if (contents.length > 0 && !isLoading) {
+      saveContents(contents);
     }
-  }, [tweets, isLoading]);
+  }, [contents, isLoading]);
 
   const updateTagSummary = () => {
     const summary = {};
-    tweets.forEach(tweet => {
-      tweet.tags.forEach(tag => {
+    contents.forEach(content => {
+      content.tags.forEach(tag => {
         summary[tag] = (summary[tag] || 0) + 1;
       });
     });
@@ -418,39 +541,35 @@ const TweetGrid = () => {
   };
 
   const handleTagsChange = (index, newTags) => {
-    const updatedTweets = [...tweets];
-    updatedTweets[index].tags = newTags;
-    setTweets(updatedTweets);
+    const updatedContents = [...contents];
+    updatedContents[index].tags = newTags;
+    setContents(updatedContents);
   };
 
   const handleNoteChange = (index, newNote) => {
-    const updatedTweets = [...tweets];
-    updatedTweets[index].note = newNote;
-    setTweets(updatedTweets);
+    const updatedContents = [...contents];
+    updatedContents[index].note = newNote;
+    setContents(updatedContents);
   };
 
-  const handleAddTweet = async (url) => {
-    const newTweets = [...tweets, { url, note: '', tags: [] }];
-    const success = await saveTweets(newTweets);
+  const handleAddContent = async (url) => {
+    const newContents = [...contents, { url, note: '', tags: [] }];
+    const success = await saveContents(newContents);
     if (success) {
-      setTweets(newTweets);
+      setContents(newContents);
       return true;
     }
     return false;
   };
 
-  const handleRemoveTweet = (index) => {
-    setTweetToDelete(index);
-    setShowDeleteConfirm(true);
-  };
-
-  const confirmDeleteTweet = async () => {
-    const updatedTweets = tweets.filter((_, i) => i !== tweetToDelete);
-    const success = await saveTweets(updatedTweets);
+  const handleRemoveContent = async (index) => {
+    const updatedContents = contents.filter((_, i) => i !== index);
+    const success = await saveContents(updatedContents);
     if (success) {
-      setTweets(updatedTweets);
-      setShowDeleteConfirm(false);
-      setTweetToDelete(null);
+      setContents(updatedContents);
+      toast.success('Content removed successfully');
+    } else {
+      toast.error('Failed to remove content');
     }
   };
 
@@ -466,25 +585,20 @@ const TweetGrid = () => {
       return;
     }
 
-    if (destination.droppableId === 'delete-zone') {
-      handleRemoveTweet(source.index);
-      return;
-    }
+    const newContents = Array.from(contents);
+    const [reorderedContent] = newContents.splice(source.index, 1);
+    newContents.splice(destination.index, 0, reorderedContent);
 
-    const newTweets = Array.from(tweets);
-    const [reorderedTweet] = newTweets.splice(source.index, 1);
-    newTweets.splice(destination.index, 0, reorderedTweet);
-
-    const success = await saveTweets(newTweets);
+    const success = await saveContents(newContents);
     if (success) {
-      setTweets(newTweets);
+      setContents(newContents);
     }
   };
 
   if (!auth.currentUser) {
     return (
       <div className="text-center p-8">
-        <p className="text-lg text-gray-500">Please sign in to start organizing tweets.</p>
+        <p className="text-lg text-gray-500">Please sign in to start organizing your content.</p>
       </div>
     );
   }
@@ -492,7 +606,7 @@ const TweetGrid = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="container mx-auto p-8 bg-gray-100 min-h-screen">
-        <AddTweetForm onAdd={handleAddTweet} />
+        <AddContentForm onAdd={handleAddContent} />
         <TagSummary tags={tagSummary} />
         
         {isLoading ? (
@@ -500,23 +614,23 @@ const TweetGrid = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           </div>
         ) : (
-          <Droppable droppableId="tweet-list">
+          <Droppable droppableId="content-list">
             {(provided) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               >
-                {tweets.map((tweet, index) => (
-                  <TweetCard
-                    key={`tweet-${index}`}
+                {contents.map((content, index) => (
+                  <ContentCard
+                    key={`content-${index}`}
                     index={index}
-                    url={tweet.url}
-                    note={tweet.note}
-                    tags={tweet.tags}
+                    url={content.url}
+                    note={content.note}
+                    tags={content.tags}
                     onTagsChange={(newTags) => handleTagsChange(index, newTags)}
                     onNoteChange={(newNote) => handleNoteChange(index, newNote)}
-                    onRemove={() => handleRemoveTweet(index)}
+                    onRemove={() => handleRemoveContent(index)}
                   />
                 ))}
                 {provided.placeholder}
@@ -524,16 +638,9 @@ const TweetGrid = () => {
             )}
           </Droppable>
         )}
-
-        <ConfirmDialog
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={confirmDeleteTweet}
-          message="Are you sure you want to delete this tweet?"
-        />
       </div>
     </DragDropContext>
   );
 };
 
-export default TweetGrid;
+export default ContentGrid;

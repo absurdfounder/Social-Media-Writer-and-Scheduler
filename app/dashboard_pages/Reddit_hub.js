@@ -56,6 +56,7 @@ const LinkPreview = ({ url }) => {
 };
 
 const RedditExplorer = () => {
+  // State declarations
   const [activeTab, setActiveTab] = useState('groups');
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -80,7 +81,25 @@ const RedditExplorer = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [comments, setComments] = useState([]);
+  const [productInfo, setProductInfo] = useState(null);
+  const [postIdeas, setPostIdeas] = useState([]);
+  const [commentSuggestions, setCommentSuggestions] = useState({});
+  const [isGeneratingIdeas, setIsGeneratingIdeas] = useState(false);
 
+  // Intersection Observer setup
+  const observer = useRef();
+  const lastCommunityElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && displayedCommunities.length < communities.length) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, displayedCommunities.length, communities.length]);
+
+  // Predefined groups data
   const predefinedGroups = [
     {
       name: "English Learners",
@@ -674,24 +693,8 @@ const RedditExplorer = () => {
       ]
     }
   ];
-  
-  const [productInfo, setProductInfo] = useState(null);
-  const [postIdeas, setPostIdeas] = useState([]);
-  const [commentSuggestions, setCommentSuggestions] = useState({});
-  const [isGeneratingIdeas, setIsGeneratingIdeas] = useState(false);
 
-  const observer = useRef();
-  const lastCommunityElementRef = useCallback(node => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && displayedCommunities.length < communities.length) {
-        setPage(prevPage => prevPage + 1);
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loading, displayedCommunities.length, communities.length]);
-
+  // useEffect hooks
   useEffect(() => {
     fetchData(activeTab);
   }, [activeTab]);
@@ -748,6 +751,7 @@ const RedditExplorer = () => {
     generatePostIdeasAfterRender();
   }, [analyzedPosts]);
 
+  // Core functionality functions
   const fetchData = async (tab) => {
     setLoading(true);
     setError(null);
@@ -810,42 +814,11 @@ const RedditExplorer = () => {
     }
   };
 
-  const fetchSubredditPosts = async (subreddit) => {
-    setLoading(true);
-    setError(null);
-    setErrorMessage(null);
-    try {
-      const response = await fetch(`https://www.reddit.com/r/${subreddit}/hot.json?limit=10`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      if (!data || !data.data || !data.data.children) {
-        throw new Error('Unexpected data structure from Reddit API');
-      }
-      const fetchedPosts = data.data.children.map(child => ({
-        id: child.data.id,
-        title: child.data.title,
-        url: `https://reddit.com${child.data.permalink}`,
-        author: child.data.author,
-        score: child.data.score,
-        numComments: child.data.num_comments,
-        created: new Date(child.data.created_utc * 1000).toLocaleDateString(),
-        selftext: child.data.selftext,
-        subreddit: child.data.subreddit
-      }));
-      setPosts(fetchedPosts);
-    } catch (err) {
-      setError(`Failed to fetch posts for r/${subreddit}: ${err.message}`);
-      setErrorMessage(`Failed to fetch posts for r/${subreddit}: ${err.message}`);
-      console.error('Error fetching posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const generatePostIdeas = async (posts) => {
-    if (!productInfo) return;
+    if (!productInfo) {
+      console.log('No product info available');
+      return;
+    }
   
     const topPosts = posts.sort((a, b) => b.score - a.score).slice(0, 5);
     const openaiKey = localStorage.getItem('openAIKey');
@@ -868,10 +841,21 @@ const RedditExplorer = () => {
           max_tokens: 4000,
           messages: [{ 
             role: "user", 
-            content: `Generate 5 engaging post ideas for Reddit based on these top-performing posts: ${JSON.stringify(topPosts)} 
-            and our product information: ${JSON.stringify(productInfo)}` 
+            content: `Based on these top performing Reddit posts and our product information, generate 5 engaging post ideas. Format each idea with a clear title and detailed description.
+
+Top Posts: ${JSON.stringify(topPosts, null, 2)}
+Product Info: ${JSON.stringify(productInfo, null, 2)}
+
+Generate 5 post ideas in this format:
+1. Title: [Post Title]
+Description: [2-3 sentences explaining the post idea]
+
+2. Title: [Post Title]
+Description: [2-3 sentences explaining the post idea]
+
+... and so on for all 5 ideas.` 
           }],
-          model: "gpt-4o-mini"
+          model: "gpt-4"
         })
       });
   
@@ -881,12 +865,22 @@ const RedditExplorer = () => {
       }
   
       const data = await response.json();
-      const ideas = data.content[0].text.split('\n\n')
+      console.log('API Response:', data); // Debug log
+
+      // Parse the response into structured ideas
+      const ideas = data.choices[0].message.content.split(/\d+\.\s+/)
         .filter(idea => idea.trim() !== '')
         .map(idea => {
-          const [title, description] = idea.split('\n');
-          return { title: title.substring(3), description };
+          const titleMatch = idea.match(/Title:\s*(.*?)\nDescription:/s);
+          const descriptionMatch = idea.match(/Description:\s*(.*?)(?=\n|$)/s);
+          
+          return {
+            title: titleMatch ? titleMatch[1].trim() : '',
+            description: descriptionMatch ? descriptionMatch[1].trim() : ''
+          };
         });
+
+      console.log('Parsed Ideas:', ideas); // Debug log
       setPostIdeas(ideas);
     } catch (error) {
       console.error('Error generating post ideas:', error);
@@ -895,11 +889,12 @@ const RedditExplorer = () => {
       setIsGeneratingIdeas(false);
     }
   };
-  
 
-  
   const generateCommentSuggestion = async (postId, postTitle, postContent) => {
-    if (!productInfo) return;
+    if (!productInfo) {
+      console.log('No product info available');
+      return;
+    }
   
     const openaiKey = localStorage.getItem('openAIKey');
     if (!openaiKey) {
@@ -908,6 +903,7 @@ const RedditExplorer = () => {
     }
   
     try {
+      console.log('Generating comment for post:', postId);
       const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
@@ -919,23 +915,23 @@ const RedditExplorer = () => {
           max_tokens: 4000,
           messages: [{ 
             role: "user", 
-            content: `Generate an engaging comment for this Reddit post that subtly promotes our product. Follow these guidelines:
-  
-  1. Add value: Focus on contributing to the discussion genuinely.
-  2. Stay humble: Don't oversell or claim superiority.
-  3. Be relevant: Ensure the comment naturally fits the context of the post.
-  4. Encourage further engagement: End with a question or call for opinions.
-  5. Subtle promotion: Mention the product only if it's highly relevant and adds value to the discussion.
-  
-  Post Title: ${postTitle}
-  Post Content: ${postContent}
-  
-  Product Info:
-  ${JSON.stringify(productInfo, null, 2)}
-  
-  Provide a comment suggestion that follows these guidelines and naturally fits the context of the post.` 
+            content: `Create an engaging comment for this Reddit post that naturally mentions our product/service when relevant. The comment should:
+
+1. Provide genuine value to the discussion
+2. Share relevant experience or insights
+3. Be conversational and authentic
+4. Include a question or discussion prompt
+5. Mention the product only if it naturally fits
+
+Post Title: ${postTitle}
+Post Content: ${postContent}
+
+Product/Service Context:
+${JSON.stringify(productInfo, null, 2)}
+
+Generate a natural, engaging comment that someone would actually write on Reddit (100-200 words).`
           }],
-          model: "gpt-4o-mini"
+          model: "gpt-4"
         })
       });
   
@@ -945,25 +941,37 @@ const RedditExplorer = () => {
       }
   
       const data = await response.json();
-      const suggestion = data.content[0].text.trim();
+      console.log('API Response:', data); // Debug log
+
+      const suggestion = data.choices[0].message.content.trim();
+      console.log('Generated comment:', suggestion); // Debug log
+      
       setCommentSuggestions(prev => ({ ...prev, [postId]: suggestion }));
     } catch (error) {
       console.error('Error generating comment suggestion:', error);
       setErrorMessage(`Error generating comment suggestion: ${error.message}`);
     }
   };
-  
 
   const analyzePostContent = async (post) => {
     try {
       const openaiKey = localStorage.getItem('openAIKey');
+      const trainingData = localStorage.getItem('getTrainingData');
       
       if (!openaiKey) {
         setErrorMessage('OpenAI API key not found. Please set your API key.');
         return post;
       }
   
-      console.log('Analyzing post content...');
+      let parsedTrainingData;
+      try {
+        parsedTrainingData = trainingData ? JSON.parse(trainingData) : {};
+      } catch (e) {
+        console.error('Error parsing training data:', e);
+        parsedTrainingData = {};
+      }
+  
+      console.log('Analyzing post content with training data...');
       const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
@@ -975,10 +983,28 @@ const RedditExplorer = () => {
           max_tokens: 4000,
           messages: [{ 
             role: "user", 
-            content: `Analyze the following Reddit post. Extract keywords, provide a brief summary, and categorize it into one or more of the following categories: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas.
+            content: `Analyze this Reddit post's marketing potential. Consider how the user could naturally promote their product/service in the comments or participate in the discussion.
   
+  Assess the following:
+  1. Keywords (comma-separated list focused on business/marketing opportunities)
+  2. Brief summary (highlighting potential marketing angles)
+  3. Categories (from: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas)
+  4. Marketing Relevancy Score (0-100) based on:
+     - Can the user's product/service help solve a problem mentioned?
+     - Is there a natural way to mention the product/service in comments?
+     - Would promotional content be well-received here?
+     - Is the audience likely to be interested?
+     - Is the discussion active and engaging?
+  5. Marketing Opportunity Explanation: Explain specifically how the user could promote their product/service in this discussion naturally and effectively. Include tactical suggestions.
+  
+  Product/Service Context:
+  ${JSON.stringify(parsedTrainingData, null, 2)}
+  
+  Post to Analyze:
   Title: ${post.title}
-  Content: ${post.selftext}` 
+  Content: ${post.selftext}
+  
+  Focus on finding genuine opportunities to add value while promoting the product/service. Score higher for posts where promotion would feel natural and helpful rather than forced.` 
           }],
           model: "gpt-4o-mini"
         })
@@ -990,25 +1016,28 @@ const RedditExplorer = () => {
       }
   
       const data = await response.json();
-      console.log('Raw API response:', data); // Debug log
+      console.log('Raw API response:', data);
   
-      // Get the text from the response
       const analysisResult = data.content[0].text;
-      console.log('Analysis result:', analysisResult); // Debug log
+      console.log('Analysis result:', analysisResult);
   
-      // Parse the analysis text using more flexible matching
       const keywords = analysisResult.match(/\*\*Keywords:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(k => k.trim()) || [];
       const summary = analysisResult.match(/\*\*Summary:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
       const categories = analysisResult.match(/\*\*Categories:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(c => c.trim()) || [];
+      const relevancyScore = parseInt(analysisResult.match(/\*\*Marketing Relevancy Score:?\*\*:?\s*(\d+)/i)?.[1]) || 0;
+      const relevancyExplanation = analysisResult.match(/\*\*Marketing Opportunity Explanation:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
   
-      console.log('Parsed results:', { keywords, summary, categories }); // Debug log
+      console.log('Parsed results:', { keywords, summary, categories, relevancyScore, relevancyExplanation });
   
       return {
         ...post,
         keywords,
         summary,
         categories,
+        relevancyScore,
+        relevancyExplanation
       };
+  
     } catch (error) {
       console.error('Error analyzing post:', error);
       setErrorMessage(`Error analyzing post: ${error.message}`);
@@ -1016,6 +1045,7 @@ const RedditExplorer = () => {
     }
   };
 
+  // Helper functions
   const handleSort = (column) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -1023,11 +1053,6 @@ const RedditExplorer = () => {
       setSortColumn(column);
       setSortDirection('asc');
     }
-  };
-
-  const SortIcon = ({ column }) => {
-    if (sortColumn !== column) return null;
-    return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
   };
 
   const handleSearch = (event) => {
@@ -1183,12 +1208,44 @@ const RedditExplorer = () => {
     }
   };
 
+  const fetchSubredditPosts = async (subreddit) => {
+    setLoading(true);
+    setError(null);
+    setErrorMessage(null);
+    try {
+      const response = await fetch(`https://www.reddit.com/r/${subreddit}/hot.json?limit=10`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (!data || !data.data || !data.data.children) {
+        throw new Error('Unexpected data structure from Reddit API');
+      }
+      const fetchedPosts = data.data.children.map(child => ({
+        id: child.data.id,
+        title: child.data.title,
+        url: `https://reddit.com${child.data.permalink}`,
+        author: child.data.author,
+        score: child.data.score,
+        numComments: child.data.num_comments,
+        created: new Date(child.data.created_utc * 1000).toLocaleDateString(),
+        selftext: child.data.selftext,
+        subreddit: child.data.subreddit
+      }));
+      setPosts(fetchedPosts);
+    } catch (err) {
+      setError(`Failed to fetch posts for r/${subreddit}: ${err.message}`);
+      setErrorMessage(`Failed to fetch posts for r/${subreddit}: ${err.message}`);
+      console.error('Error fetching posts:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filterBadges = [
     { label: 'All', icon: Home, description: 'All posts' },
-
     { label: 'Competitor Keywords Included', icon: TrendingUp, description: 'Popular discussions this week' },
     { label: 'My Brand Mentions', icon: Sparkles, description: 'Popular discussions this week' },
-
     { label: 'Hot Discussions', icon: Flame, description: 'Popular discussions this week' },
     { label: 'Top Content', icon: Trophy, description: 'Best-performing content of past month' },
     { label: 'Advice Requests', icon: HelpCircle, description: 'People asking for advice & resources' },
@@ -1201,41 +1258,62 @@ const RedditExplorer = () => {
     { label: 'Ideas', icon: Lightbulb, description: 'People suggesting ideas' },
   ];
 
-  const sortedCommunities = [...displayedCommunities].sort((a, b) => {
-    if (sortColumn) {
-      if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-      if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
 
+  // Render functions
   const renderPostIdeas = () => (
     <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-2">Post Ideas</h3>
-      {isGeneratingIdeas ? (
-        <div className="text-center p-4">
-          <p className="text-gray-500">Generating post ideas for these subreddits...please wait...</p>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">Content Ideas</h3>
+        <div className="flex items-center">
+          {isGeneratingIdeas && (
+            <RefreshCcw className="w-4 h-4 animate-spin text-blue-500 mr-2" />
+          )}
+          <span className="text-sm text-gray-500">
+            {isGeneratingIdeas ? 'Generating ideas...' : `${postIdeas.length} ideas generated`}
+          </span>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {postIdeas.map((idea, index) => (
-            <div key={index} className="bg-white rounded-lg shadow p-4">
-              <h4 className="font-semibold text-blue-500">{idea.title}</h4>
-              <p className="text-sm text-gray-500 mt-2">{idea.description}</p>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {postIdeas.map((idea, index) => (
+          <div key={index} className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+            <div className="flex items-start justify-between mb-2">
+              <h4 className="font-semibold text-blue-600 flex-grow">{idea.title}</h4>
             </div>
-          ))}
-        </div>
-      )}
+            <p className="text-sm text-gray-600 mt-2">{idea.description}</p>
+            <div className="flex items-center justify-end mt-4">
+              <button className="text-xs text-blue-500 hover:text-blue-600 flex items-center">
+                <PenTool className="w-3 h-3 mr-1" />
+                Use Template
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 
   const renderComments = () => (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Comments</h3>
-      {commentSuggestions[selectedPost.id] && (
-        <div className="bg-blue-100 border border-blue-500 text-blue-500 px-4 py-3 rounded relative mb-4">
-          <strong className="font-bold">Suggested Comment: </strong>
-          <span className="block sm:inline">{commentSuggestions[selectedPost.id]}</span>
+      <h3 className="text-lg font-semibold mb-4">Discussion</h3>
+      {commentSuggestions[selectedPost?.id] && (
+        <div className="bg-gradient-to-r from-blue-50 to-white border-l-4 border-blue-500 p-4 rounded-lg mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-semibold text-blue-600">Suggested Response</h4>
+            <div className="flex space-x-2">
+              <button className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded flex items-center">
+                <PenTool className="w-3 h-3 mr-1" />
+                Edit
+              </button>
+              <button className="text-xs bg-blue-500 text-white px-2 py-1 rounded flex items-center">
+                <Check className="w-3 h-3 mr-1" />
+                Use This
+              </button>
+            </div>
+          </div>
+          <p className="text-gray-700 text-sm whitespace-pre-wrap">
+            {commentSuggestions[selectedPost.id]}
+          </p>
         </div>
       )}
       {comments.length > 0 ? (
@@ -1258,6 +1336,19 @@ const RedditExplorer = () => {
       )}
     </div>
   );
+
+  const SortIcon = ({ column }) => {
+    if (sortColumn !== column) return null;
+    return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
+  };
+
+  const sortedCommunities = [...displayedCommunities].sort((a, b) => {
+    if (sortColumn) {
+      if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
+      if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+    }
+    return 0;
+  });
 
   if (loading && communities.length === 0) {
     return (
@@ -1286,9 +1377,9 @@ const RedditExplorer = () => {
       <div>
         <div className="flex space-x-1 sm:space-x-2 overflow-x-auto">
           <Tab label="Audiences" icon={Users} active={activeTab === 'groups'} onClick={() => setActiveTab('groups')} />
-          <Tab label="My Keywords" icon={Flame} active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
-          <Tab label="Competitor Tracking" icon={TrendingUp} active={activeTab === 'trending'} onClick={() => setActiveTab('trending')} />
-          <Tab label="Email Alerts" icon={BellDot} active={activeTab === 'new'} onClick={() => setActiveTab('new')} />
+          <Tab label="My Keywords Settings" icon={Flame} active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
+          <Tab label="Competitor Keywords Settings" icon={TrendingUp} active={activeTab === 'trending'} onClick={() => setActiveTab('trending')} />
+          <Tab label="Email Alerts Settings" icon={BellDot} active={activeTab === 'new'} onClick={() => setActiveTab('new')} />
         </div>
 
         <div className='bg-gray-50 border p-2 sm:p-4'>
@@ -1330,251 +1421,271 @@ const RedditExplorer = () => {
                       key={community.id}
                       className="hover:bg-gray-50 transition-colors duration-150"
                       ref={index === sortedCommunities.length - 1 ? lastCommunityElementRef : null}
-                    ><td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
-                    <button onClick={() => handleSubredditClick(community)} className="hover:underline">
-                      {community.name}
-                    </button>
-                  </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500">
-                    {community.subscribersCount.toLocaleString()}
-                  </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
-                    +{community.growthPerWeek.toLocaleString()}
-                  </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
-                    +{community.growthPerMonth.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {activeTab === 'groups' && !selectedGroup && (
-        <div>
-          <div className='items-center flex justify-between mb-4'>
-            <h6 className='font-bold text-lg sm:text-xl flex items-center'>
-              Grouped Audiences
-            </h6>
-            <button
-              onClick={() => setShowGroupPopup(true)}
-              className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
-            >
-              <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Create Group
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {groups.map((group) => (
-              <div
-                key={group.name}
-                className="bg-white rounded-lg shadow p-3 sm:p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                onClick={() => handleGroupClick(group)}
-              >
-                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center justify-between">
-                  <span>{group.name}</span>
-                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-500 mb-2">
-                  {group.subreddits.length} subreddit{group.subreddits.length !== 1 ? 's' : ''}
-                </p>
-                <div className="flex flex-wrap gap-1 sm:gap-2">
-                  {group.subreddits.slice(0, 5).map((subreddit) => (
-                    <span key={subreddit.id} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
-                      {subreddit.name}
-                    </span>
+                    >
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
+                        <button onClick={() => handleSubredditClick(community)} className="hover:underline">
+                          {community.name}
+                        </button>
+                      </td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500">
+                        {community.subscribersCount.toLocaleString()}
+                      </td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
+                        +{community.growthPerWeek.toLocaleString()}
+                      </td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
+                        +{community.growthPerMonth.toLocaleString()}
+                      </td>
+                    </tr>
                   ))}
-                  {group.subreddits.length > 5 && (
-                    <span className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
-                      +{group.subreddits.length - 5} more
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-      {(selectedSubreddit || selectedGroup) && (
-        <div className="mt-4 sm:mt-8">
-          <button
-            onClick={() => {
-              setSelectedSubreddit(null);
-              setSelectedGroup(null);
-              setSelectedPost(null);
-            }}
-            className="mb-4 px-3 sm:px-4 py-2 bg-gray-200 text-gray-500 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center text-xs sm:text-sm"
-          >
-            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            Back to {activeTab === 'groups' ? 'Groups' : 'Communities'}
-          </button>
-          {selectedGroup ? (
+          {activeTab === 'groups' && !selectedGroup && (
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
-                {selectedGroup.name} Group
-              </h2>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {selectedGroup.subreddits.map((subreddit) => (
-                  <a
-                    key={subreddit.id}
-                    href={`https://reddit.com/r/${subreddit.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm hover:bg-blue-200 transition-colors duration-200 flex items-center"
+              <div className='items-center flex justify-between mb-4'>
+                <h6 className='font-bold text-lg sm:text-xl flex items-center'>
+                  Grouped Audiences
+                </h6>
+                <button
+                  onClick={() => setShowGroupPopup(true)}
+                  className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                >
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  Create Group
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {groups.map((group) => (
+                  <div
+                    key={group.name}
+                    className="bg-white rounded-lg shadow p-3 sm:p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                    onClick={() => handleGroupClick(group)}
                   >
-                    r/{subreddit.name}
-                    <ExternalLink className="w-3 h-3 ml-1 inline-block" />
-                  </a>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center justify-between">
+                      <span>{group.name}</span>
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-500 mb-2">
+                      {group.subreddits.length} subreddit{group.subreddits.length !== 1 ? 's' : ''}
+                    </p>
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                      {group.subreddits.slice(0, 5).map((subreddit) => (
+                        <span key={subreddit.id} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
+                          {subreddit.name}
+                        </span>
+                      ))}
+                      {group.subreddits.length > 5 && (
+                        <span className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
+                          +{group.subreddits.length - 5} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-          ) : (
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
-              r/{selectedSubreddit.name}
-            </h2>
           )}
-          <div className="mb-4 sm:mb-6 flex flex-wrap gap-1 sm:gap-2">
-            {filterBadges.map((badge) => (
-              <button
-                key={badge.label}
-                onClick={() => setActiveFilter(badge.label === 'All' ? 'all' : badge.label)}
-                className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center ${
-                  activeFilter === (badge.label === 'All' ? 'all' : badge.label)
-                    ? 'bg-blue-200 text-blue-800'
-                    : 'bg-white border text-gray-500'
-                }`}
-              >
-                <badge.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                {badge.label}
-              </button>
-            ))}
-          </div>
-          {isAnalyzing && (
-            <div className="text-center p-4">
-              <RefreshCcw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-500 mx-auto" />
-              <p className="mt-2 text-gray-500 text-sm sm:text-base">Fetching and Analyzing posts...</p>
-            </div>
-          )}
-          {!isAnalyzing && !selectedPost && (
-            <>
-              {renderPostIdeas()}
-              <ul className="space-y-4">
-                {(analyzedPosts.length > 0 ? analyzedPosts : posts)
-                  .filter(post => activeFilter === 'all' || (post.categories && post.categories.includes(activeFilter)))
-                  .map((post) => (
-                    <li key={post.id} className="bg-white rounded-lg shadow p-3 sm:p-4">
-                      <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
-                        <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
-                          <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
-                          <span><b className='text-blue-300'>Relevance Score : <span className='text-blue-600'>90</span>/100</b> &nbsp; {post.created}</span>
-                        </div>
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">{post.title}</h3>
-                        <b className='text-blue-500 font-bold'>Why Relevant : </b> {post.summary && <p className="text-xs sm:text-sm text-gray-500 mb-2">{post.summary}</p>}
-                        {post.categories && (
-                          <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-                            {post.categories.map((category, index) => (
-                              <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                                {category}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {post.keywords && (
-                          <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-                            {post.keywords.slice(0, 5).map((keyword, index) => (
-                              <span key={index} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
-                                {keyword}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        <div className="flex items-center text-xs sm:text-sm text-gray-500">
-                          <span className="mr-4 flex items-center"><Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.score}</span>
-                          <span className="flex items-center"><MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.numComments}</span>
-                        </div>
-                      </button>
-                    </li>
-                  ))}
-              </ul>
-            </>
-          )}
-          {selectedPost && (
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <button
-                onClick={() => setSelectedPost(null)}
-                className="mb-4 text-blue-500 hover:text-blue-500 flex items-center text-sm sm:text-base"
-              >
-                <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                Back to posts
-              </button>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">{selectedPost.title}</h2>
-              <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-4">
-                <span>Posted by u/{selectedPost.author} {selectedGroup && `in r/${selectedPost.subreddit}`}</span>
-                <span>{selectedPost.created}</span>
-              </div>
-              <div className="prose text-sm sm:text-base mb-4">
-                {postContent}
-              </div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center text-xs sm:text-sm text-gray-500">
-                  <span className="mr-4 flex items-center"><Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {selectedPost.score}</span>
-                  <span className="flex items-center"><MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {selectedPost.numComments}</span>
-                </div>
-                <a
-                  href={selectedPost.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
-                >
-                  View on Reddit
-                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
-                </a>
-              </div>
-              {renderComments()}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  </div>
 
-  {showGroupPopup && (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-4 sm:p-6 w-full sm:w-3/4 max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Create New Group</h2>
-          <button onClick={() => setShowGroupPopup(false)} className="text-gray-500 hover:text-gray-500">
-            <X className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
+          {(selectedSubreddit || selectedGroup) && (
+            <div className="mt-4 sm:mt-8">
+              <button
+                onClick={() => {
+                  setSelectedSubreddit(null);
+                  setSelectedGroup(null);
+                  setSelectedPost(null);
+                }}
+                className="mb-4 px-3 sm:px-4 py-2 bg-gray-200 text-gray-500 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+              >
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Back to {activeTab === 'groups' ? 'Groups' : 'Communities'}
+              </button>
+              {selectedGroup ? (
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+                    {selectedGroup.name} Group
+                  </h2>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {selectedGroup.subreddits.map((subreddit) => (
+                      <a
+                        key={subreddit.id}
+                        href={`https://reddit.com/r/${subreddit.name}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm hover:bg-blue-200 transition-colors duration-200 flex items-center"
+                      >
+                        r/{subreddit.name}
+                        <ExternalLink className="w-3 h-3 ml-1 inline-block" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+                  r/{selectedSubreddit.name}
+                </h2>
+              )}
+              <div className="mb-4 sm:mb-6 flex flex-wrap gap-1 sm:gap-2">
+                {filterBadges.map((badge) => (
+                  <button
+                    key={badge.label}
+                    onClick={() => setActiveFilter(badge.label === 'All' ? 'all' : badge.label)}
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center ${
+                      activeFilter === (badge.label === 'All' ? 'all' : badge.label)
+                        ? 'bg-blue-200 text-blue-800'
+                        : 'bg-white border text-gray-500'
+                    }`}
+                  >
+<badge.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    {badge.label}
+                  </button>
+                ))}
+              </div>
+              {isAnalyzing && (
+                <div className="text-center p-4">
+                  <RefreshCcw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-500 mx-auto" />
+                  <p className="mt-2 text-gray-500 text-sm sm:text-base">Fetching and Analyzing posts...</p>
+                </div>
+              )}
+              {!isAnalyzing && !selectedPost && (
+                <>
+                  {renderPostIdeas()}
+                  <ul className="space-y-4">
+                    {(analyzedPosts.length > 0 ? analyzedPosts : posts)
+                      .filter(post => activeFilter === 'all' || (post.categories && post.categories.includes(activeFilter)))
+                      .map((post) => (
+                        <li key={post.id} className="bg-white rounded-lg shadow p-3 sm:p-4">
+                          <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
+                            <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
+                              <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
+                              <span>
+                                <b className='text-blue-300'>Relevance Score : <span className='text-blue-600'>{post.relevancyScore || 0}</span>/100</b>
+                                &nbsp; {post.created}
+                              </span>
+                            </div>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">{post.title}</h3>
+                            {post.relevancyExplanation && (
+                              <div className="mb-2">
+                                <b className='text-blue-500 font-bold'>Why Relevant: </b>
+                                <span className="text-xs sm:text-sm text-gray-500">{post.relevancyExplanation}</span>
+                              </div>
+                            )}
+                            {post.summary && (
+                              <p className="text-xs sm:text-sm text-gray-500 mb-2">{post.summary}</p>
+                            )}
+                            {post.categories && (
+                              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+                                {post.categories.map((category, index) => (
+                                  <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                                    {category}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {post.keywords && (
+                              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+                                {post.keywords.slice(0, 5).map((keyword, index) => (
+                                  <span key={index} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
+                                    {keyword}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            <div className="flex items-center text-xs sm:text-sm text-gray-500">
+                              <span className="mr-4 flex items-center">
+                                <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.score}
+                              </span>
+                              <span className="flex items-center">
+                                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.numComments}
+                              </span>
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                  </ul>
+                </>
+              )}
+              {selectedPost && (
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                  <button
+                    onClick={() => setSelectedPost(null)}
+                    className="mb-4 text-blue-500 hover:text-blue-500 flex items-center text-sm sm:text-base"
+                  >
+                    <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    Back to posts
+                  </button>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">{selectedPost.title}</h2>
+                  <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-4">
+                    <span>Posted by u/{selectedPost.author} {selectedGroup && `in r/${selectedPost.subreddit}`}</span>
+                    <span>{selectedPost.created}</span>
+                  </div>
+                  <div className="prose text-sm sm:text-base mb-4">
+                    {postContent}
+                  </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center text-xs sm:text-sm text-gray-500">
+                      <span className="mr-4 flex items-center">
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {selectedPost.score}
+                      </span>
+                      <span className="flex items-center">
+                        <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {selectedPost.numComments}
+                      </span>
+                    </div>
+                    <a
+                      href={selectedPost.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                    >
+                      View on Reddit
+                      <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+                    </a>
+                  </div>
+                  {renderComments()}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        <input
-          type="text"
-          placeholder="Group name"
-          value={newGroupName}
-          onChange={(e) => setNewGroupName(e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 text-sm sm:text-base"
-        />
-        <div className="mb-4 relative">
-          <input
-            type="text"
-            placeholder="Search subreddits..."
-            value={groupSearchTerm}
-            onChange={(e) => setGroupSearchTerm(e.target.value)}
-            className="w-full px-3 sm:px-4 py-2 pl-8 sm:pl-10 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-          />
-          <Search className="w-4 h-4 sm:w-5 sm:h-5 absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-        </div>
-        <div className="bg-white rounded-lg shadow overflow-x-auto mb-4">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Select
-                </th>
-                <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+      </div>
+
+      {showGroupPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full sm:w-3/4 max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Create New Group</h2>
+              <button onClick={() => setShowGroupPopup(false)} className="text-gray-500 hover:text-gray-500">
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Group name"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+              className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 text-sm sm:text-base"
+            />
+            <div className="mb-4 relative">
+              <input
+                type="text"
+                placeholder="Search subreddits..."
+                value={groupSearchTerm}
+                onChange={(e) => setGroupSearchTerm(e.target.value)}
+                className="w-full px-3 sm:px-4 py-2 pl-8 sm:pl-10 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+              />
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+            <div className="bg-white rounded-lg shadow overflow-x-auto mb-4">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Select
+                    </th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Subreddit
                     </th>
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1599,7 +1710,7 @@ const RedditExplorer = () => {
                           {community.name}
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500">
-                        {community.subscribersCount.toLocaleString()}
+                          {community.subscribersCount.toLocaleString()}
                         </td>
                       </tr>
                     ))}
@@ -1630,5 +1741,3 @@ const RedditExplorer = () => {
 };
 
 export default RedditExplorer;
-
-                    

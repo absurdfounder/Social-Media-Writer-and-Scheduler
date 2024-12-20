@@ -5,8 +5,9 @@ import {
   Flame, Trophy, HelpCircle, Frown,
   DollarSign, PenTool, Megaphone, Zap,
   Newspaper, Lightbulb, Check, ArrowLeft,
-  TrendingUp, Shuffle, Eye, MessageCircle,
-  AlertTriangle, ExternalLink
+  TrendingUp, BellDot, Eye, MessageCircle,
+  AlertTriangle, ExternalLink,
+  Sparkles
 } from 'lucide-react';
 import { getOpenAIKey } from '../Utils/getApikey';
 
@@ -1185,8 +1186,8 @@ const RedditExplorer = () => {
   const filterBadges = [
     { label: 'All', icon: Home, description: 'All posts' },
 
-    { label: 'Competitor Keywords Included', icon: Flame, description: 'Popular discussions this week' },
-    { label: 'My Brand Mentions', icon: Flame, description: 'Popular discussions this week' },
+    { label: 'Competitor Keywords Included', icon: TrendingUp, description: 'Popular discussions this week' },
+    { label: 'My Brand Mentions', icon: Sparkles, description: 'Popular discussions this week' },
 
     { label: 'Hot Discussions', icon: Flame, description: 'Popular discussions this week' },
     { label: 'Top Content', icon: Trophy, description: 'Best-performing content of past month' },
@@ -1285,9 +1286,9 @@ const RedditExplorer = () => {
       <div>
         <div className="flex space-x-1 sm:space-x-2 overflow-x-auto">
           <Tab label="Audiences" icon={Users} active={activeTab === 'groups'} onClick={() => setActiveTab('groups')} />
-          <Tab label="Popular" icon={Flame} active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
-          <Tab label="Trending" icon={TrendingUp} active={activeTab === 'trending'} onClick={() => setActiveTab('trending')} />
-          <Tab label="New" icon={Shuffle} active={activeTab === 'new'} onClick={() => setActiveTab('new')} />
+          <Tab label="My Keywords" icon={Flame} active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
+          <Tab label="Competitor Tracking" icon={TrendingUp} active={activeTab === 'trending'} onClick={() => setActiveTab('trending')} />
+          <Tab label="Email Alerts" icon={BellDot} active={activeTab === 'new'} onClick={() => setActiveTab('new')} />
         </div>
 
         <div className='bg-gray-50 border p-2 sm:p-4'>
@@ -1354,8 +1355,7 @@ const RedditExplorer = () => {
         <div>
           <div className='items-center flex justify-between mb-4'>
             <h6 className='font-bold text-lg sm:text-xl flex items-center'>
-            <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Curated Audiences
+              Grouped Audiences
             </h6>
             <button
               onClick={() => setShowGroupPopup(true)}

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, TrendingUp, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
 import Reddit_hub from './dashboard_pages/Reddit_hub';
-import Ledger from './dashboard_pages/Ledger';
+import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
@@ -100,7 +100,7 @@ export default function Dashboard() {
       case 'partylist-db':
         return <Reddit_hub />;
       case 'ledger-db':
-        return <Ledger />;
+        return <KnowledgeWall />;
       case 'BrandTraning':
         return <BrandTraning />;
       case 'ledger-check':

@@ -819,15 +819,15 @@ const RedditExplorer = () => {
       console.log('No product info available');
       return;
     }
-  
+
     const topPosts = posts.sort((a, b) => b.score - a.score).slice(0, 5);
     const openaiKey = localStorage.getItem('openAIKey');
-  
+
     if (!openaiKey) {
       setErrorMessage('OpenAI API key not found. Please set your API key.');
       return;
     }
-  
+
     try {
       setIsGeneratingIdeas(true);
       const response = await fetch('/api/openai', {
@@ -839,8 +839,8 @@ const RedditExplorer = () => {
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 4000,
-          messages: [{ 
-            role: "user", 
+          messages: [{
+            role: "user",
             content: `Based on these top performing Reddit posts and our product information, generate 5 engaging post ideas. Format each idea with a clear title and detailed description.
 
 Top Posts: ${JSON.stringify(topPosts, null, 2)}
@@ -853,17 +853,17 @@ Description: [2-3 sentences explaining the post idea]
 2. Title: [Post Title]
 Description: [2-3 sentences explaining the post idea]
 
-... and so on for all 5 ideas.` 
+... and so on for all 5 ideas.`
           }],
-          model: "gpt-4"
+          model: "gpt-4o-mini"
         })
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'API request failed');
       }
-  
+
       const data = await response.json();
       console.log('API Response:', data); // Debug log
 
@@ -873,7 +873,7 @@ Description: [2-3 sentences explaining the post idea]
         .map(idea => {
           const titleMatch = idea.match(/Title:\s*(.*?)\nDescription:/s);
           const descriptionMatch = idea.match(/Description:\s*(.*?)(?=\n|$)/s);
-          
+
           return {
             title: titleMatch ? titleMatch[1].trim() : '',
             description: descriptionMatch ? descriptionMatch[1].trim() : ''
@@ -895,13 +895,13 @@ Description: [2-3 sentences explaining the post idea]
       console.log('No product info available');
       return;
     }
-  
+
     const openaiKey = localStorage.getItem('openAIKey');
     if (!openaiKey) {
       setErrorMessage('OpenAI API key not found. Please set your API key.');
       return;
     }
-  
+
     try {
       console.log('Generating comment for post:', postId);
       const response = await fetch('/api/openai', {
@@ -913,8 +913,8 @@ Description: [2-3 sentences explaining the post idea]
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 4000,
-          messages: [{ 
-            role: "user", 
+          messages: [{
+            role: "user",
             content: `Create an engaging comment for this Reddit post that naturally mentions our product/service when relevant. The comment should:
 
 1. Provide genuine value to the discussion
@@ -931,21 +931,21 @@ ${JSON.stringify(productInfo, null, 2)}
 
 Generate a natural, engaging comment that someone would actually write on Reddit (100-200 words).`
           }],
-          model: "gpt-4"
+          model: "gpt-4o-mini"
         })
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'API request failed');
       }
-  
+
       const data = await response.json();
       console.log('API Response:', data); // Debug log
 
       const suggestion = data.choices[0].message.content.trim();
       console.log('Generated comment:', suggestion); // Debug log
-      
+
       setCommentSuggestions(prev => ({ ...prev, [postId]: suggestion }));
     } catch (error) {
       console.error('Error generating comment suggestion:', error);
@@ -957,12 +957,12 @@ Generate a natural, engaging comment that someone would actually write on Reddit
     try {
       const openaiKey = localStorage.getItem('openAIKey');
       const trainingData = localStorage.getItem('getTrainingData');
-      
+
       if (!openaiKey) {
         setErrorMessage('OpenAI API key not found. Please set your API key.');
         return post;
       }
-  
+
       let parsedTrainingData;
       try {
         parsedTrainingData = trainingData ? JSON.parse(trainingData) : {};
@@ -970,7 +970,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
         console.error('Error parsing training data:', e);
         parsedTrainingData = {};
       }
-  
+
       console.log('Analyzing post content with training data...');
       const response = await fetch('/api/openai', {
         method: 'POST',
@@ -981,8 +981,8 @@ Generate a natural, engaging comment that someone would actually write on Reddit
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 4000,
-          messages: [{ 
-            role: "user", 
+          messages: [{
+            role: "user",
             content: `Analyze this Reddit post's marketing potential. Consider how the user could naturally promote their product/service in the comments or participate in the discussion.
   
   Assess the following:
@@ -1004,31 +1004,31 @@ Generate a natural, engaging comment that someone would actually write on Reddit
   Title: ${post.title}
   Content: ${post.selftext}
   
-  Focus on finding genuine opportunities to add value while promoting the product/service. Score higher for posts where promotion would feel natural and helpful rather than forced.` 
+  Focus on finding genuine opportunities to add value while promoting the product/service. Score higher for posts where promotion would feel natural and helpful rather than forced.`
           }],
           model: "gpt-4o-mini"
         })
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'API request failed');
       }
-  
+
       const data = await response.json();
       console.log('Raw API response:', data);
-  
+
       const analysisResult = data.content[0].text;
       console.log('Analysis result:', analysisResult);
-  
+
       const keywords = analysisResult.match(/\*\*Keywords:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(k => k.trim()) || [];
       const summary = analysisResult.match(/\*\*Summary:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
       const categories = analysisResult.match(/\*\*Categories:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(c => c.trim()) || [];
       const relevancyScore = parseInt(analysisResult.match(/\*\*Marketing Relevancy Score:?\*\*:?\s*(\d+)/i)?.[1]) || 0;
       const relevancyExplanation = analysisResult.match(/\*\*Marketing Opportunity Explanation:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
-  
+
       console.log('Parsed results:', { keywords, summary, categories, relevancyScore, relevancyExplanation });
-  
+
       return {
         ...post,
         keywords,
@@ -1037,7 +1037,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
         relevancyScore,
         relevancyExplanation
       };
-  
+
     } catch (error) {
       console.error('Error analyzing post:', error);
       setErrorMessage(`Error analyzing post: ${error.message}`);
@@ -1244,8 +1244,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
 
   const filterBadges = [
     { label: 'All', icon: Home, description: 'All posts' },
-    { label: 'Competitor Keywords Included', icon: TrendingUp, description: 'Popular discussions this week' },
-    { label: 'My Brand Mentions', icon: Sparkles, description: 'Popular discussions this week' },
+
     { label: 'Hot Discussions', icon: Flame, description: 'Popular discussions this week' },
     { label: 'Top Content', icon: Trophy, description: 'Best-performing content of past month' },
     { label: 'Advice Requests', icon: HelpCircle, description: 'People asking for advice & resources' },
@@ -1261,9 +1260,9 @@ Generate a natural, engaging comment that someone would actually write on Reddit
 
   // Render functions
   const renderPostIdeas = () => (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Content Ideas</h3>
+    <div className="mb-6 bg-gray-200 p-4 rounded-lg">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Fresh Post Ideas AI</h3>
         <div className="flex items-center">
           {isGeneratingIdeas && (
             <RefreshCcw className="w-4 h-4 animate-spin text-blue-500 mr-2" />
@@ -1273,7 +1272,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
           </span>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {postIdeas.map((idea, index) => (
           <div key={index} className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
@@ -1528,18 +1527,17 @@ Generate a natural, engaging comment that someone would actually write on Reddit
                   r/{selectedSubreddit.name}
                 </h2>
               )}
-              <div className="mb-4 sm:mb-6 flex flex-wrap gap-1 sm:gap-2">
+              <div className="mb-4 sm:mb-6 flex flex-wrap gap-1 sm:gap-2 border-t border-b py-4">
                 {filterBadges.map((badge) => (
                   <button
                     key={badge.label}
                     onClick={() => setActiveFilter(badge.label === 'All' ? 'all' : badge.label)}
-                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center ${
-                      activeFilter === (badge.label === 'All' ? 'all' : badge.label)
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center ${activeFilter === (badge.label === 'All' ? 'all' : badge.label)
                         ? 'bg-blue-200 text-blue-800'
                         : 'bg-white border text-gray-500'
-                    }`}
+                      }`}
                   >
-<badge.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <badge.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     {badge.label}
                   </button>
                 ))}

@@ -987,16 +987,14 @@ Generate a natural, engaging comment that someone would actually write on Reddit
   
   Assess the following:
   1. Keywords (comma-separated list focused on business/marketing opportunities)
-  2. Brief summary (highlighting potential marketing angles)
-  3. Categories (from: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas)
-  4. Marketing Relevancy Score (0-100) based on:
+  2. Categories (from: Hot Discussions, Top Content, Advice Requests, Pain & Anger, Money Talk, Solution Requests, Self-Promotion, Opportunities, News, Ideas)
+  3. Marketing Relevancy Score (0-100) based on (description to be only 120 characters):
      - Can the user's product/service help solve a problem mentioned?
      - Is there a natural way to mention the product/service in comments?
-     - Would promotional content be well-received here?
-     - Is the audience likely to be interested?
-     - Is the discussion active and engaging?
-  5. Marketing Opportunity Explanation: Explain specifically how the user could promote their product/service in this discussion naturally and effectively. Include tactical suggestions.
-  
+     - Would it fit if user discusses his personal journey about the product or service, being genuine?
+     - can the user get affiliates here?
+    4. Marketing Opportunity Explanation (MAX 120 characters only in a single paragraph): Explain specifically how the user could promote their product/service in this discussion naturally and effectively. Include tactical suggestions.
+
   Product/Service Context:
   ${JSON.stringify(parsedTrainingData, null, 2)}
   
@@ -1533,8 +1531,8 @@ Generate a natural, engaging comment that someone would actually write on Reddit
                     key={badge.label}
                     onClick={() => setActiveFilter(badge.label === 'All' ? 'all' : badge.label)}
                     className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center ${activeFilter === (badge.label === 'All' ? 'all' : badge.label)
-                        ? 'bg-blue-200 text-blue-800'
-                        : 'bg-white border text-gray-500'
+                      ? 'bg-blue-200 text-blue-800'
+                      : 'bg-white border text-gray-500'
                       }`}
                   >
                     <badge.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />

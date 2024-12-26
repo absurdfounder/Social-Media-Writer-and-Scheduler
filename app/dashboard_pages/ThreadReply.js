@@ -386,104 +386,120 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
 
       // Add this function outside generateAIThread
       const getReplyStylePrompt = (length, stance) => {
-        const lengthPrompts = {
+        const replyStyles = {
           super_short: {
-            instruction: `Keep the reply extremely brief, 120 characters max, with informal conversational tone. Avoid formal language or structure.`,
+            instruction: `Keep reply under 120 chars, like a quick thought. Be conversational and natural.`,
+            maxLength: 120,
             examples: [
-              "I use it, too and super often",
-              "I am sold",
-              "I like the new Dan",
-              "Do you also send an email?",
-              "Smart, makes sense",
-              "It was a hook",
-              "And you, Daniel?",
-              "Could be a cool pseudonym: 'Edom Rednuof'",
-              "ah yes, a man of culture",
-              "😂"
+              "ship it already mate",
+              "hmm makes sense actually",
+              "just start small tbh",
+              "ah thats actually smart",
+              "been there last week",
+              "nah wait until v2",
+              "exactly what I needed"
             ]
           },
           medium: {
-            instruction: `Provide a balanced response in 1-2 sentences. Keep tone casual and conversational.`,
+            instruction: `1-2 casual sentences sharing quick insight or experience`,
+            maxLength: 240,
             examples: [
-              "I encountered the same a few times with Docker Swarm. Is it a skill issue? Never happened with Kubernetes though",
-              "Certainly one at the top for me, too. By the way, he really answers to emails",
-              "Your game is better 😂 Danny's had the sound turned on—it is a huge red flag",
-              "If you don't spam intentionally, why would you worry at all? I published a ton of pages at once"
+              "tried that last month with my saas actually ended up pivoting completely",
+              "speaking of bootstrapping just crossed 10k mrr doing exactly this",
+              "funny you mention that ran into same issue with docker last week",
+              "the hardest part isnt the code its finding the right users tbh"
             ]
           },
           detailed: {
-            instruction: `Give a thoughtful response in 2-3 sentences while keeping casual tone.`,
+            instruction: `2-3 sentences sharing specific experience or insight while keeping casual tone`,
+            maxLength: 400,
             examples: [
-              "Or was busy or since I am already with some other provider I haven't noticed—my brain might have filtered it. Super curious about your journey! Good luck 👍",
-              "A portfolio of products I can keep crafting till the end of my life. It brings me joy everyday. Why sell?",
-              "@johnrushx has great advice on that. Sign up under an anonymous fresh account and see what people like and what formats work. Then try to adapt your style"
+              "learned that one the hard way with my first product spent 6 months building features nobody wanted now I validate everything with a landing page first",
+              "turns out most devs overcomplicate auth built my own solution in a weekend using supabase now onboarding takes 30 seconds",
+              "found out theres actually a better way to handle this just use serverless functions and you wont have to worry about scaling at all"
             ]
           }
         };
 
-        const stancePrompts = {
+        const stancePatterns = {
           neutral: {
-            instruction: "Keep a balanced perspective, also you can add some addtional tip",
+            instruction: "Share balanced perspective drawing from experience",
             examples: [
-              "Smart, makes sense",
-              "Do you also send an email?",
-              "Been there before"
+              "depends on your use case tbh",
+              "both approaches work here actually",
+              "interesting way to look at it ngl"
             ]
           },
           in_favour: {
-            instruction: "Express agreement while staying casual , also you can add some addtional tip",
+            instruction: "Express agreement while adding value",
             examples: [
-              "I am sold",
-              "I like the new Dan",
-              "Your game is better 😂"
+              "exactly what worked for me too",
+              "this is the way honestly",
+              "100% agree from experience"
             ]
           },
           not_in_favour: {
-            instruction: "Express disagreement respectfully while staying casual , also you can add some addtional tip",
+            instruction: "Express disagreement thoughtfully with evidence",
             examples: [
-              "Is it a skill issue? Never happened with Kubernetes though",
-              "Danny's had the sound turned on—it is a huge red flag"
+              "might want to rethink that approach tbh",
+              "actually found the opposite here",
+              "careful with that one"
             ]
           },
           controversial: {
-            instruction: "Present a thought-provoking alternative view casually, like a founder with prespective, only if needed , also you can add some addtional tip.",
+            instruction: "Present thought-provoking alternative casually",
             examples: [
-              "If you don't spam intentionally, why would you worry at all?",
-              "Why sell? It brings me joy everyday"
+              "hot take but hear me out",
+              "plot twist its actually the opposite",
+              "unpopular opinion but"
             ]
           }
         };
 
-        const selectedLength = lengthPrompts[length];
-        const selectedStance = stancePrompts[stance];
+
+
+        const selectedLength = replyStyles[length];
+        const selectedStance = stancePatterns[stance];
 
         return `
-For reply mode:
-1. Style Requirements:
-- Length: ${selectedLength.instruction}
-- Stance: ${selectedStance.instruction}
-- Write naturally with occasional typing quirks
-- Use minimal punctuation
-- Keep emojis rare (max 1) and natural
-- Use informal intros like "ah", "oh", "hmm" occasionally
-- No need for line breaks or media attachments
-
-2. Example Replies:
-${selectedLength.examples.map(ex => `"${ex}"`).join('\n')}
-
-3. Stance Examples:
-${selectedStance.examples.map(ex => `"${ex}"`).join('\n')}`;
+      You are replying as an indie founder. Keep your response:
+      - Length: ${selectedLength.instruction}
+      - Stance: ${selectedStance.instruction}
+      - Use natural conversational language
+      - Add value through experience or insight
+      - Keep it casual like talking to a friend
+      - Use minimal punctuation
+      - Start with reactions like "hmm" "ah" "actually" occasionally
+      - No line breaks needed
+      
+      Examples for this style:
+      ${selectedLength.examples.join('\n')}
+      
+      Examples for this stance:
+      ${selectedStance.examples.join('\n')}`;
       };
 
 
 
       const replyModePrompt = mode === 'reply' ?
-        `You are responding as an indie founder. ${getReplyStylePrompt(replyLength, replyStance)}
-  
-  4. Media Formatting:
-Image: [https://placehold.co/600x400?text=Your+Text+Here]
-Video: [https://placehold.co/1920x1080.mp4?text=Your+Video+Text+Here]
-Link: [https://example.com]
+        `${getReplyStylePrompt(replyLength, replyStance)}
+      
+    Reply to this tweet as an indie founder: "${promptContent}"
+    
+    Note: Just give me the reply text directly, no extra formatting or explanation needed.
+    
+    1. Media Formatting:
+    Image: [https://placehold.co/600x400?text=Your+Text+Here]
+    Video: [https://placehold.co/1920x1080.mp4?text=Your+Video+Text+Here]
+    Link: [https://example.com]
+    
+    When generating tweets, always follow this structure:
+    1. Strong opening statement
+    2. Use <br> for line breaks between sections
+    3. Short, punchy lines or bullet points
+    4. Before/after comparisons when applicable
+    6. Include relevant media suggestion
+    7. Close with /endtweet
 
       How to return reply response , this is just an understanding for structure only:
       Indie hacking reality check:<br><br>
@@ -497,16 +513,8 @@ Link: [https://example.com]
       But that one "yes" makes it all worth it.<br>
       Video: [https://placehold.co/1920x1080.mp4?text=Journey+to+First+Customer]<br>
       /endtweet
-  
-      When generating tweets, always follow this structure:
-      1. Strong opening statement
-      2. Use <br> for line breaks between sections
-      3. Short, punchy lines or bullet points
-      4. Before/after comparisons when applicable
-      6. Include relevant media suggestion
-      7. Close with /endtweet
-  
-  ` : '';
+
+    ` : '';
 
 
       const baseSystemPrompt = `

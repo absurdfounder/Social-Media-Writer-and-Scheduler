@@ -154,8 +154,8 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [productInfo, setProductInfo] = useState(null);
   const [mode, setMode] = useState('share');
   const [feeling, setFeeling] = useState('not_specified');
-  const [replyLength, setReplyLength] = useState('medium');
-  const [replyStance, setReplyStance] = useState('neutral');
+  const [replyLength, setReplyLength] = useState('super_short');
+  const [replyStance, setReplyStance] = useState('controversial');
 
   const [apikeyAdded, setApikeyAdded] = useState(false);
   const [TrainingData, setTraningData] = useState({});
@@ -423,7 +423,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
 
         const stancePrompts = {
           neutral: {
-            instruction: "Keep a balanced perspective",
+            instruction: "Keep a balanced perspective, also you can add some addtional tip",
             examples: [
               "Smart, makes sense",
               "Do you also send an email?",
@@ -431,7 +431,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
             ]
           },
           in_favour: {
-            instruction: "Express agreement while staying casual",
+            instruction: "Express agreement while staying casual , also you can add some addtional tip",
             examples: [
               "I am sold",
               "I like the new Dan",
@@ -439,14 +439,14 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
             ]
           },
           not_in_favour: {
-            instruction: "Express disagreement respectfully while staying casual",
+            instruction: "Express disagreement respectfully while staying casual , also you can add some addtional tip",
             examples: [
               "Is it a skill issue? Never happened with Kubernetes though",
               "Danny's had the sound turned on—it is a huge red flag"
             ]
           },
           controversial: {
-            instruction: "Present a thought-provoking alternative view casually",
+            instruction: "Present a thought-provoking alternative view casually, like a founder with prespective, only if needed , also you can add some addtional tip.",
             examples: [
               "If you don't spam intentionally, why would you worry at all?",
               "Why sell? It brings me joy everyday"

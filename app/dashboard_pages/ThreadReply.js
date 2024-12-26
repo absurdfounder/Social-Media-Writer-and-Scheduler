@@ -154,70 +154,73 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [productInfo, setProductInfo] = useState(null);
   const [mode, setMode] = useState('share');
   const [feeling, setFeeling] = useState('not_specified');
+  const [replyLength, setReplyLength] = useState('medium');
+  const [replyStance, setReplyStance] = useState('neutral');
+
   const [apikeyAdded, setApikeyAdded] = useState(false);
-  const [TrainingData , setTraningData] =useState({});
+  const [TrainingData, setTraningData] = useState({});
   const [isValidatingKey, setIsValidatingKey] = useState(false);
-const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
-  
-// Update the apiKey effect
-useEffect(() => {
-  const validateApiKey = async () => {
-    const key = localStorage.getItem('anthropicKey');
-    if (!key) {
-      setApiKeyStatus('invalid');
-      setApikeyAdded(false);
-      return;
+  const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
+
+  // Update the apiKey effect
+  useEffect(() => {
+    const validateApiKey = async () => {
+      const key = localStorage.getItem('anthropicKey');
+      if (!key) {
+        setApiKeyStatus('invalid');
+        setApikeyAdded(false);
+        return;
+      }
+
+      if (!key.startsWith('sk-')) {
+        setApiKeyStatus('invalid');
+        setApikeyAdded(false);
+        return;
+      }
+
+      setApiKeyStatus('validating');
+      setIsValidatingKey(true);
+
+      // Simulate API validation delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      setApiKeyStatus('valid');
+      setApikeyAdded(true);
+      setIsValidatingKey(false);
+    };
+
+    validateApiKey();
+  }, []);
+
+  // Update the status message JSX
+  const getStatusMessage = () => {
+    switch (apiKeyStatus) {
+      case 'validating':
+        return (
+          <div className="flex items-center gap-2 text-blue-500 text-xs sm:text-sm">
+            <Loader size={20} className="animate-spin" />
+            Please wait validating API key...
+          </div>
+        );
+      case 'invalid':
+        return (
+          <div className="flex items-center gap-2 text-red-500 text-xs sm:text-sm">
+            <InfoIcon size={20} />
+            Claude API key added seems wrong or invalid - save again.
+          </div>
+        );
+      default:
+        return null;
     }
-
-    if (!key.startsWith('sk-')) {
-      setApiKeyStatus('invalid');
-      setApikeyAdded(false);
-      return;
-    }
-
-    setApiKeyStatus('validating');
-    setIsValidatingKey(true);
-
-    // Simulate API validation delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    setApiKeyStatus('valid');
-    setApikeyAdded(true);
-    setIsValidatingKey(false);
   };
 
-  validateApiKey();
-}, []);
-
-// Update the status message JSX
-const getStatusMessage = () => {
-  switch (apiKeyStatus) {
-    case 'validating':
-      return (
-        <div className="flex items-center gap-2 text-blue-500 text-xs sm:text-sm">
-          <Loader size={20} className="animate-spin" />
-          Please wait validating API key...
-        </div>
-      );
-    case 'invalid':
-      return (
-        <div className="flex items-center gap-2 text-red-500 text-xs sm:text-sm">
-          <InfoIcon size={20} />
-          Claude API key added seems wrong or invalid - save again.
-        </div>
-      );
-    default:
-      return null;
-  }
-};
 
 
+  useEffect(() => {
 
-  useEffect(()=>{
-
-      setTraningData(localStorage.getItem("getTrainingData"))
-      console.log('Traning data ',TrainingData);
-  },[TrainingData])
+    setTraningData(localStorage.getItem("getTrainingData"))
+    console.log('Traning data ', TrainingData);
+  }, [TrainingData])
 
   useEffect(() => {
     setIsBrowser(true);
@@ -364,19 +367,12 @@ const getStatusMessage = () => {
     try {
       let maxTweets;
       switch (threadType) {
-        case 'single':
-          maxTweets = 1;
-          break;
-        case 'three':
-          maxTweets = 3;
-          break;
-        case 'full':
-        default:
-          maxTweets = 10;
+        case 'single': maxTweets = 1; break;
+        case 'three': maxTweets = 3; break;
+        case 'full': maxTweets = 10; break;
       }
 
       let promptContent = overallPrompt;
-
       if (includeProduct) {
         const storedProductInfo = localStorage.getItem('productQuestionnaire');
         if (storedProductInfo) {
@@ -388,25 +384,134 @@ const getStatusMessage = () => {
 
       const feelingPrompt = getFeelingPrompt(feeling);
 
-      let systemPrompt = `You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
+      // Add this function outside generateAIThread
+      const getReplyStylePrompt = (length, stance) => {
+        const lengthPrompts = {
+          super_short: {
+            instruction: `Keep the reply extremely brief, 120 characters max, with informal conversational tone. Avoid formal language or structure.`,
+            examples: [
+              "I use it, too and super often",
+              "I am sold",
+              "I like the new Dan",
+              "Do you also send an email?",
+              "Smart, makes sense",
+              "It was a hook",
+              "And you, Daniel?",
+              "Could be a cool pseudonym: 'Edom Rednuof'",
+              "ah yes, a man of culture",
+              "😂"
+            ]
+          },
+          medium: {
+            instruction: `Provide a balanced response in 1-2 sentences. Keep tone casual and conversational.`,
+            examples: [
+              "I encountered the same a few times with Docker Swarm. Is it a skill issue? Never happened with Kubernetes though",
+              "Certainly one at the top for me, too. By the way, he really answers to emails",
+              "Your game is better 😂 Danny's had the sound turned on—it is a huge red flag",
+              "If you don't spam intentionally, why would you worry at all? I published a ton of pages at once"
+            ]
+          },
+          detailed: {
+            instruction: `Give a thoughtful response in 2-3 sentences while keeping casual tone.`,
+            examples: [
+              "Or was busy or since I am already with some other provider I haven't noticed—my brain might have filtered it. Super curious about your journey! Good luck 👍",
+              "A portfolio of products I can keep crafting till the end of my life. It brings me joy everyday. Why sell?",
+              "@johnrushx has great advice on that. Sign up under an anonymous fresh account and see what people like and what formats work. Then try to adapt your style"
+            ]
+          }
+        };
+
+        const stancePrompts = {
+          neutral: {
+            instruction: "Keep a balanced perspective",
+            examples: [
+              "Smart, makes sense",
+              "Do you also send an email?",
+              "Been there before"
+            ]
+          },
+          in_favour: {
+            instruction: "Express agreement while staying casual",
+            examples: [
+              "I am sold",
+              "I like the new Dan",
+              "Your game is better 😂"
+            ]
+          },
+          not_in_favour: {
+            instruction: "Express disagreement respectfully while staying casual",
+            examples: [
+              "Is it a skill issue? Never happened with Kubernetes though",
+              "Danny's had the sound turned on—it is a huge red flag"
+            ]
+          },
+          controversial: {
+            instruction: "Present a thought-provoking alternative view casually",
+            examples: [
+              "If you don't spam intentionally, why would you worry at all?",
+              "Why sell? It brings me joy everyday"
+            ]
+          }
+        };
+
+        const selectedLength = lengthPrompts[length];
+        const selectedStance = stancePrompts[stance];
+
+        return `
+For reply mode:
+1. Style Requirements:
+- Length: ${selectedLength.instruction}
+- Stance: ${selectedStance.instruction}
+- Write naturally with occasional typing quirks
+- Use minimal punctuation
+- Keep emojis rare (max 1) and natural
+- Use informal intros like "ah", "oh", "hmm" occasionally
+- No need for line breaks or media attachments
+
+2. Example Replies:
+${selectedLength.examples.map(ex => `"${ex}"`).join('\n')}
+
+3. Stance Examples:
+${selectedStance.examples.map(ex => `"${ex}"`).join('\n')}`;
+      };
+
+
+
+      const replyModePrompt = mode === 'reply' ?
+        `You are responding as an indie founder. ${getReplyStylePrompt(replyLength, replyStance)}
   
-      ${mode === 'reply' ? `
-      For reply mode, consider these additional guidelines:
-      - Address the original tweet's main points or questions directly
-      - Show empathy and understanding in your response
-      - Provide additional value or insights related to the topic
-      - Use a conversational tone that encourages further discussion
-      - If appropriate, share a relevant personal experience or anecdote
-      - End with a question to keep the conversation going
+  4. Media Formatting:
+Image: [https://placehold.co/600x400?text=Your+Text+Here]
+Video: [https://placehold.co/1920x1080.mp4?text=Your+Video+Text+Here]
+Link: [https://example.com]
+
+      How to return reply response , this is just an understanding for structure only:
+      Indie hacking reality check:<br><br>
+      Expectation:<br>
+      Launch product, get rich overnight<br><br>
+      Reality:<br>
+      - 6 months of coding<br>
+      - 3 pivots<br>
+      - 100 cold emails<br>
+      - 1 paying customer<br><br>
+      But that one "yes" makes it all worth it.<br>
+      Video: [https://placehold.co/1920x1080.mp4?text=Journey+to+First+Customer]<br>
+      /endtweet
   
-      Examples of good replies:
-      1. "Interesting point about [topic]. In my experience, [share insight]. Have you considered [alternative viewpoint]? It might offer a different perspective on the issue."
+      When generating tweets, always follow this structure:
+      1. Strong opening statement
+      2. Use <br> for line breaks between sections
+      3. Short, punchy lines or bullet points
+      4. Before/after comparisons when applicable
+      6. Include relevant media suggestion
+      7. Close with /endtweet
   
-      2. "I can relate to your struggle with [problem]. Last year, I faced a similar challenge and found that [solution] really helped. What strategies have you tried so far?"
-  
-      3. "Your success with [achievement] is inspiring! It reminds me of when I [similar experience]. What's the next big goal you're aiming for?"
-      ` : ''}
-  
+  ` : '';
+
+
+      const baseSystemPrompt = `
+You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
+
       Start with a strong hook or attention-grabbing statement
       Use simple, concise language that conveys your message quickly
       Incorporate personal stories or experiences to make your content relatable
@@ -796,17 +901,15 @@ Copy- Style guide creation
 - Visual cohesion
 - Community guidelines
 - Growth strategy
-
-
+      
+      
       
       `;
 
+      let systemPrompt = mode === 'reply' ? replyModePrompt : baseSystemPrompt;
 
-
-      systemPrompt = `${systemPrompt}  Here Training Data for this reponse  ${TrainingData}`;
-
-
-      console.log('Sending System Prompt' ,systemPrompt);
+      // Add existing training data
+      systemPrompt = `${systemPrompt} Here Training Data for this response ${TrainingData}`;
 
       const response = await fetch('/api/anthropic', {
         method: 'POST',
@@ -824,12 +927,10 @@ Copy- Style guide creation
           system: systemPrompt,
           model: "claude-3-5-sonnet-20241022",
           claudapikey: getAnthropicKey()
-        }),
+        })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
       const generatedThreadContent = data.content[0].text.split('/endtweet').filter(tweet => tweet.trim() !== '');
@@ -943,8 +1044,8 @@ Copy- Style guide creation
         <div className='bg-white rounded-md p-2 sm:p-4'>
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
             <div className='grid gap-2'>
-            <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
-            {!apikeyAdded ? <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'><InfoIcon size={20} />Claude API key added seems wrong or invalid - save again. </div> : null}
+              <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
+              {!apikeyAdded ? <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'><InfoIcon size={20} />Claude API key added seems wrong or invalid - save again. </div> : null}
             </div>
 
             <div className={`  flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
@@ -955,8 +1056,8 @@ Copy- Style guide creation
                 }}
 
                 className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'share'
-                    ? 'text-white bg-blue-500'
-                    : 'text-gray-500 hover:text-gray-500'
+                  ? 'text-white bg-blue-500'
+                  : 'text-gray-500 hover:text-gray-500'
                   }`}
                 aria-pressed={mode === 'share'}
               >
@@ -971,8 +1072,8 @@ Copy- Style guide creation
                   playSound(toggleSound);
                 }}
                 className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'reply'
-                    ? 'text-white bg-blue-500'
-                    : 'text-gray-500 hover:text-gray-500'
+                  ? 'text-white bg-blue-500'
+                  : 'text-gray-500 hover:text-gray-500'
                   }`}
                 aria-pressed={mode === 'reply'}
               >
@@ -991,49 +1092,82 @@ Copy- Style guide creation
             rows={4}
           />
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
-            <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
-              <select
-                value={threadType}
-                onChange={(e) => setThreadType(e.target.value)}
-                className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-              >
-                <option value="single">Single Tweet</option>
-                <option value="three">3 Tweet Thread</option>
-                <option value="full">Full Thread</option>
-              </select>
 
-              <select
-                value={feeling}
-                onChange={(e) => setFeeling(e.target.value)}
-                className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-              >
-                <option value="not_specified">Not Specified</option>
-                <option value="curiosity">🔍 Curiosity</option>
-                <option value="insight">💡 Insight</option>
-                <option value="authenticity">🎭 Authenticity</option>
-                <option value="achievement">🏆 Achievement</option>
-                <option value="helpful">🤝 Helpful</option>
-                <option value="reflection">🤔 Reflection</option>
-                <option value="encouragement">💪 Encouragement</option>
-                <option value="process">⚙️ Process</option>
-                <option value="observation">👀 Observation</option>
-              </select>
+            <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto gap-4'>
+              {mode === 'reply' ? (
+                <>
+                  <select
+                    value={replyLength}
+                    onChange={(e) => setReplyLength(e.target.value)}
+                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                  >
+                    <option value="super_short">Ultra-Brief Reply</option>
+                    <option value="medium">Standard Reply</option>
+                    <option value="detailed">Detailed Reply</option>
+                  </select>
+                  <select
+                    value={replyStance}
+                    onChange={(e) => setReplyStance(e.target.value)}
+                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                  >
+                    <option value="neutral">Neutral Stance</option>
+                    <option value="in_favour">In Favor</option>
+                    <option value="not_in_favour">Not in Favor</option>
+                    <option value="controversial">Controversial</option>
+                  </select>
+                </>
+              ) : (
+
+                <div className='flex gap-2'>
+
+                  <select
+                    value={threadType}
+                    onChange={(e) => setThreadType(e.target.value)}
+                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                  >
+                    <option value="single">Single Tweet</option>
+                    <option value="three">3 Tweet Thread</option>
+                    <option value="full">Full Thread</option>
+                  </select>
+
+                  <select
+                    value={feeling}
+                    onChange={(e) => setFeeling(e.target.value)}
+                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                  >
+                    <option value="not_specified">Not Specified</option>
+                    <option value="curiosity">🔍 Curiosity</option>
+                    <option value="insight">💡 Insight</option>
+                    <option value="authenticity">🎭 Authenticity</option>
+                    <option value="achievement">🏆 Achievement</option>
+                    <option value="helpful">🤝 Helpful</option>
+                    <option value="reflection">🤔 Reflection</option>
+                    <option value="encouragement">💪 Encouragement</option>
+                    <option value="process">⚙️ Process</option>
+                    <option value="observation">👀 Observation</option>
+                  </select>
+
+                </div>
+
+              )}
             </div>
 
+
+
             {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
-  <button
-    className="bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm w-full sm:w-auto"
-    onClick={generateAIThread}
-    disabled={isGenerating || apiKeyStatus === 'validating'}
-  >
-    {isGenerating || apiKeyStatus === 'validating' ? (
-      <Loader size={14} className="animate-spin" />
-    ) : (
-      <Wand2 size={14} />
-    )}
-    {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
-  </button>
-)}
+              <button
+                className="bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm w-full sm:w-auto"
+                onClick={generateAIThread}
+                disabled={isGenerating || apiKeyStatus === 'validating'}
+              >
+                {isGenerating || apiKeyStatus === 'validating' ? (
+                  <Loader size={14} className="animate-spin" />
+                ) : (
+                  <Wand2 size={14} />
+                )}
+                {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
+              </button>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 gap-2 mt-4">
             <button

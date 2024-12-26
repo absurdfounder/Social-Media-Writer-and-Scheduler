@@ -990,7 +990,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
   // Main Component Render
   return (
-    <div className="bg-white rounded-md overflow-hidden">
+    <div className="bg-white rounded-md overflow-hidden p-4">
       {/* Settings Dialog */}
       <SettingsDialog
         show={showSettings}
@@ -1026,7 +1026,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
             <div className='grid w-full whitespace-nowrap'>
               <label className='font-bold text-xs'>Type of Video</label>
-              <div className="mt-1 text-xs text-gray-500">
+              <div className="mt-1 text-xs text-gray-500 pb-2">
                 {VIDEO_STYLES[Object.keys(VIDEO_STYLES).find(key =>
                   VIDEO_STYLES[key].value === videoStyle
                 )]?.description}
@@ -1046,8 +1046,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
             <div className='grid w-full'>
               <label className='font-bold text-xs'>Format</label>
-              <div className="mt-1 text-xs text-gray-500">
-                xxxxxx
+              <div className="mt-1 text-xs text-gray-500 pb-2">
+                Where are you posting ?
               </div>
               <select
                 value={screenSize}
@@ -1064,8 +1064,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
             <div className='grid w-full'>
               <label className='font-bold text-xs'>Length</label>
-              <div className="mt-1 text-xs text-gray-500">
-                xxxxxx
+              <div className="mt-1 text-xs text-gray-500 pb-2">
+                How long ?
               </div>
               <select
                 value={videoType}
@@ -1080,8 +1080,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
             <div className='grid w-full'>
               <label className='font-bold text-xs'>Tone</label>
-              <div className="mt-1 text-xs text-gray-500">
-                xxxxxx
+              <div className="mt-1 text-xs text-gray-500 pb-2">
+                whats your style ?
               </div>
               <select
                 value={contentMood}
@@ -1145,33 +1145,41 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
               </button>
             </div>
 
-            <button
-              className={`flex items-center gap-2 px-6 py-2 rounded-md text-sm transition-colors
+
+            <div className='flex gap-4'>
+
+              <div className="text-sm text-gray-500 m-auto">
+                Format: {SCREEN_SIZES[screenSize].description} • {SCREEN_SIZES[screenSize].aspectRatio}
+              </div>
+
+              <button
+                className={`flex items-center gap-2 px-6 py-2 rounded-md text-sm transition-colors
                 ${isGenerating ?
-                  'bg-gray-100 text-gray-400 cursor-not-allowed' :
-                  'bg-blue-500 text-white hover:bg-blue-600'}`}
-              onClick={generateVideoScript}
-              disabled={isGenerating}
-            >
-              {isGenerating ? (
-                <Loader size={16} className="animate-spin" />
-              ) : (
-                <Wand2 size={16} />
-              )}
-              Generate Script
-            </button>
+                    'bg-gray-100 text-gray-400 cursor-not-allowed' :
+                    'bg-blue-500 text-white hover:bg-blue-600'}`}
+                onClick={generateVideoScript}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <Loader size={16} className="animate-spin" />
+                ) : (
+                  <Wand2 size={16} />
+                )}
+                Generate Script
+              </button>
+
+            </div>
+
           </div>
 
           {/* Format Info */}
-          <div className="text-sm text-gray-500">
-            Format: {SCREEN_SIZES[screenSize].description} • {SCREEN_SIZES[screenSize].aspectRatio}
-          </div>
+
         </div>
       </div>
 
       {/* Generated Script Display */}
       {scenes.length > 0 && (
-        <div className="bg-blue-200 p-4">
+        <div className="bg-blue-200 p-4 rounded-md">
           <div className="mx-auto">
             {/* Scene Timeline */}
             <div className="mb-6">
@@ -1180,7 +1188,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={exportFormattedScript}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-md hover:bg-gray-600 transition-colors"
                   >
                     <Download size={16} />
                     Export Script

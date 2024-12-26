@@ -1039,7 +1039,7 @@ Copy- Style guide creation
 
 
   return (
-    <div className="bg-white rounded-md overflow-hidden">
+    <div className="bg-white rounded-md overflow-hidden p-4">
       <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
         <div className='bg-white rounded-md p-2 sm:p-4'>
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
@@ -1195,7 +1195,7 @@ Copy- Style guide creation
           </div>
         </div>
       </div>
-      <div className='bg-blue-200 p-2 sm:p-4'>
+      <div className='bg-blue-200 p-2 sm:p-4 rounded-md'>
         <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-4 sm:mb-8 bg-white">
           {tweets.map((tweet, index) => (
             <div key={tweet.key} className="relative border-b border-gray-200 last:border-b-0">

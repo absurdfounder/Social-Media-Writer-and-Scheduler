@@ -27,6 +27,338 @@ import {
 } from 'lucide-react';
 import { getAnthropicKey } from '../Utils/getApikey';
 
+// Video Style Prompts
+const VIDEO_STYLE_PROMPTS = {
+  standard: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct, overallPrompt) => `
+    You are an expert video creator specializing in creating engaging content...
+
+You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
+
+Base concept:
+${overallPrompt}
+
+Tools Configuration:
+- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
+- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
+  ${toolSettings.AVATAR ? `
+  • Direct Recording: Simple, achievable actions for creator recording
+  • AI Avatar: Digital avatar performance instructions
+  • Video Transform: Style transfer guidelines` : ''}
+- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+
+    Video Specifications:
+    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
+    - Style: ${contentMood}, ${contentType}
+    - Duration: ${videoType} format (${numberOfScenes} scenes)
+${includeProduct ? '- Include natural product/brand integration' : ''}
+
+For each scene, provide:
+1. DESCRIPTION: Clear scene content and action
+2. FRAME_TYPE: Either AI_VISUAL or AVATAR
+3. VISUAL: 
+   - For AI_VISUAL: Detailed visual generation prompts for Runway
+   - For AVATAR: Clear, achievable actions based on avatar type
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+
+Format each scene as:
+SCENE [NUMBER]
+DESCRIPTION: [Content]
+FRAME_TYPE: [Type]
+VISUAL: [Direction]
+VOICE: [Script]
+
+Important Guidelines:
+- For AI visuals: Focus on clear, detailed visual descriptions
+- For recorded actions: Keep them simple and achievable
+- For AI avatar: Focus on natural expressions and movements
+- For voice: Clear, emotionally appropriate delivery
+- Ensure smooth transitions between scenes
+- Maintain consistent style and pacing
+
+    // Your existing standard prompt here
+  `,
+
+  viral_ad: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct, overallPrompt) => `
+    You are a viral marketing expert specializing in creating attention-grabbing, humorous infomercial-style content...
+
+You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
+
+Base concept:
+${overallPrompt}
+
+Tools Configuration:
+- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
+- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
+  ${toolSettings.AVATAR ? `
+  • Direct Recording: Simple, achievable actions for creator recording
+  • AI Avatar: Digital avatar performance instructions
+  • Video Transform: Style transfer guidelines` : ''}
+- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+
+    Video Specifications:
+    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
+    - Style: ${contentMood}, ${contentType}
+    - Duration: ${videoType} format (${numberOfScenes} scenes)
+${includeProduct ? '- Include natural product/brand integration' : ''}
+
+For each scene, provide:
+1. DESCRIPTION: Clear scene content and action
+2. FRAME_TYPE: Either AI_VISUAL or AVATAR
+3. VISUAL: 
+   - For AI_VISUAL: Detailed visual generation prompts for Runway
+   - For AVATAR: Clear, achievable actions based on avatar type
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+
+Format each scene as:
+SCENE [NUMBER]
+DESCRIPTION: [Content]
+FRAME_TYPE: [Type]
+VISUAL: [Direction]
+VOICE: [Script]
+
+Important Guidelines:
+- For AI visuals: Focus on clear, detailed visual descriptions
+- For recorded actions: Keep them simple and achievable
+- For AI avatar: Focus on natural expressions and movements
+- For voice: Clear, emotionally appropriate delivery
+- Ensure smooth transitions between scenes
+- Maintain consistent style and pacing
+
+    // Your Dollar Shave Club style prompt here
+  `,
+
+  movie_remix: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+    You are a creative director specializing in reimagining classic movie scenes...
+
+You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
+
+Base concept:
+${overallPrompt}
+
+Tools Configuration:
+- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
+- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
+  ${toolSettings.AVATAR ? `
+  • Direct Recording: Simple, achievable actions for creator recording
+  • AI Avatar: Digital avatar performance instructions
+  • Video Transform: Style transfer guidelines` : ''}
+- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+
+    Video Specifications:
+    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
+    - Style: ${contentMood}, ${contentType}
+    - Duration: ${videoType} format (${numberOfScenes} scenes)
+${includeProduct ? '- Include natural product/brand integration' : ''}
+
+For each scene, provide:
+1. DESCRIPTION: Clear scene content and action
+2. FRAME_TYPE: Either AI_VISUAL or AVATAR
+3. VISUAL: 
+   - For AI_VISUAL: Detailed visual generation prompts for Runway
+   - For AVATAR: Clear, achievable actions based on avatar type
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+
+Format each scene as:
+SCENE [NUMBER]
+DESCRIPTION: [Content]
+FRAME_TYPE: [Type]
+VISUAL: [Direction]
+VOICE: [Script]
+
+Important Guidelines:
+- For AI visuals: Focus on clear, detailed visual descriptions
+- For recorded actions: Keep them simple and achievable
+- For AI avatar: Focus on natural expressions and movements
+- For voice: Clear, emotionally appropriate delivery
+- Ensure smooth transitions between scenes
+- Maintain consistent style and pacing
+
+    // Your movie remix prompt here
+  `,
+
+  youtuber: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+    You are a successful educational YouTuber known for making complex topics engaging...
+
+You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
+
+Base concept:
+${overallPrompt}
+
+Tools Configuration:
+- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
+- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
+  ${toolSettings.AVATAR ? `
+  • Direct Recording: Simple, achievable actions for creator recording
+  • AI Avatar: Digital avatar performance instructions
+  • Video Transform: Style transfer guidelines` : ''}
+- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+
+    Video Specifications:
+    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
+    - Style: ${contentMood}, ${contentType}
+    - Duration: ${videoType} format (${numberOfScenes} scenes)
+${includeProduct ? '- Include natural product/brand integration' : ''}
+
+For each scene, provide:
+1. DESCRIPTION: Clear scene content and action
+2. FRAME_TYPE: Either AI_VISUAL or AVATAR
+3. VISUAL: 
+   - For AI_VISUAL: Detailed visual generation prompts for Runway
+   - For AVATAR: Clear, achievable actions based on avatar type
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+
+Format each scene as:
+SCENE [NUMBER]
+DESCRIPTION: [Content]
+FRAME_TYPE: [Type]
+VISUAL: [Direction]
+VOICE: [Script]
+
+Important Guidelines:
+- For AI visuals: Focus on clear, detailed visual descriptions
+- For recorded actions: Keep them simple and achievable
+- For AI avatar: Focus on natural expressions and movements
+- For voice: Clear, emotionally appropriate delivery
+- Ensure smooth transitions between scenes
+- Maintain consistent style and pacing
+
+    // Your YouTuber style prompt here
+  `,
+
+  how_to: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+    You are a technical instruction specialist creating clear, step-by-step tutorial content...
+
+You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
+
+Base concept:
+${overallPrompt}
+
+Tools Configuration:
+- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
+- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
+  ${toolSettings.AVATAR ? `
+  • Direct Recording: Simple, achievable actions for creator recording
+  • AI Avatar: Digital avatar performance instructions
+  • Video Transform: Style transfer guidelines` : ''}
+- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+
+    Video Specifications:
+    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
+    - Style: ${contentMood}, ${contentType}
+    - Duration: ${videoType} format (${numberOfScenes} scenes)
+${includeProduct ? '- Include natural product/brand integration' : ''}
+
+For each scene, provide:
+1. DESCRIPTION: Clear scene content and action
+2. FRAME_TYPE: Either AI_VISUAL or AVATAR
+3. VISUAL: 
+   - For AI_VISUAL: Detailed visual generation prompts for Runway
+   - For AVATAR: Clear, achievable actions based on avatar type
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+
+Format each scene as:
+SCENE [NUMBER]
+DESCRIPTION: [Content]
+FRAME_TYPE: [Type]
+VISUAL: [Direction]
+VOICE: [Script]
+
+Important Guidelines:
+- For AI visuals: Focus on clear, detailed visual descriptions
+- For recorded actions: Keep them simple and achievable
+- For AI avatar: Focus on natural expressions and movements
+- For voice: Clear, emotionally appropriate delivery
+- Ensure smooth transitions between scenes
+- Maintain consistent style and pacing
+
+    // Your how-to prompt here
+  `,
+
+  feature_drop: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+    You are a product marketing specialist creating hype-building feature announcement videos...
+
+You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
+
+Base concept:
+${overallPrompt}
+
+Tools Configuration:
+- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
+- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
+  ${toolSettings.AVATAR ? `
+  • Direct Recording: Simple, achievable actions for creator recording
+  • AI Avatar: Digital avatar performance instructions
+  • Video Transform: Style transfer guidelines` : ''}
+- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+
+    Video Specifications:
+    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
+    - Style: ${contentMood}, ${contentType}
+    - Duration: ${videoType} format (${numberOfScenes} scenes)
+${includeProduct ? '- Include natural product/brand integration' : ''}
+
+For each scene, provide:
+1. DESCRIPTION: Clear scene content and action
+2. FRAME_TYPE: Either AI_VISUAL or AVATAR
+3. VISUAL: 
+   - For AI_VISUAL: Detailed visual generation prompts for Runway
+   - For AVATAR: Clear, achievable actions based on avatar type
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+
+Format each scene as:
+SCENE [NUMBER]
+DESCRIPTION: [Content]
+FRAME_TYPE: [Type]
+VISUAL: [Direction]
+VOICE: [Script]
+
+Important Guidelines:
+- For AI visuals: Focus on clear, detailed visual descriptions
+- For recorded actions: Keep them simple and achievable
+- For AI avatar: Focus on natural expressions and movements
+- For voice: Clear, emotionally appropriate delivery
+- Ensure smooth transitions between scenes
+- Maintain consistent style and pacing
+
+    // Your feature drop prompt here
+  `
+};
+
+// Video Styles Configuration
+const VIDEO_STYLES = {
+  STANDARD: {
+    name: 'Standard Video',
+    description: 'Classic video format with flexible structure',
+    value: 'standard'
+  },
+  VIRAL_AD: {
+    name: 'Dollar Shave Club Style',
+    description: 'Witty, direct-to-camera viral marketing style',
+    value: 'viral_ad'
+  },
+  MOVIE_REMIX: {
+    name: 'Movie Scene Remix',
+    description: 'Creative adaptation of famous movie scenes',
+    value: 'movie_remix'
+  },
+  YOUTUBER: {
+    name: 'Informative YouTuber',
+    description: 'Educational content with high engagement',
+    value: 'youtuber'
+  },
+  HOW_TO: {
+    name: 'How-To Guide',
+    description: 'Clear step-by-step instructions and tutorials',
+    value: 'how_to'
+  },
+  FEATURE_DROP: {
+    name: 'Feature Announcement',
+    description: 'Exciting product/feature reveal videos',
+    value: 'feature_drop'
+  }
+};
+
+// Tool Settings
 const TOOL_SETTINGS = {
   AI_VISUALS: {
     name: 'AI Visuals',
@@ -65,11 +397,13 @@ const TOOL_SETTINGS = {
   }
 };
 
+// Frame Types
 const FRAME_TYPES = {
   AI_VISUAL: 'ai_visual',
   AVATAR: 'avatar'
 };
 
+// Screen Sizes Configuration
 const SCREEN_SIZES = {
   HORIZONTAL: {
     name: 'Horizontal (YouTube/Web)',
@@ -97,6 +431,7 @@ const SCREEN_SIZES = {
   }
 };
 
+// Initial Scene Configuration
 const INITIAL_SCENE = {
   id: Date.now(),
   content: '',
@@ -159,6 +494,101 @@ const FrameToggle = ({ isAvatar, onToggle, className = "" }) => {
   );
 };
 
+// Settings Dialog Component
+const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSound, toggleSound, defaultAvatarType, setDefaultAvatarType }) => {
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="relative bg-white rounded-lg w-full max-w-md mx-4 p-6">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+        >
+          <X size={20} />
+        </button>
+
+        <h2 className="text-xl font-semibold mb-6">Video Creation Settings</h2>
+
+        <div className="space-y-6">
+          {/* AI Visuals Setting */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Camera size={18} className="text-blue-500" />
+                <h4 className="font-medium">{TOOL_SETTINGS.AI_VISUALS.name}</h4>
+              </div>
+              <p className="text-sm text-gray-500">{TOOL_SETTINGS.AI_VISUALS.description}</p>
+            </div>
+            <Toggle
+              enabled={toolSettings.AI_VISUALS}
+              onToggle={() => {
+                setToolSettings(prev => ({ ...prev, AI_VISUALS: !prev.AI_VISUALS }));
+                playSound(toggleSound);
+              }}
+            />
+          </div>
+
+          {/* Avatar Setting */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <UserCircle2 size={18} className="text-blue-500" />
+                  <h4 className="font-medium">{TOOL_SETTINGS.AVATAR.name}</h4>
+                </div>
+                <p className="text-sm text-gray-500">{TOOL_SETTINGS.AVATAR.description}</p>
+              </div>
+              <Toggle
+                enabled={toolSettings.AVATAR}
+                onToggle={() => {
+                  setToolSettings(prev => ({ ...prev, AVATAR: !prev.AVATAR }));
+                  playSound(toggleSound);
+                }}
+              />
+            </div>
+
+            {toolSettings.AVATAR && (
+              <div className="pl-7">
+                <select
+                  value={defaultAvatarType}
+                  onChange={(e) => setDefaultAvatarType(e.target.value)}
+                  className="w-full p-2 text-sm border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {Object.values(TOOL_SETTINGS.AVATAR.types).map((type) => (
+                    <option key={type.name} value={type.name}>
+                      {type.name} - {type.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* AI Audio Setting */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Mic size={18} className="text-blue-500" />
+                <h4 className="font-medium">{TOOL_SETTINGS.AI_AUDIO.name}</h4>
+              </div>
+              <p className="text-sm text-gray-500">{TOOL_SETTINGS.AI_AUDIO.description}</p>
+            </div>
+            <Toggle
+              enabled={toolSettings.AI_AUDIO}
+              onToggle={() => {
+                setToolSettings(prev => ({ ...prev, AI_AUDIO: !prev.AI_AUDIO }));
+                playSound(toggleSound);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main Component
 const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   // Core States
   const [overallPrompt, setOverallPrompt] = useState('');
@@ -170,6 +600,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   const [error, setError] = useState(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [videoStyle, setVideoStyle] = useState('standard');
 
   // Tool Settings State
   const [toolSettings, setToolSettings] = useState({
@@ -192,6 +623,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   const sentSound = isBrowser ? new Audio('https://dazzling-cat.netlify.app/sendmsg1.mp3') : null;
   const toggleSound = isBrowser ? new Audio('https://dazzling-cat.netlify.app/sendmsg2.mp3') : null;
 
+  // Effect Hooks
   useEffect(() => {
     setIsBrowser(true);
     const storedProductInfo = localStorage.getItem('productQuestionnaire');
@@ -200,7 +632,6 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     }
   }, []);
 
-  // Update initial useEffect
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -219,21 +650,19 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     checkAuth();
   }, []);
 
-
-  // Safety check for current scene
   useEffect(() => {
     if (scenes.length > 0 && currentScene >= scenes.length) {
       setCurrentScene(scenes.length - 1);
     }
   }, [scenes.length, currentScene]);
 
+  // Utility Functions
   const playSound = (sound) => {
     if (isBrowser && sound) {
       sound.play().catch(error => console.error('Error playing sound:', error));
     }
   };
 
-  // Helper function to get the current scene safely
   const getCurrentScene = () => {
     if (!scenes.length || currentScene < 0 || currentScene >= scenes.length) {
       return INITIAL_SCENE;
@@ -241,7 +670,6 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     return scenes[currentScene];
   };
 
-  // Helper function for prompt placeholders
   const getPromptPlaceholder = (frameType, avatarType) => {
     if (frameType === FRAME_TYPES.AI_VISUAL) {
       return "Describe the visual scene in detail including:\n- Composition and framing\n- Camera movements\n- Lighting and mood\n- Visual effects and transitions\n- Key elements and their placement";
@@ -259,7 +687,6 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     }
   };
 
-  // Helper Functions
   const getPreviewUrl = (scene, index) => {
     const dimensions = SCREEN_SIZES[screenSize].dimensions;
     const bgColor = generateColorCode(index);
@@ -281,6 +708,12 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
       'CD853F', // Peru
     ];
     return colors[index % colors.length];
+  };
+
+  const extractContent = (block, section) => {
+    const regex = new RegExp(`${section}:(.+?)(?=DESCRIPTION:|FRAME_TYPE:|VISUAL:|VOICE:|$)`, 's');
+    const match = block.match(regex);
+    return match ? match[1].trim() : '';
   };
 
   // Scene Management Functions
@@ -340,7 +773,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     ));
   };
 
-  // Export function with improved formatting
+  // Export Formatted Script
   const exportFormattedScript = () => {
     let scriptText = `VIDEO SCRIPT: ${overallPrompt}\n\n`;
     scriptText += `FORMAT & SETTINGS\n`;
@@ -392,7 +825,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     URL.revokeObjectURL(url);
   };
 
-  // Content Generation Function with improved error handling
+  // Script Generation
   const generateVideoScript = async () => {
     if (!overallPrompt.trim()) {
       setError("Please provide a video concept before generating the script.");
@@ -402,6 +835,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     setError(null);
     playSound(sentSound);
     setIsGenerating(true);
+
     try {
       let sceneDuration;
       let numberOfScenes;
@@ -425,56 +859,56 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
       }
 
       const systemPrompt = `You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
+  
+  Base concept:
+  ${overallPrompt}
+  
+  Tools Configuration:
+  - AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
+  - Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
+    ${toolSettings.AVATAR ? `
+    • Direct Recording: Simple, achievable actions for creator recording
+    • AI Avatar: Digital avatar performance instructions
+    • Video Transform: Style transfer guidelines` : ''}
+  - AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+  
+  Video Specifications:
+  - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
+  - Style: ${contentMood}, ${contentType}
+  - Duration: ${videoType} format (${numberOfScenes} scenes)
+  ${includeProduct ? '- Include natural product/brand integration' : ''}
+  
+  For each scene, provide:
+  1. DESCRIPTION: Clear scene content and action
+  2. FRAME_TYPE: Either AI_VISUAL or AVATAR
+  3. VISUAL: 
+     - For AI_VISUAL: Detailed visual generation prompts for Runway
+     - For AVATAR: Clear, achievable actions based on avatar type
+  4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+  
+  Format each scene as:
+  SCENE [NUMBER]
+  DESCRIPTION: [Content]
+  FRAME_TYPE: [Type]
+  VISUAL: [Direction]
+  VOICE: [Script]
+  
+  Important Guidelines:
+  - For AI visuals: Focus on clear, detailed visual descriptions
+  - For recorded actions: Keep them simple and achievable
+  - For AI avatar: Focus on natural expressions and movements
+  - For voice: Clear, emotionally appropriate delivery
+  - Ensure smooth transitions between scenes
+  - Maintain consistent style and pacing`;
 
-Base concept:
-${overallPrompt}
 
-Tools Configuration:
-- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
-- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
-  ${toolSettings.AVATAR ? `
-  • Direct Recording: Simple, achievable actions for creator recording
-  • AI Avatar: Digital avatar performance instructions
-  • Video Transform: Style transfer guidelines` : ''}
-- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
-
-Video Specifications:
-- Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
-- Style: ${contentMood}, ${contentType}
-- Duration: ${videoType} format (${numberOfScenes} scenes)
-${includeProduct ? '- Include natural product/brand integration' : ''}
-
-For each scene, provide:
-1. DESCRIPTION: Clear scene content and action
-2. FRAME_TYPE: Either AI_VISUAL or AVATAR
-3. VISUAL: 
-   - For AI_VISUAL: Detailed visual generation prompts for Runway
-   - For AVATAR: Clear, achievable actions based on avatar type
-4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
-
-Format each scene as:
-SCENE [NUMBER]
-DESCRIPTION: [Content]
-FRAME_TYPE: [Type]
-VISUAL: [Direction]
-VOICE: [Script]
-
-Important Guidelines:
-- For AI visuals: Focus on clear, detailed visual descriptions
-- For recorded actions: Keep them simple and achievable
-- For AI avatar: Focus on natural expressions and movements
-- For voice: Clear, emotionally appropriate delivery
-- Ensure smooth transitions between scenes
-- Maintain consistent style and pacing`;
-
-const apiKey = localStorage.getItem('anthropicKey');
-        const response = await fetch('/api/anthropic', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-          },
-
+      const apiKey = localStorage.getItem('anthropicKey');
+      const response = await fetch('/api/anthropic', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
         body: JSON.stringify({
           temperature: 0.7,
           max_tokens: 1500,
@@ -534,14 +968,7 @@ const apiKey = localStorage.getItem('anthropicKey');
     }
   };
 
-  const extractContent = (block, section) => {
-    const regex = new RegExp(`${section}:(.+?)(?=DESCRIPTION:|FRAME_TYPE:|VISUAL:|VOICE:|$)`, 's');
-    const match = block.match(regex);
-    return match ? match[1].trim() : '';
-  };
-
-
-  // Add loading state to return
+  // Loading and Auth States
   if (isAuthChecking) {
     return (
       <div className="min-h-[200px] flex items-center justify-center">
@@ -560,105 +987,21 @@ const apiKey = localStorage.getItem('anthropicKey');
       </div>
     );
   }
-  
-  // Settings Dialog Component
-  const SettingsDialog = ({ show, onClose }) => {
-    if (!show) return null;
 
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="relative bg-white rounded-lg w-full max-w-md mx-4 p-6">
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-          >
-            <X size={20} />
-          </button>
-
-          <h2 className="text-xl font-semibold mb-6">Video Creation Settings</h2>
-
-          <div className="space-y-6">
-            {/* AI Visuals Setting */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Camera size={18} className="text-blue-500" />
-                  <h4 className="font-medium">{TOOL_SETTINGS.AI_VISUALS.name}</h4>
-                </div>
-                <p className="text-sm text-gray-500">{TOOL_SETTINGS.AI_VISUALS.description}</p>
-              </div>
-              <Toggle
-                enabled={toolSettings.AI_VISUALS}
-                onToggle={() => {
-                  setToolSettings(prev => ({ ...prev, AI_VISUALS: !prev.AI_VISUALS }));
-                  playSound(toggleSound);
-                }}
-              />
-            </div>
-
-            {/* Avatar Setting */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <UserCircle2 size={18} className="text-blue-500" />
-                    <h4 className="font-medium">{TOOL_SETTINGS.AVATAR.name}</h4>
-                  </div>
-                  <p className="text-sm text-gray-500">{TOOL_SETTINGS.AVATAR.description}</p>
-                </div>
-                <Toggle
-                  enabled={toolSettings.AVATAR}
-                  onToggle={() => {
-                    setToolSettings(prev => ({ ...prev, AVATAR: !prev.AVATAR }));
-                    playSound(toggleSound);
-                  }}
-                />
-              </div>
-
-              {toolSettings.AVATAR && (
-                <div className="pl-7">
-                  <select
-                    value={defaultAvatarType}
-                    onChange={(e) => setDefaultAvatarType(e.target.value)}
-                    className="w-full p-2 text-sm border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {Object.values(TOOL_SETTINGS.AVATAR.types).map((type) => (
-                      <option key={type.name} value={type.name}>
-                        {type.name} - {type.description}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-
-            {/* AI Audio Setting */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Mic size={18} className="text-blue-500" />
-                  <h4 className="font-medium">{TOOL_SETTINGS.AI_AUDIO.name}</h4>
-                </div>
-                <p className="text-sm text-gray-500">{TOOL_SETTINGS.AI_AUDIO.description}</p>
-              </div>
-              <Toggle
-                enabled={toolSettings.AI_AUDIO}
-                onToggle={() => {
-                  setToolSettings(prev => ({ ...prev, AI_AUDIO: !prev.AI_AUDIO }));
-                  playSound(toggleSound);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
+  // Main Component Render
   return (
     <div className="bg-white rounded-md overflow-hidden">
       {/* Settings Dialog */}
-      <SettingsDialog show={showSettings} onClose={() => setShowSettings(false)} />
+      <SettingsDialog
+        show={showSettings}
+        onClose={() => setShowSettings(false)}
+        toolSettings={toolSettings}
+        setToolSettings={setToolSettings}
+        playSound={playSound}
+        toggleSound={toggleSound}
+        defaultAvatarType={defaultAvatarType}
+        setDefaultAvatarType={setDefaultAvatarType}
+      />
 
       {/* Main Header */}
       <div className="p-4 border-b border-gray-200">
@@ -678,54 +1021,83 @@ const apiKey = localStorage.getItem('anthropicKey');
       <div className="p-4">
         <div className="space-y-4">
           {/* Format Controls */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <select
-              value={screenSize}
-              onChange={(e) => setScreenSize(e.target.value)}
-              className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {Object.entries(SCREEN_SIZES).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.name}
-                </option>
-              ))}
-            </select>
+          <div className="flex gap-4">
 
-            <select
-              value={videoType}
-              onChange={(e) => setVideoType(e.target.value)}
-              className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="short">Short (30s)</option>
-              <option value="standard">Standard (1-2min)</option>
-              <option value="long">Long Form (3-5min)</option>
-            </select>
 
-            <select
-              value={contentMood}
-              onChange={(e) => setContentMood(e.target.value)}
-              className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="engaging">Engaging</option>
-              <option value="professional">Professional</option>
-              <option value="casual">Casual</option>
-              <option value="dramatic">Dramatic</option>
-              <option value="humorous">Humorous</option>
-              <option value="satirical">Satirical</option>
-            </select>
+            <div className='grid w-full whitespace-nowrap'>
+              <label className='font-bold text-xs'>Type of Video</label>
+              <div className="mt-1 text-xs text-gray-500">
+                {VIDEO_STYLES[Object.keys(VIDEO_STYLES).find(key =>
+                  VIDEO_STYLES[key].value === videoStyle
+                )]?.description}
+              </div>
+              <select
+                value={videoStyle}
+                onChange={(e) => setVideoStyle(e.target.value)}
+                className="w-full p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {Object.entries(VIDEO_STYLES).map(([key, style]) => (
+                  <option key={key} value={style.value}>
+                    {style.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              value={contentType}
-              onChange={(e) => setContentType(e.target.value)}
-              className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="educational">Educational</option>
-              <option value="promotional">Promotional</option>
-              <option value="storytelling">Story-based</option>
-              <option value="tutorial">Tutorial</option>
-              <option value="testimonial">Testimonial</option>
-              <option value="meme">Pure Meme</option>
-            </select>
+            <div className='grid w-full'>
+              <label className='font-bold text-xs'>Format</label>
+              <div className="mt-1 text-xs text-gray-500">
+                xxxxxx
+              </div>
+              <select
+                value={screenSize}
+                onChange={(e) => setScreenSize(e.target.value)}
+                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {Object.entries(SCREEN_SIZES).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className='grid w-full'>
+              <label className='font-bold text-xs'>Length</label>
+              <div className="mt-1 text-xs text-gray-500">
+                xxxxxx
+              </div>
+              <select
+                value={videoType}
+                onChange={(e) => setVideoType(e.target.value)}
+                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="short">Short (30s)</option>
+                <option value="standard">Standard (1-2min)</option>
+                <option value="long">Long Form (3-5min)</option>
+              </select>
+            </div>
+
+            <div className='grid w-full'>
+              <label className='font-bold text-xs'>Tone</label>
+              <div className="mt-1 text-xs text-gray-500">
+                xxxxxx
+              </div>
+              <select
+                value={contentMood}
+                onChange={(e) => setContentMood(e.target.value)}
+                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="engaging">Engaging</option>
+                <option value="professional">Professional</option>
+                <option value="casual">Casual</option>
+                <option value="dramatic">Dramatic</option>
+                <option value="humorous">Humorous</option>
+                <option value="satirical">Satirical</option>
+              </select>
+            </div>
+
+
           </div>
 
           {/* Main Prompt Input */}
@@ -760,21 +1132,18 @@ const apiKey = localStorage.getItem('anthropicKey');
                   <Circle size={20} />
                 )}
 
-              <span className="flex items-center gap-2 text-slate-500">
-                Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
-                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
-                    <Blocks size={16} />product/service
-                  </i> with my
-                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
-                    <BicepsFlexed size={16} />personal journey
-                  </i>
+                <span className="flex items-center gap-2 text-slate-500">
+                  Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
+                    <i className='flex gap-1 sm:gap-2 text-blue-500'>
+                      <Blocks size={16} />product/service
+                    </i> with my
+                    <i className='flex gap-1 sm:gap-2 text-blue-500'>
+                      <BicepsFlexed size={16} />personal journey
+                    </i>
+                  </span>
                 </span>
-              </span>
-
-
               </button>
             </div>
-            
 
             <button
               className={`flex items-center gap-2 px-6 py-2 rounded-md text-sm transition-colors
@@ -835,8 +1204,8 @@ const apiKey = localStorage.getItem('anthropicKey');
                     >
                       {/* Preview */}
                       <div className={`w-full overflow-hidden relative rounded-t-lg ${screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
-                          screenSize === 'SQUARE' ? 'aspect-square' :
-                            screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
+                        screenSize === 'SQUARE' ? 'aspect-square' :
+                          screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'
                         }`}>
                         <img
                           src={scene.previewUrl?.replace('.mp4', '')}
@@ -1003,7 +1372,7 @@ const apiKey = localStorage.getItem('anthropicKey');
 
                     {/* Voice Direction */}
                     {toolSettings.AI_AUDIO && (
-                      <div className="border rounded-lg p-4  bg-gray-100">
+                      <div className="border rounded-lg p-4 bg-gray-100">
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Voice Direction</h4>
                         <textarea
                           value={getCurrentScene().aiPrompts.voicePrompt}
@@ -1015,8 +1384,6 @@ const apiKey = localStorage.getItem('anthropicKey');
                       </div>
                     )}
                   </div>
-
-
                 </div>
               </div>
             )}
@@ -1027,4 +1394,5 @@ const apiKey = localStorage.getItem('anthropicKey');
   );
 };
 
+// Export the component
 export default VideoScriptConstructor;

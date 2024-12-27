@@ -19,9 +19,8 @@ import ApiKeyManager from './Components/ApiKeyManager';
 
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
-    className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${
-      active ? 'bg-blue-100 text-blue-500' : 'text-gray-500 hover:bg-gray-100'
-    }`}
+    className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 ${active ? 'bg-blue-100 text-blue-500' : 'text-gray-500 hover:bg-gray-100'
+      }`}
     onClick={onClick}
   >
     <Icon className="mr-3 h-5 w-5" />
@@ -31,9 +30,8 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
 
 const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
-    className={`flex flex-col items-center justify-center p-2 ${
-      active ? 'text-blue-500' : 'text-gray-500'
-    }`}
+    className={`flex flex-col items-center justify-center p-2 ${active ? 'text-blue-500' : 'text-gray-500'
+      }`}
     onClick={onClick}
   >
     <Icon size={20} />
@@ -53,12 +51,13 @@ export default function Dashboard() {
       try {
         setIsLoading(true);
         
-        // Check both localStorage items
-        const key = localStorage.getItem('anthropicKey');
-        const userData = localStorage.getItem('userData');
-        
-        const isValid = key && key.startsWith('sk-') && userData;
-        setIsAuthenticated(isValid);
+        if (typeof window !== 'undefined') {
+          // Only access localStorage in the browser
+          const key = localStorage.getItem('anthropicKey');
+          const userData = localStorage.getItem('userData');
+          const isValid = key && key.startsWith('sk-') && userData;
+          setIsAuthenticated(isValid);
+        }
         
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (error) {
@@ -69,16 +68,16 @@ export default function Dashboard() {
       }
     };
   
-    // Run immediately
     checkLoginState();
   
-    // Add listener for login events
-    const handleLogin = () => checkLoginState();
-    window.addEventListener('userLoggedIn', handleLogin);
-    
-    return () => window.removeEventListener('userLoggedIn', handleLogin);
+    if (typeof window !== 'undefined') {
+      const handleLogin = () => checkLoginState();
+      window.addEventListener('userLoggedIn', handleLogin);
+      return () => window.removeEventListener('userLoggedIn', handleLogin);
+    }
   }, []);
 
+  
   const navItems = [
     { icon: Twitter, label: 'Build On X', id: 'dashboard' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
@@ -138,10 +137,9 @@ export default function Dashboard() {
         )}
 
         {/* Sidebar */}
-        <aside 
-          className={`fixed inset-y-0 left-0 z-10 w-64 bg-white transform ${
-            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-          } md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}
+        <aside
+          className={`fixed inset-y-0 left-0 z-10 w-64 bg-white transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            } md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}
         >
           <div className="p-6 flex justify-between items-center">
             <Image
@@ -154,8 +152,8 @@ export default function Dashboard() {
                 setLogoSrc('logo.png');
               }}
             />
-            <button 
-              onClick={() => setIsMobileMenuOpen(false)} 
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
               className="md:hidden text-gray-500 hover:text-gray-500"
             >
               <X className="h-6 w-6" />

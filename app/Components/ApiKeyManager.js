@@ -162,7 +162,10 @@ const ApiKeyManager = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">OpenAI API Key</label>
+              <div className='flex gap-4'>
+                <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-12 h-12"/>
+                <label className="block text-sm font-medium text-gray-700">Open API Key</label>
+                </div>
                 <div className="relative">
                   <input
                     type={showOpenAIKey ? "text" : "password"}
@@ -189,7 +192,10 @@ const ApiKeyManager = () => {
               </div>
 
               <div>
+                <div className='flex gap-4'>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtUnGYPe67wuzVDjTujZ21UV38Y6KQ290fow&s" className="w-12 h-12"/>
                 <label className="block text-sm font-medium text-gray-700">Anthropic API Key</label>
+                </div>
                 <div className="relative">
                   <input
                     type={showAnthropicKey ? "text" : "password"}

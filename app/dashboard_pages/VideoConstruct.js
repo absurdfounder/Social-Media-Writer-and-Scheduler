@@ -1021,7 +1021,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
       <div className="p-4">
         <div className="space-y-4">
           {/* Format Controls */}
-          <div className="flex gap-4">
+          <div className="flex gap-6 p-2">
 
 
             <div className='grid w-full whitespace-nowrap'>

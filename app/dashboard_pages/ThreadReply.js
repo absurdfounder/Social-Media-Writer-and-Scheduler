@@ -1104,6 +1104,8 @@ Copy- Style guide creation
             <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto gap-4'>
               {mode === 'reply' ? (
                 <>
+                <div className='grid'>
+                <label class="font-bold text-xs">Reply Length</label>
                   <select
                     value={replyLength}
                     onChange={(e) => setReplyLength(e.target.value)}
@@ -1113,6 +1115,9 @@ Copy- Style guide creation
                     <option value="medium">Standard Reply</option>
                     <option value="detailed">Detailed Reply</option>
                   </select>
+                  </div>
+                  <div className='grid'>
+                  <label class="font-bold text-xs">Stance</label>
                   <select
                     value={replyStance}
                     onChange={(e) => setReplyStance(e.target.value)}
@@ -1123,11 +1128,14 @@ Copy- Style guide creation
                     <option value="not_in_favour">Not in Favor</option>
                     <option value="controversial">Controversial</option>
                   </select>
+                  </div>
                 </>
               ) : (
 
                 <div className='flex gap-2'>
 
+<div className='grid'>
+                  <label class="font-bold text-xs">Post Length</label>
                   <select
                     value={threadType}
                     onChange={(e) => setThreadType(e.target.value)}
@@ -1137,7 +1145,11 @@ Copy- Style guide creation
                     <option value="three">3 Tweet Thread</option>
                     <option value="full">Full Thread</option>
                   </select>
+                  </div>
 
+
+                  <div className='grid'>
+                  <label class="font-bold text-xs">Prespective</label>
                   <select
                     value={feeling}
                     onChange={(e) => setFeeling(e.target.value)}
@@ -1154,6 +1166,7 @@ Copy- Style guide creation
                     <option value="process">⚙️ Process</option>
                     <option value="observation">👀 Observation</option>
                   </select>
+                  </div>
 
                 </div>
 

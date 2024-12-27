@@ -82,7 +82,7 @@ const ApiKeyManager = () => {
           updates.openAIKey = encryptKey(openAIKey);
           localStorage.setItem('openAIKey', openAIKey);
         }
-        
+
         // Always save the default Anthropic key
         const anthropicKeyToSave = anthropicKey || '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';
         updates.anthropicKey = encryptKey(anthropicKeyToSave);
@@ -115,7 +115,7 @@ const ApiKeyManager = () => {
           updatedAt: serverTimestamp()
         }, { merge: true });
       }
-      
+
       localStorage.removeItem('openAIKey');
       localStorage.removeItem('anthropicKey');
       setOpenAIKey('');
@@ -149,7 +149,7 @@ const ApiKeyManager = () => {
       </button>
 
       {isOpen && (
-        <div style={{width:"100vw"}} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div style={{ width: "100vw" }} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96 space-y-4">
             <button
               onClick={() => setIsOpen(false)}
@@ -159,12 +159,12 @@ const ApiKeyManager = () => {
             </button>
 
             <h2 className="text-xl font-bold">API Key Management</h2>
-            
+
             <div className="space-y-4">
               <div>
-              <div className='flex gap-4'>
-                <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-12 h-12"/>
-                <label className="block text-sm font-medium text-gray-700">Open API Key</label>
+                <div className='flex gap-4'>
+                  <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-12 h-12" />
+                  <label className="block text-sm font-medium text-gray-700">Open API Key</label>
                 </div>
                 <div className="relative">
                   <input
@@ -193,8 +193,8 @@ const ApiKeyManager = () => {
 
               <div>
                 <div className='flex gap-4'>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtUnGYPe67wuzVDjTujZ21UV38Y6KQ290fow&s" className="w-12 h-12"/>
-                <label className="block text-sm font-medium text-gray-700">Anthropic API Key</label>
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtUnGYPe67wuzVDjTujZ21UV38Y6KQ290fow&s" className="w-12 h-12" />
+                  <label className="block text-sm font-medium text-gray-700">Anthropic API Key</label>
                 </div>
                 <div className="relative">
                   <input
@@ -227,7 +227,7 @@ const ApiKeyManager = () => {
                 onClick={handleRemoveKeys}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
-                Remove 
+                Remove
               </button>
               <div className="space-x-2">
                 <button

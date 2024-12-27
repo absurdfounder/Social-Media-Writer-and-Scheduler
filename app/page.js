@@ -50,15 +50,14 @@ export default function Dashboard() {
     const checkLoginState = async () => {
       try {
         setIsLoading(true);
-        
-        if (typeof window !== 'undefined') {
-          // Only access localStorage in the browser
-          const key = localStorage.getItem('anthropicKey');
-          const userData = localStorage.getItem('userData');
-          const isValid = key && key.startsWith('sk-') && userData;
-          setIsAuthenticated(isValid);
-        }
-        
+
+        // Check both localStorage items
+        const key = localStorage.getItem('anthropicKey');
+        const userData = localStorage.getItem('userData');
+
+        const isValid = key && key.startsWith('sk-') && userData;
+        setIsAuthenticated(isValid);
+
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (error) {
         console.error('Error checking login state:', error);
@@ -67,17 +66,17 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
-  
+
+    // Run immediately
     checkLoginState();
-  
-    if (typeof window !== 'undefined') {
-      const handleLogin = () => checkLoginState();
-      window.addEventListener('userLoggedIn', handleLogin);
-      return () => window.removeEventListener('userLoggedIn', handleLogin);
-    }
+
+    // Add listener for login events
+    const handleLogin = () => checkLoginState();
+    window.addEventListener('userLoggedIn', handleLogin);
+
+    return () => window.removeEventListener('userLoggedIn', handleLogin);
   }, []);
 
-  
   const navItems = [
     { icon: Twitter, label: 'Build On X', id: 'dashboard' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },

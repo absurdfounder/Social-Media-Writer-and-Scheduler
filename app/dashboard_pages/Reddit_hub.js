@@ -7,7 +7,8 @@ import {
   Newspaper, Lightbulb, Check, ArrowLeft,
   TrendingUp, BellDot, Eye, MessageCircle,
   AlertTriangle, ExternalLink,
-  Sparkles
+  Sparkles,
+  SearchCheckIcon
 } from 'lucide-react';
 import { getOpenAIKey } from '../Utils/getApikey';
 
@@ -57,46 +58,48 @@ const LinkPreview = ({ url }) => {
 
 const RedditExplorer = () => {
   // State declarations
-// State declarations
-const [activeTab, setActiveTab] = useState('groups');
-const [sortColumn, setSortColumn] = useState('');
-const [sortDirection, setSortDirection] = useState('asc');
-const [communities, setCommunities] = useState([]);
-const [displayedCommunities, setDisplayedCommunities] = useState([]);
-const [searchTerm, setSearchTerm] = useState('');
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
-const [selectedSubreddit, setSelectedSubreddit] = useState(null);
-const [posts, setPosts] = useState([]);
-const [page, setPage] = useState(1);
-const [groups, setGroups] = useState([]);
-const [newGroupName, setNewGroupName] = useState('');
-const [selectedGroup, setSelectedGroup] = useState(null);
-const [groupSearchTerm, setGroupSearchTerm] = useState('');
-const [selectedPost, setSelectedPost] = useState(null);
-const [postContent, setPostContent] = useState('');
-const [activeFilter, setActiveFilter] = useState('all');
-const [showGroupPopup, setShowGroupPopup] = useState(false);
-const [showKeywordsModal, setShowKeywordsModal] = useState(false);
-const [selectedSubredditsForGroup, setSelectedSubredditsForGroup] = useState([]);
-const [analyzedPosts, setAnalyzedPosts] = useState([]);
-const [isAnalyzing, setIsAnalyzing] = useState(false);
-const [errorMessage, setErrorMessage] = useState(null);
-const [comments, setComments] = useState([]);
-const [productInfo, setProductInfo] = useState(null);
-const [postIdeas, setPostIdeas] = useState([]);
-const [commentSuggestions, setCommentSuggestions] = useState({});
-const [isGeneratingIdeas, setIsGeneratingIdeas] = useState(false);
-const [keywords, setKeywords] = useState([]);
-const [competitorKeywords, setCompetitorKeywords] = useState([]);
-const [keywordsInput, setKeywordsInput] = useState('');
-const [competitorKeywordsInput, setCompetitorKeywordsInput] = useState('');
-const [selectedKeywords, setSelectedKeywords] = useState([]);
-const [keywordType, setKeywordType] = useState('own'); // 'own' or 'competitor'
+  // State declarations
+  const [activeTab, setActiveTab] = useState('groups');
+  const [sortColumn, setSortColumn] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [communities, setCommunities] = useState([]);
+  const [displayedCommunities, setDisplayedCommunities] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedSubreddit, setSelectedSubreddit] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [groups, setGroups] = useState([]);
+  const [newGroupName, setNewGroupName] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [groupSearchTerm, setGroupSearchTerm] = useState('');
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [postContent, setPostContent] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [showGroupPopup, setShowGroupPopup] = useState(false);
+  const [showKeywordsModal, setShowKeywordsModal] = useState(false);
+  const [selectedSubredditsForGroup, setSelectedSubredditsForGroup] = useState([]);
+  const [analyzedPosts, setAnalyzedPosts] = useState([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [productInfo, setProductInfo] = useState(null);
+  const [postIdeas, setPostIdeas] = useState([]);
+  const [commentSuggestions, setCommentSuggestions] = useState({});
+  const [isGeneratingIdeas, setIsGeneratingIdeas] = useState(false);
+  const [keywords, setKeywords] = useState([]);
+  const [competitorKeywords, setCompetitorKeywords] = useState([]);
+  const [keywordsInput, setKeywordsInput] = useState('');
+  const [competitorKeywordsInput, setCompetitorKeywordsInput] = useState('');
+  const [selectedKeywords, setSelectedKeywords] = useState([]);
+  const [keywordType, setKeywordType] = useState('own'); // 'own' or 'competitor'
+  const [searchMode, setSearchMode] = useState('latest'); // 'latest' or 'fetch'
 
 
-// This stores filtered results
-const [keywordResults, setKeywordResults] = useState([]);
+
+  // This stores filtered results
+  const [keywordResults, setKeywordResults] = useState([]);
 
   // Intersection Observer setup
   const observer = useRef();
@@ -707,75 +710,75 @@ const [keywordResults, setKeywordResults] = useState([]);
   ];
 
   // useEffect hooks
-// useEffect hooks
-useEffect(() => {
-  fetchData(activeTab);
-}, [activeTab]);
+  // useEffect hooks
+  useEffect(() => {
+    fetchData(activeTab);
+  }, [activeTab]);
 
-useEffect(() => {
-  const filtered = communities.filter(community =>
-    community.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  setDisplayedCommunities(filtered.slice(0, page * 20));
-}, [communities, searchTerm, page]);
+  useEffect(() => {
+    const filtered = communities.filter(community =>
+      community.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setDisplayedCommunities(filtered.slice(0, page * 20));
+  }, [communities, searchTerm, page]);
 
-useEffect(() => {
-  const savedGroups = localStorage.getItem('redditGroups');
-  const savedKeywords = localStorage.getItem('redditKeywords');
-  const savedCompKeywords = localStorage.getItem('redditCompetitorKeywords');
-  
-  if (savedKeywords) setKeywords(JSON.parse(savedKeywords));
-  if (savedCompKeywords) setCompetitorKeywords(JSON.parse(savedCompKeywords));
-  
-  if (savedGroups) {
-    try {
-      const parsedGroups = JSON.parse(savedGroups);
-      if (Array.isArray(parsedGroups) && parsedGroups.every(group => group.name && Array.isArray(group.subreddits))) {
-        const mergedGroups = [...predefinedGroups];
-        parsedGroups.forEach(savedGroup => {
-          const index = mergedGroups.findIndex(g => g.name === savedGroup.name);
-          if (index !== -1) {
-            mergedGroups[index] = savedGroup;
-          } else {
-            mergedGroups.push(savedGroup);
-          }
-        });
-        setGroups(mergedGroups);
-      } else {
-        throw new Error('Invalid group structure');
+  useEffect(() => {
+    const savedGroups = localStorage.getItem('redditGroups');
+    const savedKeywords = localStorage.getItem('redditKeywords');
+    const savedCompKeywords = localStorage.getItem('redditCompetitorKeywords');
+
+    if (savedKeywords) setKeywords(JSON.parse(savedKeywords));
+    if (savedCompKeywords) setCompetitorKeywords(JSON.parse(savedCompKeywords));
+
+    if (savedGroups) {
+      try {
+        const parsedGroups = JSON.parse(savedGroups);
+        if (Array.isArray(parsedGroups) && parsedGroups.every(group => group.name && Array.isArray(group.subreddits))) {
+          const mergedGroups = [...predefinedGroups];
+          parsedGroups.forEach(savedGroup => {
+            const index = mergedGroups.findIndex(g => g.name === savedGroup.name);
+            if (index !== -1) {
+              mergedGroups[index] = savedGroup;
+            } else {
+              mergedGroups.push(savedGroup);
+            }
+          });
+          setGroups(mergedGroups);
+        } else {
+          throw new Error('Invalid group structure');
+        }
+      } catch (error) {
+        console.error('Error parsing saved groups:', error);
+        setGroups(predefinedGroups);
       }
-    } catch (error) {
-      console.error('Error parsing saved groups:', error);
+    } else {
       setGroups(predefinedGroups);
     }
-  } else {
-    setGroups(predefinedGroups);
-  }
-}, []);
+  }, []);
 
-useEffect(() => {
-  if (JSON.stringify(groups) !== JSON.stringify(predefinedGroups)) {
-    localStorage.setItem('redditGroups', JSON.stringify(groups));
-  }
-}, [groups]);
+  useEffect(() => {
+    if (JSON.stringify(groups) !== JSON.stringify(predefinedGroups)) {
+      localStorage.setItem('redditGroups', JSON.stringify(groups));
+    }
+  }, [groups]);
 
-useEffect(() => {
-  const savedProductInfo = localStorage.getItem('productQuestionnaire');
-  if (savedProductInfo) {
-    setProductInfo(JSON.parse(savedProductInfo));
-  }
-}, []);
+  useEffect(() => {
+    const savedProductInfo = localStorage.getItem('productQuestionnaire');
+    if (savedProductInfo) {
+      setProductInfo(JSON.parse(savedProductInfo));
+    }
+  }, []);
 
-useEffect(() => {
-  generatePostIdeasAfterRender();
-}, [analyzedPosts]);
+  useEffect(() => {
+    generatePostIdeasAfterRender();
+  }, [analyzedPosts]);
 
   const searchWithKeywords = async (posts, keywordList) => {
     if (!keywordList.length) return posts;
-    
+
     return posts.filter(post => {
       const content = `${post.title} ${post.selftext}`.toLowerCase();
-      return keywordList.some(keyword => 
+      return keywordList.some(keyword =>
         content.includes(keyword.toLowerCase())
       );
     });
@@ -801,56 +804,91 @@ useEffect(() => {
         default:
           endpoint = 'https://www.reddit.com/subreddits/popular.json?limit=100';
       }
-
-      const response = await fetch(endpoint);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-
-      let mappedCommunities;
-      if (tab === 'trending') {
-        mappedCommunities = data.subreddit_names.map(name => ({
-          id: name,
-          name: name,
-          url: `https://reddit.com/r/${name}`,
-          subscribersCount: 0,
-          growthPerWeek: 0,
-          growthPerMonth: 0,
-        }));
-      } else {
-        if (!data || !data.data || !data.data.children) {
-          throw new Error('Unexpected data structure from Reddit API');
-        }
-        mappedCommunities = data.data.children.map(child => ({
-          id: child.data.id,
-          name: child.data.display_name,
-          url: `https://reddit.com${child.data.url}`,
-          subscribersCount: child.data.subscribers || 0,
-          growthPerWeek: Math.floor(Math.random() * 1000),
-          growthPerMonth: Math.floor(Math.random() * 4000),
-        }));
-      }
-
-
+  
       const activeKeywords = activeTab === 'popular' ? keywords : 
-      activeTab === 'trending' ? competitorKeywords : [];
-
-if (activeKeywords.length > 0) {
-mappedCommunities = await searchWithKeywords(mappedCommunities, activeKeywords);
-}
-
-setCommunities(mappedCommunities);
-
-      setDisplayedCommunities(mappedCommunities.slice(0, 20));
+                            activeTab === 'trending' ? competitorKeywords : [];
+  
+                            if (searchMode === 'fetch' && activeKeywords.length > 0) {
+                              const searchResults = await Promise.all(selectedKeywords.map(keyword =>
+                                fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=25&sort=relevance&t=month`)
+                                  .then(res => {
+                                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                                    return res.json();
+                                  })
+                                  .then(data => data.data.children.map(child => ({
+                                    id: child.data.id,
+                                    title: child.data.title,
+                                    url: `https://reddit.com${child.data.permalink}`,
+                                    author: child.data.author,
+                                    score: child.data.score,
+                                    numComments: child.data.num_comments,
+                                    created: new Date(child.data.created_utc * 1000).toLocaleDateString(),
+                                    subreddit: child.data.subreddit,
+                                    selftext: child.data.selftext
+                                  })))
+                              ));
+                              
+                              const flattenedResults = searchResults.flat();
+                              setPosts(flattenedResults);
+                              setAnalyzedPosts(flattenedResults);
+                            
+      } else {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+  
+        let mappedCommunities;
+        if (tab === 'trending') {
+          mappedCommunities = data.subreddit_names.map(name => ({
+            id: name,
+            name: name,
+            url: `https://reddit.com/r/${name}`,
+            subscribersCount: 0,
+            growthPerWeek: 0,
+            growthPerMonth: 0,
+          }));
+        } else {
+          if (!data || !data.data || !data.data.children) {
+            throw new Error('Unexpected data structure from Reddit API');
+          }
+          mappedCommunities = data.data.children.map(child => ({
+            id: child.data.id,
+            name: child.data.display_name,
+            url: `https://reddit.com${child.data.url}`,
+            subscribersCount: child.data.subscribers || 0,
+            growthPerWeek: Math.floor(Math.random() * 1000),
+            growthPerMonth: Math.floor(Math.random() * 4000),
+          }));
+  
+          if (activeKeywords.length > 0) {
+            mappedCommunities = await searchWithKeywords(mappedCommunities, activeKeywords);
+          }
+        }
+  
+        setCommunities(mappedCommunities);
+        setDisplayedCommunities(mappedCommunities.slice(0, 20));
+      }
       setPage(1);
     } catch (err) {
-      setError(`Failed to fetch data from Reddit API: ${err.message}`);
-      setErrorMessage(`Failed to fetch data from Reddit API: ${err.message}`);
+      setError(`Failed to fetch data: ${err.message}`);
+      setErrorMessage(`Failed to fetch data: ${err.message}`);
       console.error('Error fetching data:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const highlightKeywords = (text, keywords) => {
+    if (!keywords.length || !text) return text;
+    
+    const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
+    return text.split(regex).map((part, i) => 
+      keywords.some(kw => part.toLowerCase() === kw.toLowerCase()) 
+        ? <mark key={i} className="bg-yellow-200">{part}</mark> 
+        : part
+    );
   };
 
   const generatePostIdeas = async (posts) => {
@@ -1250,7 +1288,14 @@ Generate a natural, engaging comment that someone would actually write on Reddit
     setError(null);
     setErrorMessage(null);
     try {
-      const response = await fetch(`https://www.reddit.com/r/${subreddit}/hot.json?limit=10`);
+      let endpoint;
+      if (searchMode === 'fetch' && selectedKeywords.length > 0) {
+        endpoint = `https://www.reddit.com/search.json?q=${encodeURIComponent(selectedKeywords[0])}+subreddit:${subreddit}&limit=25&sort=relevance&t=month`;
+      } else {
+        endpoint = `https://www.reddit.com/r/${subreddit}/hot.json?limit=25`;
+      }
+  
+      const response = await fetch(endpoint);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -1269,7 +1314,12 @@ Generate a natural, engaging comment that someone would actually write on Reddit
         selftext: child.data.selftext,
         subreddit: child.data.subreddit
       }));
+      
       setPosts(fetchedPosts);
+      if (fetchedPosts.length > 0) {
+        const analyzedPostsData = await Promise.all(fetchedPosts.map(analyzePostContent));
+        setAnalyzedPosts(analyzedPostsData);
+      }
     } catch (err) {
       setError(`Failed to fetch posts for r/${subreddit}: ${err.message}`);
       setErrorMessage(`Failed to fetch posts for r/${subreddit}: ${err.message}`);
@@ -1419,7 +1469,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
         </div>
 
         <div className='bg-gray-50 border p-2 sm:p-4'>
-          
+
           {activeTab !== 'groups' && (
             <div className="mb-4 sm:mb-6 relative">
               <input
@@ -1488,21 +1538,21 @@ Generate a natural, engaging comment that someone would actually write on Reddit
                 </h6>
 
                 <div className='flex gap-4'>
-                <button
-    onClick={() => setShowKeywordsModal(true)}
-    className="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
-                >
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Keywords
-                </button>
+                  <button
+                    onClick={() => setShowKeywordsModal(true)}
+                    className="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                  >
+                    <Search className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    Tracked Keywords
+                  </button>
 
-                <button
-                  onClick={() => setShowGroupPopup(true)}
-                  className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
-                >
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Create Group
-                </button>
+                  <button
+                    onClick={() => setShowGroupPopup(true)}
+                    className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                  >
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    Create Group
+                  </button>
                 </div>
 
               </div>
@@ -1553,60 +1603,27 @@ Generate a natural, engaging comment that someone would actually write on Reddit
                 Back to {activeTab === 'groups' ? 'Groups' : 'Communities'}
               </button>
               {selectedGroup ? (
-  <div>
-    <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
-      {selectedGroup.name} Group
-    </h2>
-    <div className="flex items-center gap-4 mb-4">
-      <div className="flex-grow flex flex-wrap gap-2">
-        {selectedGroup.subreddits.map((subreddit) => (
-          <a
-            key={subreddit.id}
-            href={`https://reddit.com/r/${subreddit.name}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm hover:bg-blue-200 transition-colors duration-200 flex items-center"
-          >
-            r/{subreddit.name}
-            <ExternalLink className="w-3 h-3 ml-1 inline-block" />
-          </a>
-        ))}
-      </div>
-      <div className="flex items-center gap-2">
-        <select 
-          className="px-3 py-2 border rounded text-sm"
-          onChange={(e) => {
-            const [type, value] = e.target.value.split('|');
-            setKeywordType(type);
-            setSelectedKeywords(value ? [value] : []);
-          }}
-          value={selectedKeywords.length ? `${keywordType}|${selectedKeywords[0]}` : ''}
-        >
-          <option value="">Filter by keyword...</option>
-          <optgroup label="My Keywords">
-            {keywords.map((keyword, index) => (
-              <option key={index} value={`own|${keyword}`}>{keyword}</option>
-            ))}
-          </optgroup>
-          <optgroup label="Competitor Keywords">
-            {competitorKeywords.map((keyword, index) => (
-              <option key={`comp-${index}`} value={`competitor|${keyword}`}>{keyword}</option>
-            ))}
-          </optgroup>
-        </select>
-        {selectedKeywords.length > 0 && (
-          <button
-            onClick={() => {
-              setSelectedKeywords([]);
-              setKeywordType('own');
-            }}
-            className="p-1 hover:bg-gray-100 rounded"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
-    </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+                    {selectedGroup.name} Group
+                  </h2>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex-grow flex flex-wrap gap-2">
+                      {selectedGroup.subreddits.map((subreddit) => (
+                        <a
+                          key={subreddit.id}
+                          href={`https://reddit.com/r/${subreddit.name}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm hover:bg-blue-200 transition-colors duration-200 flex items-center"
+                        >
+                          r/{subreddit.name}
+                          <ExternalLink className="w-3 h-3 ml-1 inline-block" />
+                        </a>
+                      ))}
+                    </div>
+
+                  </div>
                 </div>
               ) : (
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
@@ -1628,6 +1645,79 @@ Generate a natural, engaging comment that someone would actually write on Reddit
                   </button>
                 ))}
               </div>
+
+
+              <div className="mb-4">
+  <label className='font-bold text-sm mb-2 block'>Search Keywords</label>
+  <div className='flex flex-col gap-2'>
+    <div className="flex gap-2">
+      <select
+        className="px-3 py-2 border rounded text-sm flex-1"
+        value={searchMode}
+        onChange={(e) => setSearchMode(e.target.value)}
+      >
+        <option value="latest">Search in latest posts</option>
+        <option value="fetch">Fetch posts with keywords</option>
+      </select>
+      {searchMode === 'fetch' && (
+        <button
+          onClick={() => {
+            setLoading(true);
+            setPosts([]);
+            setAnalyzedPosts([]);
+            fetchSubredditPosts(selectedSubreddit?.name);
+          }}
+          disabled={loading}
+          className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+        >
+          <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        </button>
+      )}
+    </div>
+    
+    <div className='flex gap-4'>
+      <select 
+        className="flex-1 px-3 py-2 border rounded text-sm"
+        onChange={(e) => {
+          const [type, value] = e.target.value.split('|');
+          setKeywordType(type);
+          setSelectedKeywords(value ? [value] : []);
+          if (searchMode === 'fetch') {
+            setLoading(true);
+            setPosts([]);
+            setAnalyzedPosts([]);
+            fetchSubredditPosts(selectedSubreddit?.name);
+          }
+        }}
+        value={selectedKeywords.length ? `${keywordType}|${selectedKeywords[0]}` : ''}
+      >
+        <option value="">Filter by keyword...</option>
+        <optgroup label="My Keywords">
+          {keywords.map((keyword, index) => (
+            <option key={index} value={`own|${keyword}`}>{keyword}</option>
+          ))}
+        </optgroup>
+        <optgroup label="Competitor Keywords">
+          {competitorKeywords.map((keyword, index) => (
+            <option key={`comp-${index}`} value={`competitor|${keyword}`}>{keyword}</option>
+          ))}
+        </optgroup>
+      </select>
+      {selectedKeywords.length > 0 && (
+        <button
+          onClick={() => {
+            setSelectedKeywords([]);
+            setKeywordType('own');
+          }}
+          className="p-1 bg-red-200 text-white hover:bg-red-500 rounded"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
               {isAnalyzing && (
                 <div className="text-center p-4">
                   <RefreshCcw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-500 mx-auto" />
@@ -1642,60 +1732,65 @@ Generate a natural, engaging comment that someone would actually write on Reddit
 
                       .filter(post => {
                         const matchesFilter = activeFilter === 'all' || (post.categories && post.categories.includes(activeFilter));
-                        const matchesKeyword = selectedKeywords.length === 0 || selectedKeywords.some(keyword => 
+                        const matchesKeyword = selectedKeywords.length === 0 || selectedKeywords.some(keyword =>
                           (post.title + ' ' + post.selftext).toLowerCase().includes(keyword.toLowerCase())
                         );
                         return matchesFilter && matchesKeyword;
                       })
 
                       .map((post) => (
-                        <li key={post.id} className="bg-white rounded-lg shadow p-3 sm:p-4">
-                          <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
-                            <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
-                              <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
-                              <span>
-                                <b className='text-blue-300'>Relevance Score : <span className='text-blue-600'>{post.relevancyScore || 0}</span>/100</b>
-                                &nbsp; {post.created}
-                              </span>
-                            </div>
-                            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">{post.title}</h3>
-                            {post.relevancyExplanation && (
-                              <div className="mb-2">
-                                <b className='text-blue-500 font-bold'>Why Relevant: </b>
-                                <span className="text-xs sm:text-sm text-gray-500">{post.relevancyExplanation}</span>
-                              </div>
-                            )}
-                            {post.summary && (
-                              <p className="text-xs sm:text-sm text-gray-500 mb-2">{post.summary}</p>
-                            )}
-                            {post.categories && (
-                              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-                                {post.categories.map((category, index) => (
-                                  <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                                    {category}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                            {post.keywords && (
-                              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-                                {post.keywords.slice(0, 5).map((keyword, index) => (
-                                  <span key={index} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
-                                    {keyword}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                            <div className="flex items-center text-xs sm:text-sm text-gray-500">
-                              <span className="mr-4 flex items-center">
-                                <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.score}
-                              </span>
-                              <span className="flex items-center">
-                                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.numComments}
-                              </span>
-                            </div>
-                          </button>
-                        </li>
+<li key={post.id} className="bg-white rounded-lg shadow p-3 sm:p-4">
+  <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
+    <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
+      <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
+      <span>
+        <b className='text-blue-300'>Relevance Score : <span className='text-blue-600'>{post.relevancyScore || 0}</span>/100</b>
+        &nbsp; {post.created}
+      </span>
+    </div>
+    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
+      {highlightKeywords(post.title, selectedKeywords)}
+    </h3>
+    {post.selftext && (
+      <p className="text-sm text-gray-600 mb-2">
+        {highlightKeywords(post.selftext.slice(0, 300), selectedKeywords)}
+        {post.selftext.length > 300 && '...'}
+      </p>
+    )}
+    {post.relevancyExplanation && (
+      <div className="mb-2 bg-blue-50 p-4 rounded-md border border-blue-200 shadow-lg">
+        <b className='text-blue-500 font-bold'>Why Relevant: </b>
+        <span className="text-xs sm:text-sm text-gray-500">{post.relevancyExplanation}</span>
+      </div>
+    )}
+    {post.categories && (
+      <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+        {post.categories.map((category, index) => (
+          <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+            {category}
+          </span>
+        ))}
+      </div>
+    )}
+    {post.keywords && (
+      <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+        {post.keywords.slice(0, 5).map((keyword, index) => (
+          <span key={index} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
+            {keyword}
+          </span>
+        ))}
+      </div>
+    )}
+    <div className="flex items-center text-xs sm:text-sm text-gray-500">
+      <span className="mr-4 flex items-center">
+        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.score}
+      </span>
+      <span className="flex items-center">
+        <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.numComments}
+      </span>
+    </div>
+  </button>
+</li>
                       ))}
                   </ul>
                 </>
@@ -1746,112 +1841,112 @@ Generate a natural, engaging comment that someone would actually write on Reddit
 
 
       {showKeywordsModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Manage Keywords</h2>
-        <button onClick={() => setShowKeywordsModal(false)} className="text-gray-500">
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      <div className="mb-6">
-        <h3 className="font-semibold mb-2">My Keywords</h3>
-        <div className="flex flex-wrap gap-2 mb-2">
-          {keywords.map((keyword, index) => (
-            <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
-              {keyword}
-              <button
-                onClick={() => {
-                  const newKeywords = keywords.filter((_, i) => i !== index);
-                  setKeywords(newKeywords);
-                  localStorage.setItem('redditKeywords', JSON.stringify(newKeywords));
-                }}
-                className="ml-2 text-blue-600 hover:text-blue-800"
-              >
-                <X className="w-4 h-4" />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Manage Keywords</h2>
+              <button onClick={() => setShowKeywordsModal(false)} className="text-gray-500">
+                <X className="w-5 h-5" />
               </button>
-            </span>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={keywordsInput}
-            onChange={(e) => setKeywordsInput(e.target.value)}
-            placeholder="Add keyword..."
-            className="flex-grow px-3 py-2 border rounded"
-          />
-          <button
-            onClick={() => {
-              if (keywordsInput.trim()) {
-                const newKeywords = [...keywords, keywordsInput.trim()];
-                setKeywords(newKeywords);
-                localStorage.setItem('redditKeywords', JSON.stringify(newKeywords));
-                setKeywordsInput('');
-              }
-            }}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Add
-          </button>
-        </div>
-      </div>
+            </div>
 
-      <div className="mb-6">
-        <h3 className="font-semibold mb-2">Competitor Keywords</h3>
-        <div className="flex flex-wrap gap-2 mb-2">
-          {competitorKeywords.map((keyword, index) => (
-            <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
-              {keyword}
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2">My Keywords</h3>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {keywords.map((keyword, index) => (
+                  <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
+                    {keyword}
+                    <button
+                      onClick={() => {
+                        const newKeywords = keywords.filter((_, i) => i !== index);
+                        setKeywords(newKeywords);
+                        localStorage.setItem('redditKeywords', JSON.stringify(newKeywords));
+                      }}
+                      className="ml-2 text-blue-600 hover:text-blue-800"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={keywordsInput}
+                  onChange={(e) => setKeywordsInput(e.target.value)}
+                  placeholder="Add keyword..."
+                  className="flex-grow px-3 py-2 border rounded"
+                />
+                <button
+                  onClick={() => {
+                    if (keywordsInput.trim()) {
+                      const newKeywords = [...keywords, keywordsInput.trim()];
+                      setKeywords(newKeywords);
+                      localStorage.setItem('redditKeywords', JSON.stringify(newKeywords));
+                      setKeywordsInput('');
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2">Competitor Keywords</h3>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {competitorKeywords.map((keyword, index) => (
+                  <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
+                    {keyword}
+                    <button
+                      onClick={() => {
+                        const newKeywords = competitorKeywords.filter((_, i) => i !== index);
+                        setCompetitorKeywords(newKeywords);
+                        localStorage.setItem('redditCompetitorKeywords', JSON.stringify(newKeywords));
+                      }}
+                      className="ml-2 text-green-600 hover:text-green-800"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={competitorKeywordsInput}
+                  onChange={(e) => setCompetitorKeywordsInput(e.target.value)}
+                  placeholder="Add competitor keyword..."
+                  className="flex-grow px-3 py-2 border rounded"
+                />
+                <button
+                  onClick={() => {
+                    if (competitorKeywordsInput.trim()) {
+                      const newKeywords = [...competitorKeywords, competitorKeywordsInput.trim()];
+                      setCompetitorKeywords(newKeywords);
+                      localStorage.setItem('redditCompetitorKeywords', JSON.stringify(newKeywords));
+                      setCompetitorKeywordsInput('');
+                    }
+                  }}
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
               <button
-                onClick={() => {
-                  const newKeywords = competitorKeywords.filter((_, i) => i !== index);
-                  setCompetitorKeywords(newKeywords);
-                  localStorage.setItem('redditCompetitorKeywords', JSON.stringify(newKeywords));
-                }}
-                className="ml-2 text-green-600 hover:text-green-800"
+                onClick={() => setShowKeywordsModal(false)}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
-                <X className="w-4 h-4" />
+                Done
               </button>
-            </span>
-          ))}
+            </div>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={competitorKeywordsInput}
-            onChange={(e) => setCompetitorKeywordsInput(e.target.value)}
-            placeholder="Add competitor keyword..."
-            className="flex-grow px-3 py-2 border rounded"
-          />
-          <button
-            onClick={() => {
-              if (competitorKeywordsInput.trim()) {
-                const newKeywords = [...competitorKeywords, competitorKeywordsInput.trim()];
-                setCompetitorKeywords(newKeywords);
-                localStorage.setItem('redditCompetitorKeywords', JSON.stringify(newKeywords));
-                setCompetitorKeywordsInput('');
-              }
-            }}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            Add
-          </button>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <button
-          onClick={() => setShowKeywordsModal(false)}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Done
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {showGroupPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1880,7 +1975,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
               <Search className="w-4 h-4 sm:w-5 sm:h-5 absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
 
-            
+
             <div className="bg-white rounded-lg shadow overflow-x-auto mb-4">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-gray-50">

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, TrendingUp, Search, Bell, ChevronDown, Shapes } from 'lucide-react';
+import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, TrendingUp, Search, Bell, ChevronDown, Shapes, Book,Settings2,DollarSignIcon,Chrome, Handshake, Heart } from 'lucide-react';
 import Reddit_hub from './dashboard_pages/Reddit_hub';
 import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
@@ -83,6 +83,12 @@ export default function Dashboard() {
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
+    { icon: Book, label: 'How to Use', id: 'how-to-use' },
+    { icon: Settings2, label: 'Settings', id: 'settings' },
+    { icon: DollarSignIcon, label: 'Billing', id: 'billing', showPlan: true },
+    { icon: Chrome, label: 'Install Extension', id: 'get-scratch' },
+    { icon: Handshake, label: 'Affiliate', id: 'apply-affiliate' },
+    { icon: Heart, label: 'Love ur Feedback', id: 'feedback' },
   ];
 
   const handleConfigureTrainingData = () => {

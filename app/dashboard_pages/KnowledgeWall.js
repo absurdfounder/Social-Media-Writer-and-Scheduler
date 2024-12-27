@@ -18,8 +18,12 @@ const EmbedContent = ({ url }) => {
     try {
       const urlObj = new URL(url);
       
-      if (urlObj.hostname.includes('twitter.com')) {
+      if (urlObj.hostname.includes('twitter.com') || urlObj.hostname.includes('x.com')) {
         setEmbedType('twitter');
+        // Convert x.com URLs to twitter.com
+        const updatedUrl = url.replace('x.com', 'twitter.com');
+        // Pass the updated URL to the TwitterEmbed component
+        setEmbedUrl(updatedUrl);
       } else if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
         setEmbedType('youtube');
       } else if (urlObj.hostname.includes('vimeo.com')) {

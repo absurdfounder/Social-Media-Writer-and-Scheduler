@@ -20,6 +20,8 @@ const EmbedContent = ({ url }) => {
       
       if (urlObj.hostname.includes('twitter.com') || urlObj.hostname.includes('x.com')) {
         setEmbedType('twitter');
+      } else if (urlObj.hostname.includes('instagram.com')) {
+        setEmbedType('instagram');
       } else if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
         setEmbedType('youtube');
       } else if (urlObj.hostname.includes('vimeo.com')) {
@@ -56,6 +58,9 @@ const EmbedContent = ({ url }) => {
     switch (embedType) {
       case 'twitter':
         return <TwitterEmbed url={url} />;
+        
+      case 'instagram':
+        return <InstagramEmbed url={url} />;
       
       case 'youtube':
         const youtubeId = getYoutubeId(url);
@@ -130,6 +135,61 @@ const EmbedContent = ({ url }) => {
 };
 
 // Twitter embed component
+// Instagram embed component
+const InstagramEmbed = ({ url }) => {
+  useEffect(() => {
+    // Remove any existing Instagram script
+    const existingScript = document.querySelector('script[src="//www.instagram.com/embed.js"]');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Add new Instagram script
+    const script = document.createElement('script');
+    script.src = '//www.instagram.com/embed.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    // Call window.instgrm.Embeds.process() after script loads
+    script.onload = () => {
+      if (window.instgrm) {
+        window.instgrm.Embeds.process();
+      }
+    };
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, [url]);
+
+  // Extract post ID from Instagram URL
+  const getInstagramPostId = (url) => {
+    try {
+      const urlObj = new URL(url);
+      const path = urlObj.pathname.split('/');
+      return path[2] || path[1]; // Handle both /p/postId and /postId formats
+    } catch (err) {
+      return null;
+    }
+  };
+
+  const postId = getInstagramPostId(url);
+
+  return (
+    <div className="w-full rounded-lg instagram-embed">
+      <blockquote
+        className="instagram-media"
+        data-instgrm-permalink={url}
+        data-instgrm-version="14"
+      >
+        <a href={url}>Loading Instagram post...</a>
+      </blockquote>
+    </div>
+  );
+};
+
 const TwitterEmbed = ({ url }) => {
   useEffect(() => {
     // Remove any existing Twitter script
@@ -162,15 +222,22 @@ const TwitterEmbed = ({ url }) => {
 };
 
 // Tag Summary Component
-const TagSummary = ({ tags }) => {
+const TagSummary = ({ tags, selectedTags, onTagClick }) => {
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold mb-4">My Knowledge Wall</h2>
       <div className="flex flex-wrap gap-4">
         {Object.entries(tags).map(([tag, count]) => (
-          <span key={tag} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center">
-            {tag} <span className="ml-2 bg-blue-200 rounded-full px-2">{count}</span>
-          </span>
+          <button
+            key={tag}
+            onClick={() => onTagClick(tag)}
+            className={`px-3 py-1 rounded-full text-sm flex items-center transition-colors
+              ${selectedTags.includes(tag) 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'}`}
+          >
+            {tag} <span className={`ml-2 ${selectedTags.includes(tag) ? 'bg-blue-400' : 'bg-blue-200'} rounded-full px-2`}>{count}</span>
+          </button>
         ))}
       </div>
     </div>
@@ -316,7 +383,6 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
     </div>
   );
 };
-
 // Add Content Form Component
 const AddContentForm = ({ onAdd }) => {
   const [url, setUrl] = useState('');
@@ -345,7 +411,7 @@ const AddContentForm = ({ onAdd }) => {
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter URL to embed (Twitter, YouTube, Vimeo, Images, etc.)"
+          placeholder="Enter URL to embed (Twitter, Instagram, YouTube, Vimeo, Images, etc.)"
           className="flex-grow px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
           disabled={isLoading}
         />
@@ -360,34 +426,6 @@ const AddContentForm = ({ onAdd }) => {
         </button>
       </div>
     </form>
-  );
-};
-
-// Confirm Dialog Component
-const ConfirmDialog = ({ isOpen, onClose, onConfirm, message }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl">
-        <h2 className="text-xl font-bold mb-4">Confirm Action</h2>
-        <p className="mb-6">{message}</p>
-        <div className="flex justify-end space-x-4">
-          <button 
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-          >
-            Cancel
-          </button>
-          <button 
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
   );
 };
 
@@ -463,6 +501,7 @@ const ContentCard = ({ url, note: initialNote, tags: initialTags, onTagsChange, 
 const ContentGrid = () => {
   const [contents, setContents] = useState([]);
   const [tagSummary, setTagSummary] = useState({});
+  const [selectedTags, setSelectedTags] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
   const auth = getAuth();
@@ -505,7 +544,8 @@ const ContentGrid = () => {
           { url: 'https://twitter.com/trunarla/status/1817988695167025597', note: 'Record daily shorts like this... ', tags: ['Video', 'Inspiration'] },
           { url: 'https://twitter.com/mikeginleyseo/status/1822732460397932808', note: 'Record raw video intro like this', tags: ['Video', 'SEO'] },
           { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', note: 'Example YouTube video', tags: ['Video', 'Example'] },
-          { url: 'https://vimeo.com/148751763', note: 'Example Vimeo video', tags: ['Video', 'Example'] }
+          { url: 'https://vimeo.com/148751763', note: 'Example Vimeo video', tags: ['Video', 'Example'] },
+          { url: 'https://www.instagram.com/p/C0KqoNPL5Hy', note: 'Example Instagram post', tags: ['Social', 'Example'] }
         ];
         await saveContents(defaultContents);
         setContents(defaultContents);
@@ -551,6 +591,22 @@ const ContentGrid = () => {
       });
     });
     setTagSummary(summary);
+  };
+
+  const handleTagClick = (tag) => {
+    setSelectedTags(prev => 
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const getFilteredContents = () => {
+    if (selectedTags.length === 0) return contents;
+    
+    return contents.filter(content =>
+      selectedTags.every(tag => content.tags.includes(tag))
+    );
   };
 
   const handleTagsChange = (index, newTags) => {
@@ -621,7 +677,11 @@ const ContentGrid = () => {
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="container mx-auto p-8 bg-gray-100 min-h-screen">
         <AddContentForm onAdd={handleAddContent} />
-        <TagSummary tags={tagSummary} />
+        <TagSummary 
+          tags={tagSummary}
+          selectedTags={selectedTags}
+          onTagClick={handleTagClick}
+        />
         
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
@@ -635,7 +695,7 @@ const ContentGrid = () => {
                 ref={provided.innerRef}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               >
-                {contents.map((content, index) => (
+                {getFilteredContents().map((content, index) => (
                   <ContentCard
                     key={`content-${index}`}
                     index={index}

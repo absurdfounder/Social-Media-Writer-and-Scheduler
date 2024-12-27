@@ -14,13 +14,25 @@ const EmbedContent = ({ url }) => {
     determineEmbedType(url);
   }, [url]);
 
-  const determineEmbedType = (url) => {
+  const convertXToTwitterUrl = (url) => {
     try {
       const urlObj = new URL(url);
+      if (urlObj.hostname === 'x.com') {
+        return url.replace('x.com', 'twitter.com');
+      }
+      return url;
+    } catch (err) {
+      return url;
+    }
+  };
+
+  const determineEmbedType = (url) => {
+    try {
+      const convertedUrl = convertXToTwitterUrl(url);
+      const urlObj = new URL(convertedUrl);
       
       if (urlObj.hostname.includes('twitter.com') || urlObj.hostname.includes('x.com')) {
         setEmbedType('twitter');
-        url = url.replace('x.com', 'twitter.com');
       } else if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
         setEmbedType('youtube');
       } else if (urlObj.hostname.includes('vimeo.com')) {
@@ -54,9 +66,11 @@ const EmbedContent = ({ url }) => {
   };
 
   const renderEmbed = () => {
+    const convertedUrl = convertXToTwitterUrl(url);
+    
     switch (embedType) {
       case 'twitter':
-        return <TwitterEmbed url={url} />;
+        return <TwitterEmbed url={convertedUrl} />;
       
       case 'youtube':
         const youtubeId = getYoutubeId(url);

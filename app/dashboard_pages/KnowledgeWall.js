@@ -14,22 +14,9 @@ const EmbedContent = ({ url }) => {
     determineEmbedType(url);
   }, [url]);
 
-  const convertXToTwitterUrl = (url) => {
-    try {
-      const urlObj = new URL(url);
-      if (urlObj.hostname === 'x.com') {
-        return url.replace('x.com', 'twitter.com');
-      }
-      return url;
-    } catch (err) {
-      return url;
-    }
-  };
-
   const determineEmbedType = (url) => {
     try {
-      const convertedUrl = convertXToTwitterUrl(url);
-      const urlObj = new URL(convertedUrl);
+      const urlObj = new URL(url);
       
       if (urlObj.hostname.includes('twitter.com') || urlObj.hostname.includes('x.com')) {
         setEmbedType('twitter');
@@ -66,11 +53,9 @@ const EmbedContent = ({ url }) => {
   };
 
   const renderEmbed = () => {
-    const convertedUrl = convertXToTwitterUrl(url);
-    
     switch (embedType) {
       case 'twitter':
-        return <TwitterEmbed url={convertedUrl} />;
+        return <TwitterEmbed url={url} />;
       
       case 'youtube':
         const youtubeId = getYoutubeId(url);
@@ -483,6 +468,19 @@ const ContentGrid = () => {
   const auth = getAuth();
   const db = getFirestore();
 
+  const convertXToTwitterUrl = (url) => {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname === 'x.com') {
+        urlObj.hostname = 'twitter.com';
+        return urlObj.toString();
+      }
+      return url;
+    } catch (err) {
+      return url;
+    }
+  };
+
   useEffect(() => {
     if (auth.currentUser) {
       loadContents();
@@ -568,7 +566,8 @@ const ContentGrid = () => {
   };
 
   const handleAddContent = async (url) => {
-    const newContents = [...contents, { url, note: '', tags: [] }];
+    const convertedUrl = convertXToTwitterUrl(url);
+    const newContents = [...contents, { url: convertedUrl, note: '', tags: [] }];
     const success = await saveContents(newContents);
     if (success) {
       setContents(newContents);

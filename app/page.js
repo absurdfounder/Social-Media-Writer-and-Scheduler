@@ -458,6 +458,7 @@ export default function Dashboard() {
 
           {/* Bottom navigation */}
           <div className="px-6 space-y-1 mb-8">
+            <ApiKeyManager/>
             {bottomNavItems.map((item) => (
               <NavItem
                 key={item.id}

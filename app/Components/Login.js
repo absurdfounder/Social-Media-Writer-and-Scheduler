@@ -279,7 +279,7 @@ export const Login = () => {
                   className="w-8 h-8 rounded-full"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
                   {user.displayName?.charAt(0) || user.email?.charAt(0)}
                 </div>
               )}

@@ -139,7 +139,7 @@ const ApiKeyManager = () => {
   };
 
   return (
-    <div className="px-4">
+    <div>
       <button
         onClick={() => setIsOpen(true)}
         className="flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 text-gray-500 hover:bg-gray-100"
@@ -159,12 +159,13 @@ const ApiKeyManager = () => {
             </button>
 
             <h2 className="text-xl font-bold">API Key Management</h2>
+            <p className='text-sm opacity-50'>All keys are encrypted.</p>
 
             <div className="space-y-4">
               <div>
-                <div className='flex gap-4'>
-                  <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-12 h-12" />
-                  <label className="block text-sm font-medium text-gray-700">Open API Key</label>
+                <div className='flex'>
+                  <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-8 h-8" />
+                  <label className="block text-sm font-medium text-gray-700 text-center m-auto mx-0">Open API Key</label>
                 </div>
                 <div className="relative">
                   <input
@@ -192,9 +193,9 @@ const ApiKeyManager = () => {
               </div>
 
               <div>
-                <div className='flex gap-4'>
-                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtUnGYPe67wuzVDjTujZ21UV38Y6KQ290fow&s" className="w-12 h-12" />
-                  <label className="block text-sm font-medium text-gray-700">Anthropic API Key</label>
+                <div className='flex'>
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtUnGYPe67wuzVDjTujZ21UV38Y6KQ290fow&s" className="w-8 h-8" />
+                  <label className="block text-sm font-medium text-gray-700 text-center m-auto mx-0">Anthropic API Key</label>
                 </div>
                 <div className="relative">
                   <input
@@ -225,9 +226,9 @@ const ApiKeyManager = () => {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleRemoveKeys}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-4 py-2 bg-red-200 text-red-600 rounded hover:bg-red-600"
               >
-                Remove
+                Delete Keys
               </button>
               <div className="space-x-2">
                 <button
@@ -235,7 +236,7 @@ const ApiKeyManager = () => {
                   disabled={loading}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
                 >
-                  {loading ? 'Saving...' : 'Save'}
+                  {loading ? 'Saving...' : 'Update Keys'}
                 </button>
               </div>
             </div>

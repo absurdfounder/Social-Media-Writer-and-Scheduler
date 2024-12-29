@@ -223,6 +223,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
 import Reddit_hub from './dashboard_pages/Reddit_hub';
 import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
+import MemeEditor from './dashboard_pages/MemeEditor';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
 import CollectionThisWeek from './dashboard_pages/CollectionThisWeek';
@@ -323,6 +324,7 @@ export default function Dashboard() {
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
+    { icon: Shapes, label: 'Meme Editor', id: 'MemeEditor' },
   ];
 
   const bottomNavItems = [
@@ -395,6 +397,8 @@ export default function Dashboard() {
         return <KnowledgeWall />;
       case 'BrandTraning':
         return <BrandTraning />;
+        case 'MemeEditor':
+          return <MemeEditor />;        
       default:
         return <div className="text-center text-gray-500">Select a tab</div>;
     }

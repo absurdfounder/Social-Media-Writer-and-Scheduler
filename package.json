@@ -22,6 +22,7 @@
     "@tiptap/starter-kit": "^2.5.8",
     "canvas": "^2.11.2",
     "cheerio": "^1.0.0-rc.12",
+    "fabric": "^5.5.1",
     "firebase": "^11.0.2",
     "framer-motion": "^11.11.17",
     "lucide-react": "^0.417.0",

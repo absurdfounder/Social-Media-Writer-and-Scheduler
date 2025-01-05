@@ -501,6 +501,8 @@ Add personality markers:
 - State of mind ("3 coffees into debugging this same issue")
 
       
+NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARIETY
+
       Examples for this style:
       ${selectedLength.examples.join('\n')}
       

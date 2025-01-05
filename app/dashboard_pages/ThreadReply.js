@@ -469,8 +469,37 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
       - Add value through experience or insight
       - Keep it casual like talking to a friend
       - Use minimal punctuation
-      - Start with reactions like "hmm" "ah" "actually" occasionally
       - No line breaks needed
+
+Reply Guidelines:
+- Start with reactive phrases ("Oh man", "Wait what", "Been there")
+- Share quick personal experiences
+- Add supportive elements for struggles
+- Keep it casual but insightful
+- Use natural flow and timing
+
+Reply Structures Based on Length:
+
+Super Short (under 120 chars):
+- Quick reactions ("literally did this yesterday")
+- Supportive comments ("the localhost struggles are real")
+- Brief shared experiences ("took me 6 months to learn this")
+
+Medium (1-2 sentences):
+- Quick story ("reminds me of when I broke prod doing exactly this")
+- Relatable moment ("my docker containers are feeling very seen right now")
+- Friendly advice ("quick tip: found that using X saves tons of time here")
+
+Detailed (2-3 sentences):
+- Mini experience share ("ok so funny story about this - last week I...")
+- Expanded perspective ("actually discovered something similar when...")
+- Helpful context ("been working with this pattern for a while and...")
+
+Add personality markers:
+- Time references ("currently doing this exact thing")
+- Location context ("writing this from my error log screen")
+- State of mind ("3 coffees into debugging this same issue")
+
       
       Examples for this style:
       ${selectedLength.examples.join('\n')}
@@ -589,6 +618,9 @@ You are an indie founder building your audience and personal brand on Twitter wh
       Video: [https://placehold.co/1920x1080.mp4?text=Journey+to+First+Customer]<br>
       /endtweet
   
+
+
+
       When generating tweets, always follow this structure:
       1. Strong opening statement
       2. Use <br> for line breaks between sections
@@ -597,11 +629,19 @@ You are an indie founder building your audience and personal brand on Twitter wh
       6. Include relevant media suggestion
       7. Close with /endtweet
   
-      Remember:
-      - No emojis
-      - Concise, impactful language
-      - Focus on personal experiences and lessons learned
-      - Always provide value to the audience
+
+Remember:
+- Write like you're messaging a friend
+- Include those "oh wait" moments and self-corrections
+- Share the messy parts of development
+- Let your personality show through
+- Keep it technical but relatable
+
+If the tweet involves code or technical concepts:
+- Add real-world context ("Found this while debugging our payment system")
+- Include specific problems ("Kept getting that weird AWS timeout")
+- Share actual mistakes ("Forgot to increment the loop... classic")
+- Add time references ("Spent 3 hours before realizing...")
   
       # IMPORTANT: DO NOT USE EMOJIS IN ANY TWEETS
   
@@ -965,76 +1005,58 @@ Copy- Style guide creation
     }
   };
 
-  const getFeelingPrompt = (feeling) => {
-    const feelingPrompts = {
-      curiosity: {
-        prompt: "Share a thought-provoking question or observation that makes people think. Start with 'Ever wonder why...' or 'What if...'",
-        examples: [
-          "Ever wonder why some startups take off instantly while others struggle? Here's what I discovered:",
-          "What if the traditional advice about [topic] is completely wrong? 🤔"
-        ]
-      },
-      insight: {
-        prompt: "Share a surprising learning or realization from your experience. Use 'Just realized...' or 'Plot twist:'",
-        examples: [
-          "Just realized after 5 years of building: The hardest part isn't the code, it's...",
-          "Plot twist: The 'best practices' everyone follows? They might be holding you back."
-        ]
-      },
-      authenticity: {
-        prompt: "Share an honest, behind-the-scenes moment or challenge you're facing. Start with 'Real talk:' or 'Behind the scenes:'",
-        examples: [
-          "Real talk: Just spent 3 hours debugging what turned out to be a typo. We all have these days",
-          "Behind the scenes: Here's what running a startup actually looks like..."
-        ]
-      },
-      achievement: {
-        prompt: "Share a milestone or win, but keep it humble and focus on the learning. Lead with 'Small win:' or 'Milestone reached:'",
-        examples: [
-          "Small win: Hit 100 users today! Here's what worked (and what didn't):",
-          "Milestone reached: First paying customer! Lessons learned:"
-        ]
-      },
-      helpful: {
-        prompt: "Share a practical tip or solution to a common problem. Use 'Quick tip:' or 'Solved:'",
-        examples: [
-          "Quick tip: Found a way to cut my deployment time in half. Here's how:",
-          "Solved: That annoying problem with [common issue]. The fix is surprisingly simple:"
-        ]
-      },
-      reflection: {
-        prompt: "Share insights from past experiences or mistakes. Start with 'Looking back:' or 'Lesson learned:'",
-        examples: [
-          "Looking back: 3 things I wish I knew when starting my indie journey",
-          "Lesson learned: The biggest mistake I made in my first year (and how you can avoid it)"
-        ]
-      },
-      encouragement: {
-        prompt: "Offer support and motivation to others facing similar challenges. Use 'Reminder:' or 'For anyone who...'",
-        examples: [
-          "Reminder: Your side project taking longer than expected is totally normal. Here's why:",
-          "For anyone struggling with imposter syndrome today: Here's what helps me"
-        ]
-      },
-      process: {
-        prompt: "Break down your workflow or system for solving problems. Start with 'How I:' or 'My process:'",
-        examples: [
-          "How I validate new feature ideas in under 24 hours:",
-          "My process: From idea to launched feature in 5 steps"
-        ]
-      },
-      observation: {
-        prompt: "Share an interesting trend or pattern you've noticed. Use 'Noticed:' or 'Interesting pattern:'",
-        examples: [
-          "Noticed: The most successful indie hackers I know all do this one thing differently...",
-          "Interesting pattern: Analyzed 50+ successful launches. Here's what they have in common:"
-        ]
-      }
-    };
 
-    if (!feeling || feeling === 'not_specified') return "";
-    return feelingPrompts[feeling]?.prompt || "";
+// First, update the getFeelingPrompt function to be more natural
+const getFeelingPrompt = (feeling) => {
+  const feelingPrompts = {
+    curiosity: {
+      prompt: "Share something that's been keeping you up at night lately - you know, that weird dev thing you can't stop thinking about",
+      examples: [
+        "3am thought: what if we've been doing databases wrong this whole time...",
+        "Been thinking about this all week: why do we still..."
+      ]
+    },
+    insight: {
+      prompt: "Tell us about that random realization you just had - the kind that hits you in the shower or during a coffee break",
+      examples: [
+        "Wait hold up. Just realized after 4 years of coding that...",
+        "Ok this is gonna sound obvious but it just clicked..."
+      ]
+    },
+    authenticity: {
+      prompt: "Share that behind-the-scenes moment that probably isn't going in the portfolio",
+      examples: [
+        "Currently: debugging what I swore was 'just a quick fix' (4 hours ago)",
+        "Honest dev update: pretty sure my code is held together by..."
+      ]
+    },
+    achievement: {
+      prompt: "Share that tiny win you can't tell non-tech friends about (but we'll get it)",
+      examples: [
+        "Literally jumping around my room rn because this bug that's been haunting me for weeks...",
+        "Not to brag but I just fixed a production issue without breaking anything else"
+      ]
+    },
+    helpful: {
+      prompt: "Share that trick you discovered by accident that's actually kind of genius",
+      examples: [
+        "Found this by mistake but turns out you can...",
+        "Ok this might be obvious but it blew my mind when..."
+      ]
+    },
+    reflection: {
+      prompt: "Look back at something you used to do and now realize was either genius or totally wrong",
+      examples: [
+        "Past me thought they were so clever using... Present me has thoughts",
+        "Cleaning up old code and wow, past me really said..."
+      ]
+    }
   };
+
+  if (!feeling || feeling === 'not_specified') return "";
+  return feelingPrompts[feeling]?.prompt || "";
+};
+
 
 
 

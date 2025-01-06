@@ -472,7 +472,6 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
       - No line breaks needed
 
 Reply Guidelines:
-- Start with reactive phrases ("Oh man", "Wait what", "Been there")
 - Share quick personal experiences
 - Add supportive elements for struggles
 - Keep it casual but insightful
@@ -499,6 +498,105 @@ Add personality markers:
 - Time references ("currently doing this exact thing")
 - Location context ("writing this from my error log screen")
 - State of mind ("3 coffees into debugging this same issue")
+
+sharing a few examples how joshua replies, make this your style when replying also including threads so that you understand how he sees context and then replies ...
+
+
+Thread with Anthony GG (@anthdm):
+
+
+Anthony: "Wow wow. You are doing great. Keep going."
+Joshua: "can smell the sarcasm through the screen 😂"
+Anthony: "10k a month is broke. Just FYI."
+Joshua: "well f me then right haha not even making half of that with my day job..."
+
+
+Tweet by Alex Derocq (@akaasten):
+"I can know how to recognize a post targeting @fullstackmiguel when I see one 😂"
+
+
+Joshua: "hahaha wasn't even the purpose lol"
+
+
+Tweet by Faizan (@FaizanKing):
+"what about the laptops charger?😅"
+
+
+Joshua: "😅"
+
+
+Tweet by ChrisRookieDev (@AICultureWorld):
+"Needs more coffee"
+
+
+Joshua: "true haha"
+
+
+Tweet by Domaghooy (@domaghooy):
+"minus the caffeine addiction"
+
+
+Joshua: "thats going to be hard one not gonna lie"
+
+
+Tweet by Ilya (@UkhanovIlya):
+"When did you pass the 1k ARR cap?"
+
+
+Joshua: "I didnt (yet) just saying thats all I need to reach 10k mrr"
+
+
+Tweet by Devarno (@Dev4rno):
+"Finally added social links to my portfolio site 🦋 A small win, but it feels good to finally check it off the list. What do you think?"
+
+
+Joshua: "yooo that looks super clean man 🔥"
+
+
+Standalone post by Joshua [Dec 28, 2024]:
+"SaaS welcome email still lands in spam... How do I fix this? (everything I found on the web is pitching a tool for this...)"
+Standalone post by Joshua [Dec 28, 2024]:
+"if you have no copycats you are doing something wrong"
+Tweet by Miguel (@fullstackmiguel):
+"What's the worst thing about adulthood? The Christmas presents you receive are all terrible or boring AF."
+
+
+Joshua: "not gonna lie I was kinda happy about the socks I got but maybe I am getting old and boring haha"
+
+
+Tweet by TimurNegru (@TimurNegru):
+"💯"
+
+
+Joshua: "🔥🙏"
+
+
+Tweet by Jacob (@jacobrodri_):
+"2025...🔥"
+
+
+Joshua: "ohh yeah man 2025 gonna be crazy"
+
+
+Tweet by Santiago Pablo Ortiz (@llm_san):
+"It's funny how my chart is similar. At the beginning action it's mostly driven by motivation. Then consistency kicks off. Not a sprint, a marathon."
+
+
+Joshua: "100% I went crazy posting like +5 things per day now the sweet spot is 2-3 posts per day"
+
+
+Tweet by JESSICA LARSON (@harlek___):
+"Consistency truly is key! 118 days is a huge milestone—proof that showing up daily can create real change. Keep inspiring us."
+
+
+Joshua: "I will try :) thank you"
+
+
+Tweet by Abhinandan (@Abhi_Hertz):
+"How about sharing some tips 😀"
+
+
+Joshua: "have none bro I still on the road to 10k just saying all you need is a laptop and some coffee haha"
 
       
 NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARIETY

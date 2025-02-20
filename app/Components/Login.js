@@ -316,7 +316,7 @@ export const Login = () => {
       <button
         onClick={user ? handleLogout : handleGoogleLogin}
         disabled={loading}
-        className={`min-w-64 h-16 bg-blue-600 text-white rounded-full py-4 px-4 flex items-center justify-center space-x-2 mb-4 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed ${user ? 'hover:bg-blue-800' : 'hover:bg-blue-600'
+        className={`min-w-64 h-16 bg-blue-600 text-xl font-bold text-white rounded-full py-4 px-4 flex items-center justify-center space-x-2 mb-4 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed ${user ? 'hover:bg-blue-800' : 'hover:bg-blue-600'
           }`}
       >
         {renderButtonContent()}

@@ -804,41 +804,41 @@ const RedditExplorer = () => {
         default:
           endpoint = 'https://www.reddit.com/subreddits/popular.json?limit=100';
       }
-  
-      const activeKeywords = activeTab === 'popular' ? keywords : 
-                            activeTab === 'trending' ? competitorKeywords : [];
-  
-                            if (searchMode === 'fetch' && activeKeywords.length > 0) {
-                              const searchResults = await Promise.all(selectedKeywords.map(keyword =>
-                                fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=25&sort=relevance&t=month`)
-                                  .then(res => {
-                                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                                    return res.json();
-                                  })
-                                  .then(data => data.data.children.map(child => ({
-                                    id: child.data.id,
-                                    title: child.data.title,
-                                    url: `https://reddit.com${child.data.permalink}`,
-                                    author: child.data.author,
-                                    score: child.data.score,
-                                    numComments: child.data.num_comments,
-                                    created: new Date(child.data.created_utc * 1000).toLocaleDateString(),
-                                    subreddit: child.data.subreddit,
-                                    selftext: child.data.selftext
-                                  })))
-                              ));
-                              
-                              const flattenedResults = searchResults.flat();
-                              setPosts(flattenedResults);
-                              setAnalyzedPosts(flattenedResults);
-                            
+
+      const activeKeywords = activeTab === 'popular' ? keywords :
+        activeTab === 'trending' ? competitorKeywords : [];
+
+      if (searchMode === 'fetch' && activeKeywords.length > 0) {
+        const searchResults = await Promise.all(selectedKeywords.map(keyword =>
+          fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=25&sort=relevance&t=month`)
+            .then(res => {
+              if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+              return res.json();
+            })
+            .then(data => data.data.children.map(child => ({
+              id: child.data.id,
+              title: child.data.title,
+              url: `https://reddit.com${child.data.permalink}`,
+              author: child.data.author,
+              score: child.data.score,
+              numComments: child.data.num_comments,
+              created: new Date(child.data.created_utc * 1000).toLocaleDateString(),
+              subreddit: child.data.subreddit,
+              selftext: child.data.selftext
+            })))
+        ));
+
+        const flattenedResults = searchResults.flat();
+        setPosts(flattenedResults);
+        setAnalyzedPosts(flattenedResults);
+
       } else {
         const response = await fetch(endpoint);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-  
+
         let mappedCommunities;
         if (tab === 'trending') {
           mappedCommunities = data.subreddit_names.map(name => ({
@@ -861,12 +861,12 @@ const RedditExplorer = () => {
             growthPerWeek: Math.floor(Math.random() * 1000),
             growthPerMonth: Math.floor(Math.random() * 4000),
           }));
-  
+
           if (activeKeywords.length > 0) {
             mappedCommunities = await searchWithKeywords(mappedCommunities, activeKeywords);
           }
         }
-  
+
         setCommunities(mappedCommunities);
         setDisplayedCommunities(mappedCommunities.slice(0, 20));
       }
@@ -882,11 +882,11 @@ const RedditExplorer = () => {
 
   const highlightKeywords = (text, keywords) => {
     if (!keywords.length || !text) return text;
-    
+
     const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
-    return text.split(regex).map((part, i) => 
-      keywords.some(kw => part.toLowerCase() === kw.toLowerCase()) 
-        ? <mark key={i} className="bg-yellow-200">{part}</mark> 
+    return text.split(regex).map((part, i) =>
+      keywords.some(kw => part.toLowerCase() === kw.toLowerCase())
+        ? <mark key={i} className="bg-yellow-200">{part}</mark>
         : part
     );
   };
@@ -1294,7 +1294,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
       } else {
         endpoint = `https://www.reddit.com/r/${subreddit}/hot.json?limit=25`;
       }
-  
+
       const response = await fetch(endpoint);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -1314,7 +1314,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
         selftext: child.data.selftext,
         subreddit: child.data.subreddit
       }));
-      
+
       setPosts(fetchedPosts);
       if (fetchedPosts.length > 0) {
         const analyzedPostsData = await Promise.all(fetchedPosts.map(analyzePostContent));
@@ -1463,8 +1463,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
       <div>
         <div className="flex space-x-1 sm:space-x-2 overflow-x-auto">
           <Tab label="Audiences" icon={Users} active={activeTab === 'groups'} onClick={() => setActiveTab('groups')} />
-          <Tab label="My Keywords Settings" icon={Flame} active={activeTab === 'popular'} onClick={() => setActiveTab('popular')} />
-          <Tab label="Competitor Keywords Settings" icon={TrendingUp} active={activeTab === 'trending'} onClick={() => setActiveTab('trending')} />
+
           <Tab label="Email Alerts Settings" icon={BellDot} active={activeTab === 'new'} onClick={() => setActiveTab('new')} />
         </div>
 
@@ -1648,75 +1647,75 @@ Generate a natural, engaging comment that someone would actually write on Reddit
 
 
               <div className="mb-4">
-  <label className='font-bold text-sm mb-2 block'>Search Keywords</label>
-  <div className='flex flex-col gap-2'>
-    <div className="flex gap-2">
-      <select
-        className="px-3 py-2 border rounded text-sm flex-1"
-        value={searchMode}
-        onChange={(e) => setSearchMode(e.target.value)}
-      >
-        <option value="latest">Search in latest posts</option>
-        <option value="fetch">Fetch posts with keywords</option>
-      </select>
-      {searchMode === 'fetch' && (
-        <button
-          onClick={() => {
-            setLoading(true);
-            setPosts([]);
-            setAnalyzedPosts([]);
-            fetchSubredditPosts(selectedSubreddit?.name);
-          }}
-          disabled={loading}
-          className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
-        >
-          <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        </button>
-      )}
-    </div>
-    
-    <div className='flex gap-4'>
-      <select 
-        className="flex-1 px-3 py-2 border rounded text-sm"
-        onChange={(e) => {
-          const [type, value] = e.target.value.split('|');
-          setKeywordType(type);
-          setSelectedKeywords(value ? [value] : []);
-          if (searchMode === 'fetch') {
-            setLoading(true);
-            setPosts([]);
-            setAnalyzedPosts([]);
-            fetchSubredditPosts(selectedSubreddit?.name);
-          }
-        }}
-        value={selectedKeywords.length ? `${keywordType}|${selectedKeywords[0]}` : ''}
-      >
-        <option value="">Filter by keyword...</option>
-        <optgroup label="My Keywords">
-          {keywords.map((keyword, index) => (
-            <option key={index} value={`own|${keyword}`}>{keyword}</option>
-          ))}
-        </optgroup>
-        <optgroup label="Competitor Keywords">
-          {competitorKeywords.map((keyword, index) => (
-            <option key={`comp-${index}`} value={`competitor|${keyword}`}>{keyword}</option>
-          ))}
-        </optgroup>
-      </select>
-      {selectedKeywords.length > 0 && (
-        <button
-          onClick={() => {
-            setSelectedKeywords([]);
-            setKeywordType('own');
-          }}
-          className="p-1 bg-red-200 text-white hover:bg-red-500 rounded"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      )}
-    </div>
-  </div>
-</div>
+                <label className='font-bold text-sm mb-2 block'>Search Keywords</label>
+                <div className='flex flex-col gap-2'>
+                  <div className="flex gap-2">
+                    <select
+                      className="px-3 py-2 border rounded text-sm flex-1"
+                      value={searchMode}
+                      onChange={(e) => setSearchMode(e.target.value)}
+                    >
+                      <option value="latest">Search in latest posts</option>
+                      <option value="fetch">Fetch posts with keywords</option>
+                    </select>
+                    {searchMode === 'fetch' && (
+                      <button
+                        onClick={() => {
+                          setLoading(true);
+                          setPosts([]);
+                          setAnalyzedPosts([]);
+                          fetchSubredditPosts(selectedSubreddit?.name);
+                        }}
+                        disabled={loading}
+                        className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+                      >
+                        <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className='flex gap-4'>
+                    <select
+                      className="flex-1 px-3 py-2 border rounded text-sm"
+                      onChange={(e) => {
+                        const [type, value] = e.target.value.split('|');
+                        setKeywordType(type);
+                        setSelectedKeywords(value ? [value] : []);
+                        if (searchMode === 'fetch') {
+                          setLoading(true);
+                          setPosts([]);
+                          setAnalyzedPosts([]);
+                          fetchSubredditPosts(selectedSubreddit?.name);
+                        }
+                      }}
+                      value={selectedKeywords.length ? `${keywordType}|${selectedKeywords[0]}` : ''}
+                    >
+                      <option value="">Filter by keyword...</option>
+                      <optgroup label="My Keywords">
+                        {keywords.map((keyword, index) => (
+                          <option key={index} value={`own|${keyword}`}>{keyword}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Competitor Keywords">
+                        {competitorKeywords.map((keyword, index) => (
+                          <option key={`comp-${index}`} value={`competitor|${keyword}`}>{keyword}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                    {selectedKeywords.length > 0 && (
+                      <button
+                        onClick={() => {
+                          setSelectedKeywords([]);
+                          setKeywordType('own');
+                        }}
+                        className="p-1 bg-red-200 text-white hover:bg-red-500 rounded"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               {isAnalyzing && (
                 <div className="text-center p-4">
@@ -1739,58 +1738,58 @@ Generate a natural, engaging comment that someone would actually write on Reddit
                       })
 
                       .map((post) => (
-<li key={post.id} className="bg-white rounded-lg shadow p-3 sm:p-4">
-  <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
-    <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
-      <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
-      <span>
-        <b className='text-blue-300'>Relevance Score : <span className='text-blue-600'>{post.relevancyScore || 0}</span>/100</b>
-        &nbsp; {post.created}
-      </span>
-    </div>
-    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
-      {highlightKeywords(post.title, selectedKeywords)}
-    </h3>
-    {post.selftext && (
-      <p className="text-sm text-gray-600 mb-2">
-        {highlightKeywords(post.selftext.slice(0, 300), selectedKeywords)}
-        {post.selftext.length > 300 && '...'}
-      </p>
-    )}
-    {post.relevancyExplanation && (
-      <div className="mb-2 bg-blue-50 p-4 rounded-md border border-blue-200 shadow-lg">
-        <b className='text-blue-500 font-bold'>Why Relevant: </b>
-        <span className="text-xs sm:text-sm text-gray-500">{post.relevancyExplanation}</span>
-      </div>
-    )}
-    {post.categories && (
-      <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-        {post.categories.map((category, index) => (
-          <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-            {category}
-          </span>
-        ))}
-      </div>
-    )}
-    {post.keywords && (
-      <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-        {post.keywords.slice(0, 5).map((keyword, index) => (
-          <span key={index} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
-            {keyword}
-          </span>
-        ))}
-      </div>
-    )}
-    <div className="flex items-center text-xs sm:text-sm text-gray-500">
-      <span className="mr-4 flex items-center">
-        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.score}
-      </span>
-      <span className="flex items-center">
-        <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.numComments}
-      </span>
-    </div>
-  </button>
-</li>
+                        <li key={post.id} className="bg-white rounded-lg shadow p-3 sm:p-4">
+                          <button onClick={() => handlePostClick(post)} className="w-full text-left hover:bg-gray-50 transition-colors duration-200 p-2 rounded">
+                            <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
+                              <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
+                              <span>
+                                <b className='text-blue-300'>Relevance Score : <span className='text-blue-600'>{post.relevancyScore || 0}</span>/100</b>
+                                &nbsp; {post.created}
+                              </span>
+                            </div>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
+                              {highlightKeywords(post.title, selectedKeywords)}
+                            </h3>
+                            {post.selftext && (
+                              <p className="text-sm text-gray-600 mb-2">
+                                {highlightKeywords(post.selftext.slice(0, 300), selectedKeywords)}
+                                {post.selftext.length > 300 && '...'}
+                              </p>
+                            )}
+                            {post.relevancyExplanation && (
+                              <div className="mb-2 bg-blue-50 p-4 rounded-md border border-blue-200 shadow-lg">
+                                <b className='text-blue-500 font-bold'>Why Relevant: </b>
+                                <span className="text-xs sm:text-sm text-gray-500">{post.relevancyExplanation}</span>
+                              </div>
+                            )}
+                            {post.categories && (
+                              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+                                {post.categories.map((category, index) => (
+                                  <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                                    {category}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {post.keywords && (
+                              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+                                {post.keywords.slice(0, 5).map((keyword, index) => (
+                                  <span key={index} className="px-2 py-1 bg-gray-200 text-gray-500 rounded text-xs">
+                                    {keyword}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            <div className="flex items-center text-xs sm:text-sm text-gray-500">
+                              <span className="mr-4 flex items-center">
+                                <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.score}
+                              </span>
+                              <span className="flex items-center">
+                                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {post.numComments}
+                              </span>
+                            </div>
+                          </button>
+                        </li>
                       ))}
                   </ul>
                 </>

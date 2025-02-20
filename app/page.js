@@ -328,8 +328,8 @@ export default function Dashboard() {
 
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
-    { icon: Settings2, label: 'Settings', id: 'settings' },
-    /* { icon: DollarSign, label: 'Billing', id: 'billing' },
+   /* { icon: Settings2, label: 'Settings', id: 'settings' },
+    { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 
      { icon: Handshake, label: 'Affiliate', id: 'affiliate' },
      { icon: Heart, label: 'Feedback', id: 'feedback' }*/

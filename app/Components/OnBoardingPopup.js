@@ -128,7 +128,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
               <div>
                 <section>
                   <h2
-                    className="text-center text-slate-700 max-w-2xl mx-auto sm:text-3xl md:text-5xl"
+                    className="text-center text-slate-700 max-w-2xl mx-auto sm:text-3xl md:text-4xl"
                     style={{ lineHeight: "1.5" }}
                   >
                     <span>
@@ -137,7 +137,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <br />
                   </h2>
                   <div className="flex flex-wrap justify-center gap-4 mt-4">
-                    <span className="font-bold text-blue-400 bg-blue-100 border-blue-400 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+                    <span className="font-bold text-blue-400 bg-blue-100 border-blue-400 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-3xl leading-none">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/X_logo.jpg/768px-X_logo.jpg"
                         alt="X logo"
@@ -145,7 +145,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       />
                       X
                     </span>
-                    <span className="font-bold text-pink-500 bg-pink-100 border-pink-500 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+                    <span className="font-bold text-pink-500 bg-pink-100 border-pink-500 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-3xl leading-none">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/1200px-Instagram_icon.png"
                         alt="Instagram logo"
@@ -153,7 +153,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       />
                       Instagram
                     </span>
-                    <span className="font-bold text-gray-600 bg-gray-200 border-gray-800 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+                    <span className="font-bold text-gray-600 bg-gray-200 border-gray-800 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-3xl leading-none">
                       <img
                         src="https://p16-va-tiktok.ibyteimg.com/obj/musically-maliva-obj/a45cf75986e5f90595049b68725bfd87.png"
                         alt="TikTok logo"
@@ -161,16 +161,16 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       />
                       TikTok
                     </span>
-                    <span className="font-bold text-red-500 bg-red-100 border-red-400 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-4xl leading-none">
+                    <span className="font-bold text-red-500 bg-red-100 border-red-400 border rounded-full px-4 py-2 font-sans flex items-center whitespace-nowrap sm:text-xl md:text-3xl leading-none">
                       <img
                         src="https://seeklogo.com/images/R/reddit-logo-23F13F6A6A-seeklogo.com.png"
                         alt="Reddit logo"
-                        className="w-8 h-8 rounded-lg mr-2"
+                        className="w-8 h-8 rounded-full mr-2"
                       />
                       Reddit
                     </span>
                   </div>
-                  <h2 className="mt-4 text-center text-slate-700 max-w-2xl mx-auto sm:text-3xl md:text-5xl mb-6">
+                  <h2 className="mt-4 text-center text-slate-700 max-w-2xl mx-auto sm:text-3xl md:text-4xl mb-6">
                     using <b className="text-blue-500">AI trained</b> on <b className="text-blue-500">your brand</b>.
                   </h2>
                 </section>

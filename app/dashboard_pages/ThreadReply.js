@@ -22,7 +22,11 @@ import {
   Blocks,
   BicepsFlexed,
   CircleCheckBig,
-  InfoIcon
+  InfoIcon,
+  User,
+  LetterText,
+  HeartCrackIcon,
+  Eclipse
 } from 'lucide-react';
 import { getAnthropicKey } from '../Utils/getApikey';
 import { getFirestore, collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
@@ -1292,7 +1296,7 @@ Copy- Style guide creation
               {mode === 'reply' ? (
                 <>
                   <div className='grid'>
-                    <label className="font-bold text-xs">Reply Length</label>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><LetterText size={14} /> Reply Length</label>
                     <select
                       value={replyLength}
                       onChange={(e) => setReplyLength(e.target.value)}
@@ -1304,7 +1308,7 @@ Copy- Style guide creation
                     </select>
                   </div>
                   <div className='grid'>
-                    <label className="font-bold text-xs">Stance</label>
+                    <label className="font-bold text-xs flex gap-2 mb-2"> <Eclipse size={14} />Stance</label>
                     <select
                       value={replyStance}
                       onChange={(e) => setReplyStance(e.target.value)}
@@ -1320,7 +1324,7 @@ Copy- Style guide creation
               ) : (
                 <div className='flex gap-2'>
                   <div className='grid'>
-                    <label className="font-bold text-xs">Post Length</label>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><LetterText size={14} />Post Length</label>
                     <select
                       value={threadType}
                       onChange={(e) => setThreadType(e.target.value)}
@@ -1332,7 +1336,7 @@ Copy- Style guide creation
                     </select>
                   </div>
                   <div className='grid'>
-                    <label className="font-bold text-xs">Prespective</label>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><HeartCrackIcon size={14} />Prespective</label>
                     <select
                       value={feeling}
                       onChange={(e) => setFeeling(e.target.value)}
@@ -1352,7 +1356,7 @@ Copy- Style guide creation
                   </div>
                   {/* Celebrity Mode Dropdown */}
                   <div className='grid'>
-                    <label className="font-bold text-xs">Celebrity Mode</label>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><User size={14} /> Celebrity Mode</label>
                     <select
                       value={celebrityMode}
                       onChange={(e) => setCelebrityMode(e.target.value)}

@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, 
-  TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2, 
-  DollarSign, Chrome, Handshake, Heart, Check,Calendar, CheckCircle2, LaughIcon } from 'lucide-react';
+import {
+  Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
+  TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
+  DollarSign, Chrome, Handshake, Heart, Check, Calendar, CheckCircle2, LaughIcon
+} from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -74,7 +76,7 @@ const BillingModal = ({ isOpen, onClose }) => {
               <X className="h-5 w-5" />
             </button>
           </div>
-          
+
           <div className="p-6">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
@@ -112,11 +114,10 @@ const BillingModal = ({ isOpen, onClose }) => {
                       </li>
                     ))}
                   </ul>
-                  <button className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
-                    plan.popular 
+                  <button className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${plan.popular
                       ? 'bg-blue-500 hover:bg-blue-600 text-white'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-                  }`}>
+                    }`}>
                     Get Started
                   </button>
                 </div>
@@ -142,21 +143,19 @@ const FeedbackModal = ({ isOpen, onClose }) => {
       <div className="flex flex-col space-y-6 max-h-[80vh]">
         <div className="flex rounded-lg bg-gray-100 p-1">
           <button
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              selectedTab === 'feedback'
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'feedback'
                 ? 'bg-white text-blue-600 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
             onClick={() => setSelectedTab('feedback')}
           >
             Share Feedback
           </button>
           <button
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              selectedTab === 'call'
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'call'
                 ? 'bg-white text-blue-600 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
             onClick={() => setSelectedTab('call')}
           >
             Schedule Call
@@ -177,35 +176,35 @@ const FeedbackModal = ({ isOpen, onClose }) => {
           </div>
         ) : (
           <div className="space-y-6 p-4">
-<div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100">
-                  <Calendar className="h-8 w-8 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Schedule a 1-on-1 Call</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Book a personal call to discuss features, provide feedback, or get help with your workflow.
-                  </p>
-                </div>
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100">
+                <Calendar className="h-8 w-8 text-blue-600" />
               </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Schedule a 1-on-1 Call</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Book a personal call to discuss features, provide feedback, or get help with your workflow.
+                </p>
+              </div>
+            </div>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900">What to expect:</h4>
-                  <ul className="mt-2 space-y-2">
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-600">30-minute personalized discussion</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-600">Direct access to me.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-600">Opportunity to influence our roadmap</span>
-                    </li>
-                  </ul>
-                </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-gray-900">What to expect:</h4>
+              <ul className="mt-2 space-y-2">
+                <li className="flex items-start">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-600">30-minute personalized discussion</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-600">Direct access to me.</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-600">Opportunity to influence our roadmap</span>
+                </li>
+              </ul>
+            </div>
             <button
               onClick={handleScheduleCall}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
@@ -245,7 +244,7 @@ const SubscriptionBanner = ({ onUpgrade }) => {
       if (subscription?.isTrialing) {
         const trialEndDate = new Date(subscription.trialEndDate);
         const now = new Date();
-        
+
         if (now > trialEndDate) {
           setTrialStatus(null);
           return;
@@ -271,7 +270,7 @@ const SubscriptionBanner = ({ onUpgrade }) => {
   return (
     <div className="text-sm text-blue-800 rounded-md border border-blue-300 p-2 flex justify-between bg-blue-50 text-center items-center max-w-7xl m-auto">
       <p>Trial period: <b>{trialStatus.daysLeft}</b> days remaining</p>
-      <button 
+      <button
         onClick={onUpgrade}
         className="ml-2 hover:text-blue-900 transition-colors font-bold bg-blue-200 p-2 rounded-md"
       >
@@ -330,10 +329,10 @@ export default function Dashboard() {
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
     { icon: Settings2, label: 'Settings', id: 'settings' },
-   /* { icon: DollarSign, label: 'Billing', id: 'billing' },
-    { icon: Chrome, label: 'Extension', id: 'extension' }, 
-    { icon: Handshake, label: 'Affiliate', id: 'affiliate' },
-    { icon: Heart, label: 'Feedback', id: 'feedback' }*/
+    /* { icon: DollarSign, label: 'Billing', id: 'billing' },
+     { icon: Chrome, label: 'Extension', id: 'extension' }, 
+     { icon: Handshake, label: 'Affiliate', id: 'affiliate' },
+     { icon: Heart, label: 'Feedback', id: 'feedback' }*/
   ];
 
   useEffect(() => {
@@ -397,8 +396,8 @@ export default function Dashboard() {
         return <KnowledgeWall />;
       case 'BrandTraning':
         return <BrandTraning />;
-        case 'MemeEditor':
-          return <MemeEditor />;        
+      case 'MemeEditor':
+        return <MemeEditor />;
       default:
         return <div className="text-center text-gray-500">Select a tab</div>;
     }
@@ -462,7 +461,7 @@ export default function Dashboard() {
 
           {/* Bottom navigation */}
           <div className="px-6 space-y-1 mb-8">
-            <ApiKeyManager/>
+            <ApiKeyManager />
             {bottomNavItems.map((item) => (
               <NavItem
                 key={item.id}
@@ -514,7 +513,7 @@ export default function Dashboard() {
       <OnBoardingPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
       <BillingModal isOpen={isBillingOpen} onClose={() => setIsBillingOpen(false)} />
       <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
-      
+
       {/* How to Use Modal */}
       <Modal isOpen={isHowToUseOpen} onClose={() => setIsHowToUseOpen(false)} title="How to Use">
         <div className="py-4">

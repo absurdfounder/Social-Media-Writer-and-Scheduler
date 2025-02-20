@@ -1,13 +1,35 @@
 "use client"
 
-import React, { useState, useCallback, useEffect, use } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { PlusCircle, X, Smile, Image as ImageIcon, Link as LinkIcon, Wand2, FileText, Video, Loader, ToggleLeft, ToggleRight, Circle, CircleCheck, Blocks, BicepsFlexed, CircleCheckBig, InfoIcon } from 'lucide-react';
+import {
+  PlusCircle,
+  X,
+  Smile,
+  Image as ImageIcon,
+  Link as LinkIcon,
+  Wand2,
+  FileText,
+  Video,
+  Loader,
+  ToggleLeft,
+  ToggleRight,
+  Circle,
+  CircleCheck,
+  Blocks,
+  BicepsFlexed,
+  CircleCheckBig,
+  InfoIcon
+} from 'lucide-react';
 import { getAnthropicKey } from '../Utils/getApikey';
+import { getFirestore, collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { toast } from 'react-toastify';
 
+// ===== TipTapEditor Component =====
 const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkAdd }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -85,6 +107,7 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
   );
 };
 
+// ===== LinkPreview Component =====
 const LinkPreview = ({ url }) => {
   const [preview, setPreview] = useState(null);
 
@@ -118,7 +141,7 @@ const LinkPreview = ({ url }) => {
   );
 };
 
-
+// ===== TweetContent Component =====
 const TweetContent = ({ images, links, videos }) => {
   return (
     <div className="mb-4">
@@ -143,6 +166,7 @@ const TweetContent = ({ images, links, videos }) => {
   );
 };
 
+// ===== ThreadWriter Component =====
 const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [isBrowser, setIsBrowser] = useState(false);
   const [tweets, setTweets] = useState([{ id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
@@ -161,6 +185,57 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [TrainingData, setTraningData] = useState({});
   const [isValidatingKey, setIsValidatingKey] = useState(false);
   const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
+
+  // New state for profiles and selected profiles
+  const [profiles, setProfiles] = useState([]);
+  const [selectedProfiles, setSelectedProfiles] = useState([]);
+
+  // New state for Training Data Popup visibility
+  const [isTrainingPopupOpen, setIsTrainingPopupOpen] = useState(false);
+
+  // New state for celebrity mode
+  const [celebrityMode, setCelebrityMode] = useState("");
+
+  // Define celebrity prompts
+  const celebrityPrompts = {
+    marclou: "When replying, channel Marc Lou’s sharp wit and confident tone. Use punchy, memorable phrases with a laid-back style.",
+    johnrush: "When replying, use John Rush’s energetic and direct style. Keep it brief, impactful and slightly irreverent.",
+    examplecelebrity: "For Example Celebrity, use a quirky and fun tone with clever wordplay and a hint of irony."
+  };
+
+  // Load profiles from Firebase (using logic similar to ProfileManager)
+  useEffect(() => {
+    const loadProfiles = async () => {
+      const auth = getAuth();
+      if (!auth.currentUser) return;
+      try {
+        const db = getFirestore();
+        const profilesRef = collection(db, 'profiles');
+        const q = query(profilesRef, where('userId', '==', auth.currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        const loadedProfiles = [];
+        querySnapshot.forEach((doc) => {
+          loadedProfiles.push({ id: doc.id, ...doc.data() });
+        });
+        setProfiles(loadedProfiles);
+      } catch (error) {
+        console.error('Error loading profiles:', error);
+      }
+    };
+    loadProfiles();
+  }, []);
+
+  // Handler for multi-select change
+  const handleProfileSelect = (e) => {
+    const options = e.target.options;
+    const selected = [];
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].selected) {
+        selected.push(options[i].value);
+      }
+    }
+    setSelectedProfiles(selected);
+  };
 
   // Update the apiKey effect
   useEffect(() => {
@@ -214,13 +289,10 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     }
   };
 
-
-
   useEffect(() => {
-
     setTraningData(localStorage.getItem("getTrainingData"))
     console.log('Traning data ', TrainingData);
-  }, [TrainingData])
+  }, [TrainingData]);
 
   useEffect(() => {
     setIsBrowser(true);
@@ -359,8 +431,6 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     return { content: content.trim(), images, links, videos };
   };
 
-
-
   const generateAIThread = async () => {
     playSound(sentSound);
     setIsGenerating(true);
@@ -370,6 +440,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
         case 'single': maxTweets = 1; break;
         case 'three': maxTweets = 3; break;
         case 'full': maxTweets = 10; break;
+        default: maxTweets = 1;
       }
 
       let promptContent = overallPrompt;
@@ -384,7 +455,6 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
 
       const feelingPrompt = getFeelingPrompt(feeling);
 
-      // Add this function outside generateAIThread
       const getReplyStylePrompt = (length, stance) => {
         const replyStyles = {
           super_short: {
@@ -455,8 +525,6 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
             ]
           }
         };
-
-
 
         const selectedLength = replyStyles[length];
         const selectedStance = stancePatterns[stance];
@@ -608,8 +676,6 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
       ${selectedStance.examples.join('\n')}`;
       };
 
-
-
       const replyModePrompt = mode === 'reply' ?
         `${getReplyStylePrompt(replyLength, replyStance)}
       
@@ -630,21 +696,20 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
     6. Include relevant media suggestion
     7. Close with /endtweet
 
-      How to return reply response , this is just an understanding for structure only:
-      Indie hacking reality check:<br><br>
-      Expectation:<br>
-      Launch product, get rich overnight<br><br>
-      Reality:<br>
-      - 6 months of coding<br>
-      - 3 pivots<br>
-      - 100 cold emails<br>
-      - 1 paying customer<br><br>
-      But that one "yes" makes it all worth it.<br>
-      Video: [https://placehold.co/1920x1080.mp4?text=Journey+to+First+Customer]<br>
-      /endtweet
+    How to return reply response , this is just an understanding for structure only:
+    Indie hacking reality check:<br><br>
+    Expectation:<br>
+    Launch product, get rich overnight<br><br>
+    Reality:<br>
+    - 6 months of coding<br>
+    - 3 pivots<br>
+    - 100 cold emails<br>
+    - 1 paying customer<br><br>
+    But that one "yes" makes it all worth it.<br>
+    Video: [https://placehold.co/1920x1080.mp4?text=Journey+to+First+Customer]<br>
+    /endtweet
 
     ` : '';
-
 
       const baseSystemPrompt = `
 You are an indie founder building your audience and personal brand on Twitter while developing a side-product. Your goal is to create engaging, high-impact tweets that resonate with your audience and showcase your journey. When writing tweets, follow these guidelines:
@@ -1054,7 +1119,13 @@ Copy- Style guide creation
       
       `;
 
+      // Build system prompt based on mode
       let systemPrompt = mode === 'reply' ? replyModePrompt : baseSystemPrompt;
+
+      // Append celebrity prompt if celebrity mode is selected
+      if (celebrityMode && celebrityPrompts[celebrityMode]) {
+        systemPrompt += `\n\nCelebrity Mode Instruction:\n${celebrityPrompts[celebrityMode]}`;
+      }
 
       // Add existing training data
       systemPrompt = `${systemPrompt} Here Training Data for this response ${TrainingData}`;
@@ -1105,60 +1176,56 @@ Copy- Style guide creation
     }
   };
 
+  // First, update the getFeelingPrompt function to be more natural
+  const getFeelingPrompt = (feeling) => {
+    const feelingPrompts = {
+      curiosity: {
+        prompt: "Share something that's been keeping you up at night lately - you know, that weird dev thing you can't stop thinking about",
+        examples: [
+          "3am thought: what if we've been doing databases wrong this whole time...",
+          "Been thinking about this all week: why do we still..."
+        ]
+      },
+      insight: {
+        prompt: "Tell us about that random realization you just had - the kind that hits you in the shower or during a coffee break",
+        examples: [
+          "Wait hold up. Just realized after 4 years of coding that...",
+          "Ok this is gonna sound obvious but it just clicked..."
+        ]
+      },
+      authenticity: {
+        prompt: "Share that behind-the-scenes moment that probably isn't going in the portfolio",
+        examples: [
+          "Currently: debugging what I swore was 'just a quick fix' (4 hours ago)",
+          "Honest dev update: pretty sure my code is held together by..."
+        ]
+      },
+      achievement: {
+        prompt: "Share that tiny win you can't tell non-tech friends about (but we'll get it)",
+        examples: [
+          "Literally jumping around my room rn because this bug that's been haunting me for weeks...",
+          "Not to brag but I just fixed a production issue without breaking anything else"
+        ]
+      },
+      helpful: {
+        prompt: "Share that trick you discovered by accident that's actually kind of genius",
+        examples: [
+          "Found this by mistake but turns out you can...",
+          "Ok this might be obvious but it blew my mind when..."
+        ]
+      },
+      reflection: {
+        prompt: "Look back at something you used to do and now realize was either genius or totally wrong",
+        examples: [
+          "Past me thought they were so clever using... Present me has thoughts",
+          "Cleaning up old code and wow, past me really said..."
+        ]
+      }
+    };
 
-// First, update the getFeelingPrompt function to be more natural
-const getFeelingPrompt = (feeling) => {
-  const feelingPrompts = {
-    curiosity: {
-      prompt: "Share something that's been keeping you up at night lately - you know, that weird dev thing you can't stop thinking about",
-      examples: [
-        "3am thought: what if we've been doing databases wrong this whole time...",
-        "Been thinking about this all week: why do we still..."
-      ]
-    },
-    insight: {
-      prompt: "Tell us about that random realization you just had - the kind that hits you in the shower or during a coffee break",
-      examples: [
-        "Wait hold up. Just realized after 4 years of coding that...",
-        "Ok this is gonna sound obvious but it just clicked..."
-      ]
-    },
-    authenticity: {
-      prompt: "Share that behind-the-scenes moment that probably isn't going in the portfolio",
-      examples: [
-        "Currently: debugging what I swore was 'just a quick fix' (4 hours ago)",
-        "Honest dev update: pretty sure my code is held together by..."
-      ]
-    },
-    achievement: {
-      prompt: "Share that tiny win you can't tell non-tech friends about (but we'll get it)",
-      examples: [
-        "Literally jumping around my room rn because this bug that's been haunting me for weeks...",
-        "Not to brag but I just fixed a production issue without breaking anything else"
-      ]
-    },
-    helpful: {
-      prompt: "Share that trick you discovered by accident that's actually kind of genius",
-      examples: [
-        "Found this by mistake but turns out you can...",
-        "Ok this might be obvious but it blew my mind when..."
-      ]
-    },
-    reflection: {
-      prompt: "Look back at something you used to do and now realize was either genius or totally wrong",
-      examples: [
-        "Past me thought they were so clever using... Present me has thoughts",
-        "Cleaning up old code and wow, past me really said..."
-      ]
-    }
+    if (!feeling || feeling === 'not_specified') return "";
+    return feelingPrompts[feeling]?.prompt || "";
   };
-
-  if (!feeling || feeling === 'not_specified') return "";
-  return feelingPrompts[feeling]?.prompt || "";
-};
-
-
-
 
   useEffect(() => {
     const key = localStorage.getItem('anthropicKey');
@@ -1167,7 +1234,6 @@ const getFeelingPrompt = (feeling) => {
     }
   }, []);
 
-
   return (
     <div className="bg-white rounded-md overflow-hidden p-4">
       <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
@@ -1175,16 +1241,20 @@ const getFeelingPrompt = (feeling) => {
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
             <div className='grid gap-2'>
               <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
-              {!apikeyAdded ? <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'><InfoIcon size={20} />Claude API key added seems wrong or invalid - save again. </div> : null}
+              {!apikeyAdded ? (
+                <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'>
+                  <InfoIcon size={20} />
+                  Claude API key added seems wrong or invalid - save again.
+                </div>
+              ) : null}
             </div>
 
-            <div className={`  flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
+            <div className={`flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
               <button
                 onClick={() => {
                   setMode('share');
                   playSound(toggleSound);
                 }}
-
                 className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'share'
                   ? 'text-white bg-blue-500'
                   : 'text-gray-500 hover:text-gray-500'
@@ -1192,9 +1262,7 @@ const getFeelingPrompt = (feeling) => {
                 aria-pressed={mode === 'share'}
               >
                 <span className="relative z-10">Share</span>
-                {mode === 'share' && (
-                  <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />
-                )}
+                {mode === 'share' && <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />}
               </button>
               <button
                 onClick={() => {
@@ -1208,9 +1276,7 @@ const getFeelingPrompt = (feeling) => {
                 aria-pressed={mode === 'reply'}
               >
                 <span className="relative z-10">Reply</span>
-                {mode === 'reply' && (
-                  <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />
-                )}
+                {mode === 'reply' && <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />}
               </button>
             </div>
           </div>
@@ -1222,127 +1288,151 @@ const getFeelingPrompt = (feeling) => {
             rows={4}
           />
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
-
             <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto gap-4'>
               {mode === 'reply' ? (
                 <>
-                <div className='grid'>
-                <label class="font-bold text-xs">Reply Length</label>
-                  <select
-                    value={replyLength}
-                    onChange={(e) => setReplyLength(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="super_short">Ultra-Brief Reply</option>
-                    <option value="medium">Standard Reply</option>
-                    <option value="detailed">Detailed Reply</option>
-                  </select>
+                  <div className='grid'>
+                    <label className="font-bold text-xs">Reply Length</label>
+                    <select
+                      value={replyLength}
+                      onChange={(e) => setReplyLength(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <option value="super_short">Ultra-Brief Reply</option>
+                      <option value="medium">Standard Reply</option>
+                      <option value="detailed">Detailed Reply</option>
+                    </select>
                   </div>
                   <div className='grid'>
-                  <label class="font-bold text-xs">Stance</label>
-                  <select
-                    value={replyStance}
-                    onChange={(e) => setReplyStance(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="neutral">Neutral Stance</option>
-                    <option value="in_favour">In Favor</option>
-                    <option value="not_in_favour">Not in Favor</option>
-                    <option value="controversial">Controversial</option>
-                  </select>
+                    <label className="font-bold text-xs">Stance</label>
+                    <select
+                      value={replyStance}
+                      onChange={(e) => setReplyStance(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <option value="neutral">Neutral Stance</option>
+                      <option value="in_favour">In Favor</option>
+                      <option value="not_in_favour">Not in Favor</option>
+                      <option value="controversial">Controversial</option>
+                    </select>
                   </div>
                 </>
               ) : (
-
                 <div className='flex gap-2'>
-
-<div className='grid'>
-                  <label class="font-bold text-xs">Post Length</label>
-                  <select
-                    value={threadType}
-                    onChange={(e) => setThreadType(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="single">Single Tweet</option>
-                    <option value="three">3 Tweet Thread</option>
-                    <option value="full">Full Thread</option>
-                  </select>
-                  </div>
-
-
                   <div className='grid'>
-                  <label class="font-bold text-xs">Prespective</label>
-                  <select
-                    value={feeling}
-                    onChange={(e) => setFeeling(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="not_specified">Not Specified</option>
-                    <option value="curiosity">🔍 Curiosity</option>
-                    <option value="insight">💡 Insight</option>
-                    <option value="authenticity">🎭 Authenticity</option>
-                    <option value="achievement">🏆 Achievement</option>
-                    <option value="helpful">🤝 Helpful</option>
-                    <option value="reflection">🤔 Reflection</option>
-                    <option value="encouragement">💪 Encouragement</option>
-                    <option value="process">⚙️ Process</option>
-                    <option value="observation">👀 Observation</option>
-                  </select>
+                    <label className="font-bold text-xs">Post Length</label>
+                    <select
+                      value={threadType}
+                      onChange={(e) => setThreadType(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <option value="single">Single Tweet</option>
+                      <option value="three">3 Tweet Thread</option>
+                      <option value="full">Full Thread</option>
+                    </select>
                   </div>
-
+                  <div className='grid'>
+                    <label className="font-bold text-xs">Prespective</label>
+                    <select
+                      value={feeling}
+                      onChange={(e) => setFeeling(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <option value="not_specified">Not Specified</option>
+                      <option value="curiosity">🔍 Curiosity</option>
+                      <option value="insight">💡 Insight</option>
+                      <option value="authenticity">🎭 Authenticity</option>
+                      <option value="achievement">🏆 Achievement</option>
+                      <option value="helpful">🤝 Helpful</option>
+                      <option value="reflection">🤔 Reflection</option>
+                      <option value="encouragement">💪 Encouragement</option>
+                      <option value="process">⚙️ Process</option>
+                      <option value="observation">👀 Observation</option>
+                    </select>
+                  </div>
+                  {/* Celebrity Mode Dropdown */}
+                  <div className='grid'>
+                    <label className="font-bold text-xs">Celebrity Mode</label>
+                    <select
+                      value={celebrityMode}
+                      onChange={(e) => setCelebrityMode(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <option value="">None</option>
+                      <option value="marclou">Marc Lou</option>
+                      <option value="johnrush">John Rush</option>
+                      <option value="examplecelebrity">Example Celebrity</option>
+                    </select>
+                  </div>
                 </div>
-
               )}
             </div>
 
+            {/* Training Data button and multi-select placed side-by-side */}
+            <div className="flex items-center gap-2">
 
-
-            {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
-              <button
-                className="bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm w-full sm:w-auto"
-                onClick={generateAIThread}
-                disabled={isGenerating || apiKeyStatus === 'validating'}
+            <button
+                className='flex gap-2 bg-blue-100 text-blue-600 p-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm'
+                onClick={() => setIsTrainingPopupOpen(true)}
               >
-                {isGenerating || apiKeyStatus === 'validating' ? (
-                  <Loader size={14} className="animate-spin" />
-                ) : (
-                  <Wand2 size={14} />
-                )}
-                {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
+                Training Data
               </button>
-            )}
+
+              {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
+                <button
+                  className="bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm"
+                  onClick={generateAIThread}
+                  disabled={isGenerating || apiKeyStatus === 'validating'}
+                >
+                  {isGenerating || apiKeyStatus === 'validating' ? (
+                    <Loader size={14} className="animate-spin" />
+                  ) : (
+                    <Wand2 size={14} />
+                  )}
+                  {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
+                </button>
+              )}
+
+
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 gap-2 mt-4">
-            <button
-              onClick={() => setIncludeProduct(!includeProduct)}
-              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm gap-4"
-            >
-              {includeProduct ? <CircleCheckBig size={20} /> : <Circle size={20} />}
-              <span className="flex items-center gap-2 text-slate-500">
-                Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
-                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
-                    <Blocks size={16} />product/service
-                  </i> with my
-                  <i className='flex gap-1 sm:gap-2 text-blue-500'>
-                    <BicepsFlexed size={16} />personal journey
-                  </i>
-                </span>
-              </span>
-            </button>
-            <button
-              className='flex gap-2 bg-blue-100 text-blue-600 p-1 px-2 sm:px-4 rounded-2xl text-xs sm:text-sm'
-              onClick={onConfigureTrainingData}
-            >
-              Training Data
-            </button>
-          </div>
+
+          {/* Popup Modal for Training Data & Multi-select */}
+          {isTrainingPopupOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white rounded-md p-4 sm:p-6 w-80">
+                <h2 className="text-lg font-bold mb-4">Select Profiles</h2>
+                <select
+                  multiple
+                  value={selectedProfiles}
+                  onChange={handleProfileSelect}
+                  className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full"
+                >
+                  {profiles.map((profile) => (
+                    <option key={profile.id} value={profile.id}>
+                      {profile.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    onClick={() => setIsTrainingPopupOpen(false)}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
       <div className='bg-blue-200 p-2 sm:p-4 rounded-md'>
         <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-4 sm:mb-8 bg-white">
           {tweets.map((tweet, index) => (
             <div key={tweet.key} className="relative border-b border-gray-200 last:border-b-0">
-              <div className="absolute left-0 top-0 -ml-4 sm:-ml-6 mt-2 text-xs font-bold text-white">
+              <div className="absolute left-0 top-0 -ml-4 sm:-ml-6 mt-2 text-xs font-bold text-blue-500">
                 {index + 1}
               </div>
               <div className="p-2 sm:p-4">
@@ -1375,7 +1465,7 @@ const getFeelingPrompt = (feeling) => {
                   videos={tweet.videos}
                 />
                 <div className="flex space-x-2 mt-2">
-
+                  {/* Additional tweet-specific actions can go here */}
                 </div>
               </div>
             </div>

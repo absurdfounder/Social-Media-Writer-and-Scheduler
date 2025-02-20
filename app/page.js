@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace, 
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2, 
-  DollarSign, Chrome, Handshake, Heart, Check,Calendar, CheckCircle2 } from 'lucide-react';
+  DollarSign, Chrome, Handshake, Heart, Check,Calendar, CheckCircle2, LaughIcon } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -324,16 +324,16 @@ export default function Dashboard() {
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
-    { icon: Shapes, label: 'Meme Editor', id: 'MemeEditor' },
+    { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor' },
   ];
 
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
     { icon: Settings2, label: 'Settings', id: 'settings' },
-    { icon: DollarSign, label: 'Billing', id: 'billing' },
-    { icon: Chrome, label: 'Extension', id: 'extension' },
+   /* { icon: DollarSign, label: 'Billing', id: 'billing' },
+    { icon: Chrome, label: 'Extension', id: 'extension' }, 
     { icon: Handshake, label: 'Affiliate', id: 'affiliate' },
-    { icon: Heart, label: 'Feedback', id: 'feedback' }
+    { icon: Heart, label: 'Feedback', id: 'feedback' }*/
   ];
 
   useEffect(() => {

@@ -500,7 +500,7 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative bg-white rounded-lg w-full max-w-md mx-4 p-6">
+      <div className="relative bg-white rounded-lg w-full max-w-xl mx-4 p-6">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"

@@ -14,8 +14,8 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
   const plans = [
     {
       name: "Content Creator",
-      price: "$29/month",
-      billedAs: "Billed $348 yearly",
+      price: "$6/month",
+      billedAs: "Billed $48 yearly",
       description: "Perfect for growing creators",
       features: [
         "AI-powered content generation",
@@ -29,7 +29,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
     {
       name: "Creator Suite",
       popular: true,
-      price: "$89",
+      price: "$70",
       billedAs: "One-time payment forever",
       description: "Everything you need to go viral",
       features: [

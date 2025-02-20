@@ -1874,7 +1874,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
                   value={keywordsInput}
                   onChange={(e) => setKeywordsInput(e.target.value)}
                   placeholder="Add keyword..."
-                  className="flex-grow px-3 py-2 border rounded"
+                  className="flex-grow px-3 py-2 border rounded w-full"
                 />
                 <button
                   onClick={() => {
@@ -1938,7 +1938,7 @@ Generate a natural, engaging comment that someone would actually write on Reddit
             <div className="flex justify-end">
               <button
                 onClick={() => setShowKeywordsModal(false)}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="px-4 py-2 bg-slate-800 text-white rounded hover:bg-blue-600 w-full"
               >
                 Done
               </button>

@@ -279,7 +279,7 @@ export const Login = () => {
                 <img
                   src={user.photoURL}
                   alt="Profile"
-                  className="w-10 h-10 rounded-full"
+                  className="w-10 h-10 rounded-full m-auto"
                 />
               ) : (
                 <div className="w-8 h-8 grid rounded-full bg-orange-500 flex items-center justify-center text-white">

@@ -233,16 +233,16 @@ export const Login = () => {
     const getBadgeColor = () => {
       switch (subscription.planName) {
         case 'lifetime':
-          return 'bg-purple-500';
+          return 'bg-gray-500 text-white';
         case 'monthly':
-          return 'bg-blue-500';
+          return 'bg-blue-500 text-white';
         default:
           return '';
       }
     };
 
     return (
-      <div className={`${getBadgeColor()}  rounded-full text-xs opacity-50 font-medium flex space-x-1`}>
+      <div className={`${getBadgeColor()} rounded-full text-xs opacity-50 font-medium flex space-x-1 py-1 px-2`}>
         <span>
           {subscription.planName === 'lifetime' ? '∞' : '★'}
         </span>
@@ -287,8 +287,8 @@ export const Login = () => {
                 </div>
               )}
               <div className='grid gap-1'>
-              <span className="truncate max-w-[150px]">{user.displayName || user.email}</span>
-              {renderSubscriptionBadge()}
+                <span className="truncate max-w-[150px] text-start font-bold">{user.displayName || user.email}</span>
+                {renderSubscriptionBadge()}
               </div>
 
             </div>
@@ -328,7 +328,7 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center border-t mt-4">
       <button
         onClick={user ? handleLogout : handleGoogleLogin}
         disabled={loading}

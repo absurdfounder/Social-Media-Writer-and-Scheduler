@@ -434,7 +434,7 @@ export default function Dashboard() {
         <aside className={`fixed inset-y-0 left-0 z-20 w-64 bg-white transform 
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
-          <div className="p-6 flex justify-between items-center">
+          <div className="p-8 flex justify-between items-center">
             <Image
               src={logoSrc}
               alt="Logo"

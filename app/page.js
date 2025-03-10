@@ -5,7 +5,7 @@ import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
-  DollarSign, Chrome, Handshake, Heart, Check, Calendar, CheckCircle2, LaughIcon
+  DollarSign, Chrome, Handshake, Heart, Check, Calendar, CheckCircle2, LaughIcon, MailIcon
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -222,6 +222,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
 import Reddit_hub from './dashboard_pages/Reddit_hub';
 import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
+import OutreachAgent from './dashboard_pages/Outreach';
 import MemeEditor from './dashboard_pages/MemeEditor';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
@@ -323,6 +324,7 @@ export default function Dashboard() {
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
+    { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor' },
   ];
 
@@ -396,6 +398,8 @@ export default function Dashboard() {
         return <KnowledgeWall />;
       case 'BrandTraning':
         return <BrandTraning />;
+        case 'OutreachAgent':
+          return <OutreachAgent />;
       case 'MemeEditor':
         return <MemeEditor />;
       default:

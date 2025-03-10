@@ -173,6 +173,7 @@ const TweetContent = ({ images, links, videos }) => {
 // ===== ThreadWriter Component =====
 const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [isBrowser, setIsBrowser] = useState(false);
+  const [isClient, setIsClient] = useState(false); // Add the missing state
   const [tweets, setTweets] = useState([{ id: Date.now(), content: '', images: [], links: [], videos: [], key: Date.now() }]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [overallPrompt, setOverallPrompt] = useState('');
@@ -186,13 +187,30 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [replyStance, setReplyStance] = useState('controversial');
 
   const [apikeyAdded, setApikeyAdded] = useState(false);
-  const [TrainingData, setTraningData] = useState({});
+  const [TrainingData, setTraningData] = useState('');
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("getTrainingData");
+    if (storedData) {
+      setTraningData(storedData);
+    }
+  }, []);
+  
+  // Log training data when it changes
+  useEffect(() => {
+    if (TrainingData) {
+      console.log('Training data updated:', TrainingData);
+    }
+  }, [TrainingData]);
+
   const [isValidatingKey, setIsValidatingKey] = useState(false);
   const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
 
   // New state for profiles and selected profiles
-  const [profiles, setProfiles] = useState([]);
-  const [selectedProfiles, setSelectedProfiles] = useState([]);
+// New state for profiles and selected profiles
+const [profiles, setProfiles] = useState([]);
+const [selectedProfiles, setSelectedProfiles] = useState([]);
+const [selectedProfile, setSelectedProfile] = useState(null); // Add this for single profile selection
 
   // New state for Training Data Popup visibility
   const [isTrainingPopupOpen, setIsTrainingPopupOpen] = useState(false);
@@ -208,38 +226,113 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   };
 
   // Load profiles from Firebase (using logic similar to ProfileManager)
-  useEffect(() => {
-    const loadProfiles = async () => {
-      const auth = getAuth();
-      if (!auth.currentUser) return;
-      try {
-        const db = getFirestore();
-        const profilesRef = collection(db, 'profiles');
-        const q = query(profilesRef, where('userId', '==', auth.currentUser.uid));
-        const querySnapshot = await getDocs(q);
-        const loadedProfiles = [];
-        querySnapshot.forEach((doc) => {
-          loadedProfiles.push({ id: doc.id, ...doc.data() });
-        });
-        setProfiles(loadedProfiles);
-      } catch (error) {
-        console.error('Error loading profiles:', error);
-      }
-    };
-    loadProfiles();
-  }, []);
+// Load profiles from Firebase
+// Define validateApiKey function before using it
+const validateApiKey = async () => {
+  const key = localStorage.getItem('anthropicKey');
+  if (!key) {
+    setApiKeyStatus('invalid');
+    setApikeyAdded(false);
+    return;
+  }
 
-  // Handler for multi-select change
-  const handleProfileSelect = (e) => {
-    const options = e.target.options;
-    const selected = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selected.push(options[i].value);
+  if (!key.startsWith('sk-')) {
+    setApiKeyStatus('invalid');
+    setApikeyAdded(false);
+    return;
+  }
+
+  setApiKeyStatus('validating');
+  setIsValidatingKey(true);
+
+  // Simulate API validation delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  setApiKeyStatus('valid');
+  setApikeyAdded(true);
+  setIsValidatingKey(false);
+};
+
+// Load profiles from Firebase
+useEffect(() => {
+  setIsClient(true);
+  validateApiKey();
+  
+  const loadProfiles = async () => {
+    try {
+      const auth = getAuth();
+      // Wait for auth to initialize and check if user is logged in
+      if (!auth || !auth.currentUser) {
+        console.log("User not authenticated yet, waiting for auth state");
+        // Add a listener for auth state changes
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          if (user) {
+            fetchProfiles(user.uid);
+            unsubscribe();
+          }
+        });
+        return;
+      }
+      
+      // If we already have a user, fetch profiles directly
+      fetchProfiles(auth.currentUser.uid);
+    } catch (error) {
+      console.error('Error in loadProfiles:', error);
+      // Fallback with test data if in development
+      if (process.env.NODE_ENV === 'development') {
+        setProfiles([
+          { id: "test1", name: "Test Profile 1", description: "For testing purposes" },
+          { id: "test2", name: "Test Profile 2", description: "Another test profile" }
+        ]);
       }
     }
-    setSelectedProfiles(selected);
   };
+  
+  const fetchProfiles = async (userId) => {
+    try {
+      console.log("Fetching profiles for user:", userId);
+      const db = getFirestore();
+      const profilesRef = collection(db, 'profiles');
+      const q = query(profilesRef, where('userId', '==', userId));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        console.log("No profiles found for this user");
+        return;
+      }
+      
+      const loadedProfiles = [];
+      querySnapshot.forEach((doc) => {
+        loadedProfiles.push({ id: doc.id, ...doc.data() });
+      });
+      
+      console.log("Loaded profiles:", loadedProfiles.length);
+      setProfiles(loadedProfiles);
+    } catch (error) {
+      console.error('Error fetching profiles:', error);
+      toast.error("Failed to load profiles");
+    }
+  };
+  
+  loadProfiles();
+}, []);
+
+// Handler for single profile selection
+const handleProfileSelect = (profileId) => {
+  setSelectedProfile(profileId);
+  
+  // Find the selected profile from the profiles array
+  const profile = profiles.find(p => p.id === profileId);
+  
+  // If a profile was found, set its data as training data
+  if (profile) {
+    // You can update the training data based on the selected profile
+    setTraningData(profile.description || '');
+    
+    // And save to localStorage if needed
+    localStorage.setItem("getTrainingData", profile.description || '');
+  }
+};
 
   // Update the apiKey effect
   useEffect(() => {
@@ -293,10 +386,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     }
   };
 
-  useEffect(() => {
-    setTraningData(localStorage.getItem("getTrainingData"))
-    console.log('Traning data ', TrainingData);
-  }, [TrainingData]);
+
 
   useEffect(() => {
     setIsBrowser(true);
@@ -1402,33 +1492,92 @@ Copy- Style guide creation
           </div>
 
           {/* Popup Modal for Training Data & Multi-select */}
-          {isTrainingPopupOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white rounded-md p-4 sm:p-6 w-80">
-                <h2 className="text-lg font-bold mb-4">Select Profiles</h2>
-                <select
-                  multiple
-                  value={selectedProfiles}
-                  onChange={handleProfileSelect}
-                  className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full"
-                >
-                  {profiles.map((profile) => (
-                    <option key={profile.id} value={profile.id}>
-                      {profile.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-4 flex justify-end">
-                  <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                    onClick={() => setIsTrainingPopupOpen(false)}
-                  >
-                    Done
-                  </button>
+{/* Profile Selection Modal */}
+{isTrainingPopupOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white rounded-md p-4 sm:p-6 w-80 sm:w-96 max-h-[80vh] overflow-y-auto">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold">Select Profile</h2>
+        <button 
+          onClick={() => setIsTrainingPopupOpen(false)}
+          className="text-gray-500 hover:text-red-500"
+        >
+          <X size={18} />
+        </button>
+      </div>
+      
+      <div className="mb-4">
+        <p className="text-sm text-gray-500 mb-2">
+          Select a profile to personalize your outreach messages with your information and style.
+        </p>
+        
+        {profiles && profiles.length > 0 ? (
+          <div className="space-y-2">
+            {profiles.map((profile) => (
+              <div 
+                key={profile.id}
+                onClick={() => {
+                  handleProfileSelect(profile.id);
+                  toast.success(`Profile "${profile.name}" selected`);
+                  setIsTrainingPopupOpen(false);
+                }}
+                className={`p-3 rounded-md cursor-pointer flex items-center ${
+                  selectedProfile === profile.id 
+                    ? 'bg-blue-100 border border-blue-300' 
+                    : 'bg-gray-50 hover:bg-gray-100'
+                }`}
+              >
+                <User size={18} className="mr-2 text-blue-500" />
+                <div className="flex-1">
+                  <div className="font-medium">{profile.name || "Unnamed Profile"}</div>
+                  {profile.description && (
+                    <div className="text-xs text-gray-500">{profile.description}</div>
+                  )}
                 </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        ) : (
+          <div className="text-center p-4 bg-gray-100 rounded-md">
+            <p className="text-gray-500">No profiles found. Please create a profile first.</p>
+            <button 
+              className="mt-2 text-sm text-blue-500 hover:underline"
+              onClick={() => {
+                // You can add navigation to profile manager here
+                setIsTrainingPopupOpen(false);
+                // window.location.href = '/profile-manager';
+                toast.info("Please create a profile in the Profile Manager");
+              }}
+            >
+              Create a Profile
+            </button>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex justify-between">
+        {selectedProfile && (
+          <button
+            onClick={() => {
+              setSelectedProfile(null);
+              setTrainingData('');
+              toast.info("Profile selection cleared");
+            }}
+            className="bg-red-50 text-red-600 px-4 py-2 rounded-md"
+          >
+            Clear Selection
+          </button>
+        )}
+        <button
+          onClick={() => setIsTrainingPopupOpen(false)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         </div>
       </div>

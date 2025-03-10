@@ -223,6 +223,7 @@ import Reddit_hub from './dashboard_pages/Reddit_hub';
 import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
 import OutreachAgent from './dashboard_pages/Outreach';
+import Crypto from './dashboard_pages/crypto';
 import MemeEditor from './dashboard_pages/MemeEditor';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
@@ -330,6 +331,7 @@ export default function Dashboard() {
 
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
+    { icon: MailIcon, label: 'Crypto', id: 'Crypto' },
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 
@@ -398,8 +400,10 @@ export default function Dashboard() {
         return <KnowledgeWall />;
       case 'BrandTraning':
         return <BrandTraning />;
-        case 'OutreachAgent':
-          return <OutreachAgent />;
+      case 'OutreachAgent':
+        return <OutreachAgent />;
+      case 'Crypto':
+        return <Crypto />;
       case 'MemeEditor':
         return <MemeEditor />;
       default:

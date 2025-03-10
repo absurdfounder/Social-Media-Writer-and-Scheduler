@@ -5,7 +5,8 @@ import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
-  DollarSign, Chrome, Handshake, Heart, Check, Calendar, CheckCircle2, LaughIcon, MailIcon
+  DollarSign, Chrome, Handshake, Heart, Check, Calendar, CheckCircle2, LaughIcon, MailIcon,
+  ShieldAlert
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -331,7 +332,7 @@ export default function Dashboard() {
 
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
-    { icon: MailIcon, label: 'Crypto', id: 'Crypto' },
+    { icon: ShieldAlert, label: 'C-Internal', id: 'Crypto' },
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 

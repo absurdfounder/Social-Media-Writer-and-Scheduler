@@ -364,7 +364,12 @@ export default function App() {
       // Sort transactions by timestamp (newest first)
       const sortedTxs = validTxs.sort((a, b) => b.timestamp - a.timestamp);
 
-      // Calculate running loan state balance correctly
+// Calculate running loan state balance correctly
+      // Start from the earliest transactions and go forward in time
+      // First reverse the sorted transactions (oldest first)
+      const chronologicalTxs = [...sortedTxs].reverse();
+      
+      // Initialize balances
       let ethSupplied = 0;
       let daiSupplied = 0;
       let btcSupplied = 0;
@@ -374,62 +379,156 @@ export default function App() {
       let btcBalance = 0;
       let usdcBalance = 0;
       let usdtBalance = 0;
-
-      const txsWithBalance = sortedTxs.map(tx => {
-        // Update Compound position balances
-        if (tx.tokenSymbol === "ETH" && tx.contractType === "Supply") {
-          if (tx.action === "Supply") ethSupplied += tx.value;
-          else if (tx.action === "Withdraw") ethSupplied -= tx.value;
+      let cETHBalance = 0;
+      let cDAIBalance = 0;
+      let cWBTCBalance = 0;
+      
+      // Process transactions chronologically
+      const txsWithBalance = chronologicalTxs.map(tx => {
+        // Update Compound position balances based on the contract and action
+        if (tx.contractName === "cETH") {
+          if (tx.action === "Supply") {
+            ethSupplied += tx.value;
+            cETHBalance += tx.value;
+            ethBalance -= tx.value; // Deduct from ETH balance when supplying
+          } 
+          else if (tx.action === "Withdraw") {
+            ethSupplied -= tx.value;
+            cETHBalance -= tx.value;
+            ethBalance += tx.value; // Add to ETH balance when withdrawing
+          }
         } 
-        else if (tx.tokenSymbol === "DAI" && tx.contractType === "Borrow") {
-          if (tx.action === "Supply") daiSupplied += tx.value;
-          else if (tx.action === "Withdraw") daiSupplied -= tx.value;
-          else if (tx.action === "Borrow") daiBorrowed += tx.value;
-          else if (tx.action === "Repay") daiBorrowed -= tx.value;
+        else if (tx.contractName === "cDAI") {
+          if (tx.action === "Supply") {
+            daiSupplied += tx.value;
+            cDAIBalance += tx.value;
+            daiBalance -= tx.value;
+          } 
+          else if (tx.action === "Withdraw") {
+            daiSupplied -= tx.value;
+            cDAIBalance -= tx.value;
+            daiBalance += tx.value;
+          }
+          else if (tx.action === "Borrow") {
+            daiBorrowed += tx.value;
+            daiBalance += tx.value; // Add to DAI balance when borrowing
+          }
+          else if (tx.action === "Repay") {
+            daiBorrowed -= tx.value;
+            daiBalance -= tx.value; // Deduct from DAI balance when repaying
+          }
         }
-        else if (tx.tokenSymbol === "WBTC" && tx.contractType === "Supply") {
-          if (tx.action === "Supply") btcSupplied += tx.value;
-          else if (tx.action === "Withdraw") btcSupplied -= tx.value;
+        else if (tx.contractName === "cWBTC" || tx.contractName === "cWBTC Legacy") {
+          if (tx.action === "Supply") {
+            btcSupplied += tx.value;
+            cWBTCBalance += tx.value;
+            btcBalance -= tx.value;
+          } 
+          else if (tx.action === "Withdraw") {
+            btcSupplied -= tx.value;
+            cWBTCBalance -= tx.value;
+            btcBalance += tx.value;
+          }
         }
         
-        // Update token balances for general transfers
-        if (tx.tokenSymbol === "ETH" && tx.direction === "out") ethBalance -= tx.value;
-        else if (tx.tokenSymbol === "ETH" && tx.direction === "in") ethBalance += tx.value;
-        else if (tx.tokenSymbol === "DAI" && tx.direction === "out") daiBalance -= tx.value;
-        else if (tx.tokenSymbol === "DAI" && tx.direction === "in") daiBalance += tx.value;
-        else if (tx.tokenSymbol === "WBTC" && tx.direction === "out") btcBalance -= tx.value;
-        else if (tx.tokenSymbol === "WBTC" && tx.direction === "in") btcBalance += tx.value;
-        else if (tx.tokenSymbol === "USDC" && tx.direction === "out") usdcBalance -= tx.value;
-        else if (tx.tokenSymbol === "USDC" && tx.direction === "in") usdcBalance += tx.value;
-        else if (tx.tokenSymbol === "USDT" && tx.direction === "out") usdtBalance -= tx.value;
-        else if (tx.tokenSymbol === "USDT" && tx.direction === "in") usdtBalance += tx.value;
+        // Handle regular token transfers
+        if (tx.asset === "ETH" || tx.asset === "WETH") {
+          if (tx.direction === "out") ethBalance -= tx.value;
+          else if (tx.direction === "in") ethBalance += tx.value;
+        } 
+        else if (tx.asset === "DAI") {
+          if (tx.direction === "out") daiBalance -= tx.value;
+          else if (tx.direction === "in") daiBalance += tx.value;
+        }
+        else if (tx.asset === "WBTC") {
+          if (tx.direction === "out") btcBalance -= tx.value;
+          else if (tx.direction === "in") btcBalance += tx.value;
+        }
+        else if (tx.asset === "USDC") {
+          if (tx.direction === "out") usdcBalance -= tx.value;
+          else if (tx.direction === "in") usdcBalance += tx.value;
+        }
+        else if (tx.asset === "USDT") {
+          if (tx.direction === "out") usdtBalance -= tx.value;
+          else if (tx.direction === "in") usdtBalance += tx.value;
+        }
         
-        // Calculate net position in ETH equivalent (simplified for display)
+        // Calculate historical USD values based on the timestamp of this transaction
+        const txDate = new Date(tx.timestamp);
+        const ethPriceUSD = getHistoricalPrice("ethereum", txDate) || 0;
+        const btcPriceUSD = getHistoricalPrice("wrapped-bitcoin", txDate) || 0;
+        
+        // Calculate USD values for all balances
+        const ethBalanceUSD = ethBalance * ethPriceUSD;
+        const daiBalanceUSD = daiBalance; // DAI is a stablecoin, 1 DAI ≈ 1 USD
+        const btcBalanceUSD = btcBalance * btcPriceUSD;
+        const usdcBalanceUSD = usdcBalance; // USDC is a stablecoin, 1 USDC ≈ 1 USD
+        const usdtBalanceUSD = usdtBalance; // USDT is a stablecoin, 1 USDT ≈ 1 USD
+        
+        // Calculate USD values for all supplied/borrowed assets
+        const ethSuppliedUSD = ethSupplied * ethPriceUSD;
+        const cETHBalanceUSD = cETHBalance * ethPriceUSD;
+        const daiSuppliedUSD = daiSupplied; // DAI is a stablecoin
+        const daiBorrowedUSD = daiBorrowed; // DAI is a stablecoin
+        const btcSuppliedUSD = btcSupplied * btcPriceUSD;
+        const cWBTCBalanceUSD = cWBTCBalance * btcPriceUSD;
+        
+        // Calculate total portfolio value
+        const totalPortfolioUSD = ethBalanceUSD + daiBalanceUSD + btcBalanceUSD + usdcBalanceUSD + usdtBalanceUSD + 
+                                 ethSuppliedUSD + btcSuppliedUSD - daiBorrowedUSD;
+        
+        // Calculate net position in ETH equivalent (for comparison)
         const ethValue = ethSupplied;
-        const btcInEth = btcSupplied * (tx.historicalPrice || 0) / getHistoricalPrice("ethereum", new Date(tx.timestamp));
-        
-        const netPositionETH = ethValue + btcInEth;
+        const btcInEth = btcSupplied * btcPriceUSD / ethPriceUSD;
+        const netPositionETH = ethValue + btcInEth - (daiBorrowed / ethPriceUSD);
         
         return {
           ...tx,
+          // Supply/borrow positions
           ethSupplied,
           daiSupplied,
           daiBorrowed,
           btcSupplied,
-          netPositionETH,
+          cETHBalance,
+          cDAIBalance,
+          cWBTCBalance,
+          
+          // Regular token balances
           ethBalance,
           daiBalance,
           btcBalance,
           usdcBalance,
-          usdtBalance
+          usdtBalance,
+          
+          // USD values
+          ethBalanceUSD,
+          daiBalanceUSD,
+          btcBalanceUSD,
+          usdcBalanceUSD,
+          usdtBalanceUSD,
+          ethSuppliedUSD,
+          daiSuppliedUSD, 
+          daiBorrowedUSD,
+          btcSuppliedUSD,
+          
+          // Summary metrics
+          totalPortfolioUSD,
+          netPositionETH,
+          
+          // Store prices for reference
+          ethPriceUSD,
+          btcPriceUSD
         };
       });
-
+      
+      // Sort back to newest-first for display
+      const displayTxs = [...txsWithBalance].reverse();
+      
       // Set transactions state
       if (page === 1) {
-        setTransactions(txsWithBalance);
+        setTransactions(displayTxs);
       } else {
-        setTransactions(prev => [...prev, ...txsWithBalance]);
+        setTransactions(prev => [...prev, ...displayTxs]);
       }
 
       // Extract historical balances for potential charting
@@ -575,7 +674,7 @@ export default function App() {
           ) : (
             <div>
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
+              <table className="w-full border-collapse">
                   <thead>
                     <tr className="border-b">
                       <th className="px-3 py-2 text-left">Date</th>
@@ -585,6 +684,7 @@ export default function App() {
                       <th className="px-3 py-2 text-right">USD Value</th>
                       <th className="px-3 py-2 text-center">Direction</th>
                       <th className="px-3 py-2 text-center">Tx Hash</th>
+                      <th className="px-3 py-2 text-left">Cumulative Balance</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -599,7 +699,6 @@ export default function App() {
                         <td className="px-3 py-3 text-right">
                           {formatUSD(tx.valueUSD)}
                         </td>
-
                         <td className="px-3 py-3 text-center">
                           <span className={tx.direction === "out" ? "text-red-600" : "text-green-600"}>
                             {tx.direction === "out" ? "Outgoing" : "Incoming"}
@@ -614,6 +713,41 @@ export default function App() {
                           >
                             {tx.hash.substring(0, 6)}...{tx.hash.substring(tx.hash.length - 4)}
                           </a>
+                        </td>
+                        <td className="px-3 py-3 text-left">
+                          <div className="text-xs">
+                            <div className="font-semibold text-sm mb-1">Tokens:</div>
+                            {tx.ethBalance !== 0 && (
+                              <div className="mb-1">ETH: {tx.ethBalance.toFixed(4)} (${tx.ethBalanceUSD.toFixed(2)})</div>
+                            )}
+                            {tx.daiBalance !== 0 && (
+                              <div className="mb-1">DAI: {tx.daiBalance.toFixed(2)} (${tx.daiBalanceUSD.toFixed(2)})</div>
+                            )}
+                            {tx.btcBalance !== 0 && (
+                              <div className="mb-1">WBTC: {tx.btcBalance.toFixed(8)} (${tx.btcBalanceUSD.toFixed(2)})</div>
+                            )}
+                            {tx.usdcBalance !== 0 && (
+                              <div className="mb-1">USDC: {tx.usdcBalance.toFixed(2)} (${tx.usdcBalanceUSD.toFixed(2)})</div>
+                            )}
+                            {tx.usdtBalance !== 0 && (
+                              <div className="mb-1">USDT: {tx.usdtBalance.toFixed(2)} (${tx.usdtBalanceUSD.toFixed(2)})</div>
+                            )}
+                            
+                            <div className="font-semibold text-sm mt-2 mb-1">Compound Positions:</div>
+                            {tx.cETHBalance !== 0 && (
+                              <div className="mb-1 font-medium">cETH: {tx.cETHBalance.toFixed(4)} (${tx.ethSuppliedUSD.toFixed(2)})</div>
+                            )}
+                            {tx.cWBTCBalance !== 0 && (
+                              <div className="mb-1 font-medium">cWBTC: {tx.cWBTCBalance.toFixed(8)} (${tx.btcSuppliedUSD.toFixed(2)})</div>
+                            )}
+                            {tx.daiBorrowed !== 0 && (
+                              <div className="mb-1 font-medium text-red-600">Borrowed DAI: {tx.daiBorrowed.toFixed(2)} (${tx.daiBorrowedUSD.toFixed(2)})</div>
+                            )}
+                            
+                            <div className="font-semibold text-sm text-green-700 mt-2 border-t pt-1">
+                              Total Portfolio: ${tx.totalPortfolioUSD.toFixed(2)}
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     ))}

@@ -16,7 +16,10 @@ import {
   Check,
   FileText,
   X,
-  Database
+  Database,
+  StickyNote,
+  Save,
+  Trash2
 } from 'lucide-react';
 import { getAnthropicKey } from '../Utils/getApikey';
 import { getFirestore, collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
@@ -32,24 +35,41 @@ const OutreachAgent = () => {
   const [platform, setPlatform] = useState('twitter');
   const [messageType, setMessageType] = useState('cold_outreach');
   const [tone, setTone] = useState('friendly');
-  const [goal, setGoal] = useState('partnership');
+  const [goal, setGoal] = useState('sales');
   const [messageLength, setMessageLength] = useState('short');
   
   const [apiKeyStatus, setApiKeyStatus] = useState('unchecked');
   const [isValidatingKey, setIsValidatingKey] = useState(false);
   const [copied, setCopied] = useState(false);
   
-  // Add the missing state variables here
+  // State variables
   const [trainingData, setTrainingData] = useState('');
   const [profiles, setProfiles] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isTrainingPopupOpen, setIsTrainingPopupOpen] = useState(false);
+  
+  // Notes feature state
+  const [notes, setNotes] = useState('');
+  const [isNotesExpanded, setIsNotesExpanded] = useState(false);
+  const [includeNotesInGeneration, setIncludeNotesInGeneration] = useState(false);
 
   // Load training data from localStorage
   useEffect(() => {
     const storedTrainingData = localStorage.getItem("getTrainingData");
     if (storedTrainingData) {
       setTrainingData(storedTrainingData);
+    }
+    
+    // Load saved notes from localStorage
+    const savedNotes = localStorage.getItem("outreachNotes");
+    if (savedNotes) {
+      setNotes(savedNotes);
+    }
+    
+    // Load notes inclusion preference
+    const savedIncludeNotes = localStorage.getItem("includeNotesInGeneration");
+    if (savedIncludeNotes) {
+      setIncludeNotesInGeneration(savedIncludeNotes === 'true');
     }
   }, []);
 
@@ -77,6 +97,20 @@ const OutreachAgent = () => {
     validateApiKey();
     loadProfiles();
   }, []);
+
+  // Save notes to localStorage whenever they change
+  useEffect(() => {
+    if (isClient && notes !== undefined) {
+      localStorage.setItem("outreachNotes", notes);
+    }
+  }, [notes, isClient]);
+  
+  // Save include notes preference
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem("includeNotesInGeneration", includeNotesInGeneration.toString());
+    }
+  }, [includeNotesInGeneration, isClient]);
 
   const validateApiKey = async () => {
     const key = localStorage.getItem('anthropicKey');
@@ -145,6 +179,15 @@ const OutreachAgent = () => {
       // System prompt based on selected preferences
       const systemPrompt = getSystemPrompt();
       
+      // Create enhanced user content including notes if enabled
+      let userContent = `Generate a ${messageLength} ${messageType} message for ${platform} based on this context about the recipient: "${userContext}"`;
+      userContent += `. The goal is ${goal}.`;
+      
+      // Add notes as additional instructions if enabled
+      if (includeNotesInGeneration && notes.trim()) {
+        userContent += `\n\nAdditional instructions or context for generating this message: "${notes.trim()}"`;
+      }
+      
       const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
@@ -156,7 +199,7 @@ const OutreachAgent = () => {
           max_tokens: 1000,
           messages: [{
             role: "user",
-            content: `Generate a ${messageLength} ${messageType} message for ${platform} based on this context about the recipient: "${userContext}". The goal is ${goal}.`
+            content: userContent
           }],
           system: systemPrompt,
           model: "claude-3-5-sonnet-20241022",
@@ -285,12 +328,21 @@ For networking messages:
       });
   };
 
-  // Add the missing handleProfileSelect function
+  // Handle profile selection
   const handleProfileSelect = (profileId) => {
     setSelectedProfile(profileId);
     const selectedProfileData = profiles.find(p => p.id === profileId);
     if (selectedProfileData && selectedProfileData.trainingData) {
       setTrainingData(selectedProfileData.trainingData);
+    }
+  };
+
+  // Clear notes
+  const clearNotes = () => {
+    if (window.confirm("Are you sure you want to clear your notes?")) {
+      setNotes('');
+      localStorage.removeItem("outreachNotes");
+      toast.success("Notes cleared successfully");
     }
   };
 
@@ -400,6 +452,7 @@ For networking messages:
             </div>
           </div>
           
+
           {/* Recipient Context */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -414,6 +467,60 @@ For networking messages:
             />
           </div>
           
+
+          {/* Notes Section */}
+          <div className="mb-4">
+            <div 
+              className="flex items-center justify-between cursor-pointer p-2 bg-yellow-50 rounded-t-md border border-yellow-200"
+              onClick={() => setIsNotesExpanded(!isNotesExpanded)}
+            >
+              <div className="flex items-center gap-2 text-yellow-700">
+                <StickyNote size={16} />
+                <span className="font-medium">Personal Notes</span>
+                <span className="text-xs text-yellow-600">(saved locally)</span>
+              </div>
+              <div className="text-yellow-600">
+                {isNotesExpanded ? '−' : '+'}
+              </div>
+            </div>
+            
+            {isNotesExpanded && (
+              <div className="border border-t-0 border-yellow-200 rounded-b-md p-2">
+                <textarea
+                  className="w-full p-2 border border-yellow-100 rounded-md bg-white focus:ring-yellow-500 focus:border-yellow-500 min-h-24"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add your personal notes here. These will be saved locally and won't be lost when you refresh the page."
+                  rows={4}
+                />
+                <div className="flex justify-between mt-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="includeNotes"
+                      checked={includeNotesInGeneration}
+                      onChange={(e) => setIncludeNotesInGeneration(e.target.checked)}
+                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="includeNotes" className="text-sm text-gray-700">
+                      Use notes as additional instructions for message generation
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={clearNotes}
+                      className="flex items-center gap-1 bg-red-50 text-red-600 px-3 py-1 rounded-md hover:bg-red-100"
+                      title="Clear notes"
+                    >
+                      <Trash2 size={14} /> Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+
           {/* Generate Button */}
           {/* Training Data & Profile Selection */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
@@ -448,6 +555,8 @@ For networking messages:
               )}
             </div>
           </div>
+
+          
           
           {/* Profile Selection Modal */}
           {isTrainingPopupOpen && (

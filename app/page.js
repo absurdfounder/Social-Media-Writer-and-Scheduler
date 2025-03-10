@@ -320,11 +320,11 @@ export default function Dashboard() {
   // Navigation items configuration
   const mainNavItems = [
     { icon: Twitter, label: 'Build On X', id: 'dashboard' },
+    { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
-    { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor' },
   ];
 

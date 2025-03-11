@@ -171,27 +171,28 @@ const OutreachAgent = () => {
 
 
 // Update the getSystemPrompt function to improve DM quality
+// Import this function into your OutreachAgent component
 const getSystemPrompt = () => {
   // Base prompt that applies to all platforms
-  let prompt = `You are an expert outreach message writer who specializes in creating personalized, effective messages for ${platform}.
+  let prompt = `You are now an expert in creating ultra-casual, authentic outreach messages for ${platform}.
 
-Your task is to craft a ${messageLength} message in a ${tone} tone with the goal of ${goal}.
+Your task is to write a ${messageLength} message that sounds like it was typed quickly by a real human (not AI-generated) with the goal of ${goal}.
 The message type is: ${messageType}.
 
-Guidelines for your message:
-- Be concise and respectful of the recipient's time
-- Personalize the message based on the context provided
-- Avoid generic language that feels like a template
-- Make a clear connection between the sender and recipient
-- Include a specific, low-friction call to action
-- Write in a natural, conversational style
-- Focus on value for the recipient, not just what you want
-- Create a message that feels like it comes from a helpful friend, not a corporation
-- Lead with the recipient's problem, not your product
-- Be authentic and genuine, building trust through value-first communication
-- Use curiosity-driven questions to encourage replies
+IMPORTANT STYLE GUIDELINES:
+- Be naturally casual and conversational
+- Use simple language that's authentic, not corporate
+- Occasional shorthand is fine (like "thanks" → "thx") but don't overdo it
+- Avoid excessive abbreviations, emojis, or slang that feels forced
+- Keep capitalization minimal but natural - no need to capitalize properly
+- Use straightforward sentences that get to the point quickly
+- Avoid corporate-speak and jargon completely
+- Skip unnecessary formalities and get straight to the point
+- Don't try too hard to sound "cool" or "hip" - just be genuine
+- Make it feel like it was typed by a real human person, not AI or marketing
+- Sound friendly but not overly enthusiastic or salesy
 
-${trainingData ? `Here is Training Data about me and my products/services to incorporate naturally in the message:\n${trainingData}\n` : ""}
+${trainingData ? `Here is Training Data about me and my products/services to incorporate naturally (but casually) in the message:\n${trainingData}\n` : ""}
 `;
 
   // Platform-specific additions
@@ -199,40 +200,32 @@ ${trainingData ? `Here is Training Data about me and my products/services to inc
     case 'twitter':
       prompt += `
 For Twitter/X DMs:
-- Keep it ultra-concise (max 280 characters is ideal)
-- Be casual but professional
-- Get to the point immediately
-- Use a friendly, conversational tone
-- Make it easy to respond to
-- Don't use hashtags in DMs
-- Consider offering a free template, tool, or resource as value upfront
-- End with a micro-commitment question that's easy to say yes to
+- Keep it brief (aim for under 250 characters)
+- Be casual but authentic - not trying too hard
+- Get straight to the point quickly
+- Write like you'd text a professional acquaintance
+- Keep it simple and easy to respond to
+- Make it feel helpful, not salesy
 `;
       break;
     case 'linkedin':
       prompt += `
 For LinkedIn messages:
-- Maintain professional language while being personable
-- Reference specific aspects of their profile or content
-- Establish credibility and relevant connection points
-- Be respectful of professional boundaries
-- Keep paragraphs short (1-2 sentences)
-- Avoid sales-focused language
-- Position yourself as a peer with valuable insights to share
-- End with a question that invites a response without requiring much effort
+- Still casual but slightly more put-together than Twitter
+- Reference something specific from their profile/posts but in a casual way
+- Keep it brief and scannable
+- Sound like a real person, not a LinkedIn influencer
+- End with an easy question that takes 2 seconds to answer
 `;
       break;
     case 'email':
       prompt += `
 For Email outreach:
-- Include a clear, specific subject line
-- Use a proper greeting
-- Keep paragraphs short and scannable
-- End with a specific, actionable next step
-- Include a professional sign-off
-- Format the email properly with subject line on the first line
-- Offer immediate value (a template, resource, or specific tip)
-- Make it feel like a 1:1 personal message, not a mass email
+- Use a super casual subject line that looks typed quickly
+- Skip formal greetings, just use "hey" or their first name
+- Keep paragraphs to 1-2 sentences max
+- Use a casual sign-off like "later," "cheers," or just your name
+- Make sure it reads like an email from a friend, not a marketing email
 `;
       break;
   }
@@ -242,60 +235,108 @@ For Email outreach:
     case 'cold_outreach':
       prompt += `
 For cold outreach:
-- Be extra respectful of their time
-- Make it crystal clear why you're reaching out specifically to them
-- Demonstrate you've done your homework
-- Keep it shorter than you think necessary
-- One clear ask only
-- Use the "I've Got Your Back" approach where you offer something valuable first
-- When appropriate, use the "Quick Fix" approach where you provide an immediate solution to a pain point
-- Avoid coming across as salesy or pushy
+- Be extra authentic - acknowledge it's random that you're reaching out
+- Make it sound like you just happened to notice something about them
+- Keep it extremely brief
+- Offer something immediately useful with zero strings attached
+- Sound like you don't really care if they respond (even though you do)
 `;
       break;
     case 'follow_up':
       prompt += `
 For follow-up messages:
-- Reference previous interaction specifically
-- Be brief and to the point
-- Provide a compelling reason for the follow-up
-- Add new value in each follow-up
-- Be patient and respectful
-- Consider a voice note or video mention to add a personal touch
-- Ask a specific question to restart the conversation
+- Be super casual about following up ("just checking in")
+- Act like you're not really bothered either way
+- Reference previous interaction but very briefly
+- Add a tiny new value point
+- Sound busy but interested
 `;
       break;
     case 'networking':
       prompt += `
 For networking messages:
-- Focus on mutual interests or connections
-- Be specific about why you want to connect
-- Mention how you discovered them
-- Express genuine interest in their work
-- Suggest a low-friction way to start the conversation
-- Use the "You're Not Crazy" approach where you show empathy for their challenges
-- When appropriate, use the "Behind-the-Scenes" approach where you share insider knowledge
+- Sound like you're genuinely impressed by their work
+- Make the connection request sound super low-pressure
+- Be a little self-deprecating
+- Mention mutual connections/interests very casually
+- Make it sound like you're typing quickly between meetings
 `;
       break;
   }
 
-  // Add examples of high-performing messages
+  // Add examples of high-performing casual messages
   prompt += `
-Examples of highly effective ${platform} outreach messages:
+Examples of authentic casual ${platform} outreach messages that worked well:
 
-Example 1 - "I've Got Your Back" Approach:
-"Hey [First Name], saw your post about [specific struggle]. I run a tool that solves exactly this for founders. No pitch—just sending over a free template we built for [use case]. Use it, tweak it, or trash it. Let me know if it helps!"
+Example 1:
+"hey, noticed your post about scaling issues - we had the same problem last year. built a solution that might help with what you're dealing with. happy to share how we did it if you're interested. no sales pitch"
 
-Example 2 - "Quick Fix" Approach:
-"Hi [Name], [specific pain point] is tricky! Here's a 2-minute hack most people miss: [specific tip]. Try it and let me know if it helps!"
+Example 2:
+"saw you mentioned analytics problems in your thread. quick tip that worked for us: [specific straightforward tip]. let me know if that helps"
 
-Example 3 - "You're Not Crazy" Approach:
-"Hey [Name], [shared frustration] is real. I used to struggle with that too—until I found a better way. If you want, I'll share the exact workflow I use. Just reply 'yes' and it's yours."
+Example 3:
+"noticed you're working with [technology/problem]. we solved something similar recently and it saved us tons of headaches. happy to share our approach if you want - no pressure though"
 
-Use these examples as inspiration but create a unique, personalized message based on the specific context provided.
+Use these examples as inspiration but create something unique that feels authentically human-written based on the context provided.
 `;
 
   return prompt;
 };
+
+// Example function to generate the message
+const generateCasualMessage = async () => {
+  if (!userContext.trim()) {
+    toast.error("Add some info about who you're messaging first");
+    return;
+  }
+  
+  setIsGenerating(true);
+  try {
+    // Get the casual system prompt
+    const systemPrompt = getSystemPrompt();
+    
+    // Create user content with notes if enabled
+    let userContent = `Write a natural, casual ${messageType} message for ${platform} based on this context: "${userContext}"`;
+    userContent += `. Goal is ${goal}. Make it sound authentically human - use simple, straightforward language that doesn't sound corporate or overly salesy. Keep it genuine, like something a real person would write without trying too hard to sound cool.`;
+    
+    // Add notes as additional context if enabled
+    if (includeNotesInGeneration && notes.trim()) {
+      userContent += `\n\nExtra context for the message: "${notes.trim()}"`;
+    }
+    
+    // Call your API
+    const response = await fetch('/api/anthropic', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': localStorage.getItem('anthropicKey')
+      },
+      body: JSON.stringify({
+        temperature: 0.8, // Higher temperature for more creativity and variation
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: userContent
+        }],
+        system: systemPrompt,
+        model: "claude-3-5-sonnet-20241022",
+        claudapikey: getAnthropicKey()
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    setGeneratedMessage(data.content[0].text);
+  } catch (error) {
+    console.error('Error generating message:', error);
+    toast.error(`Failed to generate message: ${error.message}`);
+  } finally {
+    setIsGenerating(false);
+  }
+};
+
+
 
 // Update the generateMessage function to ensure proper handling of profiles
 const generateMessage = async () => {

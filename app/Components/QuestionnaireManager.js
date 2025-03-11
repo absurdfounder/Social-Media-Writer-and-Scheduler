@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
@@ -35,30 +35,46 @@ export const QuestionnaireManager = ({ currentProfile }) => {
   const [answers, setAnswers] = useState({});
   const [saved, setSaved] = useState(false);
   const [displayMode, setDisplayMode] = useState('card');
+  const [isLoading, setIsLoading] = useState(true);
+  const hasLoadedRef = useRef({});
 
   const auth = getAuth();
   const db = getFirestore();
 
   useEffect(() => {
-    if (currentProfile) {
+    // Only load answers if we haven't loaded them for this profile yet
+    if (currentProfile && !hasLoadedRef.current[currentProfile.id]) {
       loadAnswers();
     }
   }, [currentProfile]);
-
+  
+  // Add a window event listener for beforeunload to ensure localStorage is updated before refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (currentProfile && answers) {
+        // Ensure the latest data is in localStorage before page unload/refresh
+        updateLocalStorage(answers);
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [currentProfile, answers]);
 
   const loadAnswers = async () => {
-    console.log('Loading answers - Initial state:', {
-        currentProfile,
-        authUser: auth.currentUser?.uid
-    });
-
-    if (!auth.currentUser || !currentProfile) {
-        console.log('Missing requirements:', {
-            hasUser: !!auth.currentUser,
-            hasProfile: !!currentProfile
-        });
-        return;
+    if (!currentProfile || !auth.currentUser) {
+      console.log('Missing requirements:', {
+          hasUser: !!auth.currentUser,
+          hasProfile: !!currentProfile
+      });
+      return;
     }
+
+    setIsLoading(true);
+    console.log('Loading answers for profile:', currentProfile.id);
 
     try {
         const docId = `${currentProfile.id}_${auth.currentUser.uid}`;
@@ -74,23 +90,18 @@ export const QuestionnaireManager = ({ currentProfile }) => {
             console.log('Loaded data:', profileData);
             setAnswers(profileData);
             
-            // Save to localStorage
-            const storedData = localStorage.getItem('getTrainingData') || '{}';
-            const allProfilesData = JSON.parse(storedData);
-            allProfilesData[currentProfile.id] = {
-                answers: profileData,
-                questions: questions.map(q => ({
-                    id: q.id,
-                    question: q.question,
-                    type: q.type,
-                    limit: q.limit
-                }))
-            };
-            localStorage.setItem('getTrainingData', JSON.stringify(allProfilesData));
+            // Always update localStorage with the current data
+            updateLocalStorage(profileData);
         } else {
             console.log('No existing answers found');
             setAnswers({});
+            
+            // Initialize with empty data in localStorage
+            updateLocalStorage({});
         }
+
+        // Mark this profile as loaded
+        hasLoadedRef.current[currentProfile.id] = true;
     } catch (error) {
         console.error('Error details:', {
             error,
@@ -98,14 +109,48 @@ export const QuestionnaireManager = ({ currentProfile }) => {
             userId: auth.currentUser?.uid
         });
         toast.error('Failed to load answers');
+    } finally {
+        setIsLoading(false);
     }
-};
-
+  };
+  
+  // Helper function to update localStorage
+  const updateLocalStorage = (profileData) => {
+    // First try to get existing data
+    let storedData;
+    try {
+      storedData = JSON.parse(localStorage.getItem('getTrainingData') || '{}');
+    } catch (e) {
+      console.error('Error parsing localStorage data:', e);
+      storedData = {};
+    }
+    
+    // Update data for current profile
+    storedData[currentProfile.id] = {
+      answers: profileData,
+      questions: questions.map(q => ({
+        id: q.id,
+        question: q.question,
+        type: q.type,
+        limit: q.limit
+      }))
+    };
+    
+    // Save back to localStorage
+    try {
+      localStorage.setItem('getTrainingData', JSON.stringify(storedData));
+      console.log('Successfully saved to localStorage');
+    } catch (e) {
+      console.error('Error saving to localStorage:', e);
+      toast.error('Failed to save data locally');
+    }
+  };
 
   const saveAnswers = async (newAnswers) => {
     if (!auth.currentUser || !currentProfile) return;
 
     try {
+      // Save to Firestore
       const answersRef = doc(db, 'questionnaire_answers', `${currentProfile.id}_${auth.currentUser.uid}`);
       await setDoc(answersRef, {
         answers: newAnswers,
@@ -113,12 +158,22 @@ export const QuestionnaireManager = ({ currentProfile }) => {
         userId: auth.currentUser.uid,
         updatedAt: new Date().toISOString()
       }, { merge: true });
+      
+      // Also update localStorage whenever we save to Firestore
+      updateLocalStorage(newAnswers);
 
       setSaved(true);
       setTimeout(() => setSaved(false), 1000);
     } catch (error) {
       console.error('Error saving answers:', error);
       toast.error('Failed to save answers');
+      
+      // Even if Firestore fails, we should still try to save to localStorage
+      try {
+        updateLocalStorage(newAnswers);
+      } catch (localError) {
+        console.error('Failed localStorage backup save:', localError);
+      }
     }
   };
 
@@ -236,6 +291,15 @@ export const QuestionnaireManager = ({ currentProfile }) => {
     return (
       <div className="text-center p-8">
         <p className="text-lg text-gray-500">Please select or create a profile to start the questionnaire.</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="text-center p-8">
+        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+        <p className="text-lg text-gray-500">Loading questionnaire data...</p>
       </div>
     );
   }

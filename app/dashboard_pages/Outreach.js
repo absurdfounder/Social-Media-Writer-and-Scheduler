@@ -168,60 +168,12 @@ const OutreachAgent = () => {
     }
   };
 
-  const generateMessage = async () => {
-    if (!userContext.trim()) {
-      toast.error("Please provide context about the recipient");
-      return;
-    }
-    
-    setIsGenerating(true);
-    try {
-      // System prompt based on selected preferences
-      const systemPrompt = getSystemPrompt();
-      
-      // Create enhanced user content including notes if enabled
-      let userContent = `Generate a ${messageLength} ${messageType} message for ${platform} based on this context about the recipient: "${userContext}"`;
-      userContent += `. The goal is ${goal}.`;
-      
-      // Add notes as additional instructions if enabled
-      if (includeNotesInGeneration && notes.trim()) {
-        userContent += `\n\nAdditional instructions or context for generating this message: "${notes.trim()}"`;
-      }
-      
-      const response = await fetch('/api/anthropic', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': localStorage.getItem('anthropicKey')
-        },
-        body: JSON.stringify({
-          temperature: 0.7,
-          max_tokens: 1000,
-          messages: [{
-            role: "user",
-            content: userContent
-          }],
-          system: systemPrompt,
-          model: "claude-3-5-sonnet-20241022",
-          claudapikey: getAnthropicKey()
-        })
-      });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const data = await response.json();
-      setGeneratedMessage(data.content[0].text);
-    } catch (error) {
-      console.error('Error generating message:', error);
-      toast.error(`Failed to generate message: ${error.message}`);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const getSystemPrompt = () => {
-    // Base prompt that applies to all platforms
-    let prompt = `You are an expert outreach message writer who specializes in creating personalized, effective messages for ${platform}.
+// Update the getSystemPrompt function to improve DM quality
+const getSystemPrompt = () => {
+  // Base prompt that applies to all platforms
+  let prompt = `You are an expert outreach message writer who specializes in creating personalized, effective messages for ${platform}.
 
 Your task is to craft a ${messageLength} message in a ${tone} tone with the goal of ${goal}.
 The message type is: ${messageType}.
@@ -234,15 +186,18 @@ Guidelines for your message:
 - Include a specific, low-friction call to action
 - Write in a natural, conversational style
 - Focus on value for the recipient, not just what you want
-- Don't use emojis unless specifically requested
+- Create a message that feels like it comes from a helpful friend, not a corporation
+- Lead with the recipient's problem, not your product
+- Be authentic and genuine, building trust through value-first communication
+- Use curiosity-driven questions to encourage replies
 
 ${trainingData ? `Here is Training Data about me and my products/services to incorporate naturally in the message:\n${trainingData}\n` : ""}
 `;
 
-    // Platform-specific additions
-    switch (platform) {
-      case 'twitter':
-        prompt += `
+  // Platform-specific additions
+  switch (platform) {
+    case 'twitter':
+      prompt += `
 For Twitter/X DMs:
 - Keep it ultra-concise (max 280 characters is ideal)
 - Be casual but professional
@@ -250,10 +205,12 @@ For Twitter/X DMs:
 - Use a friendly, conversational tone
 - Make it easy to respond to
 - Don't use hashtags in DMs
+- Consider offering a free template, tool, or resource as value upfront
+- End with a micro-commitment question that's easy to say yes to
 `;
-        break;
-      case 'linkedin':
-        prompt += `
+      break;
+    case 'linkedin':
+      prompt += `
 For LinkedIn messages:
 - Maintain professional language while being personable
 - Reference specific aspects of their profile or content
@@ -261,10 +218,12 @@ For LinkedIn messages:
 - Be respectful of professional boundaries
 - Keep paragraphs short (1-2 sentences)
 - Avoid sales-focused language
+- Position yourself as a peer with valuable insights to share
+- End with a question that invites a response without requiring much effort
 `;
-        break;
-      case 'email':
-        prompt += `
+      break;
+    case 'email':
+      prompt += `
 For Email outreach:
 - Include a clear, specific subject line
 - Use a proper greeting
@@ -272,46 +231,123 @@ For Email outreach:
 - End with a specific, actionable next step
 - Include a professional sign-off
 - Format the email properly with subject line on the first line
+- Offer immediate value (a template, resource, or specific tip)
+- Make it feel like a 1:1 personal message, not a mass email
 `;
-        break;
-    }
+      break;
+  }
 
-    // Message type specific additions
-    switch (messageType) {
-      case 'cold_outreach':
-        prompt += `
+  // Message type specific additions
+  switch (messageType) {
+    case 'cold_outreach':
+      prompt += `
 For cold outreach:
 - Be extra respectful of their time
 - Make it crystal clear why you're reaching out specifically to them
 - Demonstrate you've done your homework
 - Keep it shorter than you think necessary
 - One clear ask only
+- Use the "I've Got Your Back" approach where you offer something valuable first
+- When appropriate, use the "Quick Fix" approach where you provide an immediate solution to a pain point
+- Avoid coming across as salesy or pushy
 `;
-        break;
-      case 'follow_up':
-        prompt += `
+      break;
+    case 'follow_up':
+      prompt += `
 For follow-up messages:
 - Reference previous interaction specifically
 - Be brief and to the point
 - Provide a compelling reason for the follow-up
 - Add new value in each follow-up
 - Be patient and respectful
+- Consider a voice note or video mention to add a personal touch
+- Ask a specific question to restart the conversation
 `;
-        break;
-      case 'networking':
-        prompt += `
+      break;
+    case 'networking':
+      prompt += `
 For networking messages:
 - Focus on mutual interests or connections
 - Be specific about why you want to connect
 - Mention how you discovered them
 - Express genuine interest in their work
 - Suggest a low-friction way to start the conversation
+- Use the "You're Not Crazy" approach where you show empathy for their challenges
+- When appropriate, use the "Behind-the-Scenes" approach where you share insider knowledge
 `;
-        break;
-    }
+      break;
+  }
 
-    return prompt;
-  };
+  // Add examples of high-performing messages
+  prompt += `
+Examples of highly effective ${platform} outreach messages:
+
+Example 1 - "I've Got Your Back" Approach:
+"Hey [First Name], saw your post about [specific struggle]. I run a tool that solves exactly this for founders. No pitch—just sending over a free template we built for [use case]. Use it, tweak it, or trash it. Let me know if it helps!"
+
+Example 2 - "Quick Fix" Approach:
+"Hi [Name], [specific pain point] is tricky! Here's a 2-minute hack most people miss: [specific tip]. Try it and let me know if it helps!"
+
+Example 3 - "You're Not Crazy" Approach:
+"Hey [Name], [shared frustration] is real. I used to struggle with that too—until I found a better way. If you want, I'll share the exact workflow I use. Just reply 'yes' and it's yours."
+
+Use these examples as inspiration but create a unique, personalized message based on the specific context provided.
+`;
+
+  return prompt;
+};
+
+// Update the generateMessage function to ensure proper handling of profiles
+const generateMessage = async () => {
+  if (!userContext.trim()) {
+    toast.error("Please provide context about the recipient");
+    return;
+  }
+  
+  setIsGenerating(true);
+  try {
+    // System prompt based on selected preferences
+    const systemPrompt = getSystemPrompt();
+    
+    // Create enhanced user content including notes if enabled
+    let userContent = `Generate a ${messageLength} ${messageType} message for ${platform} based on this context about the recipient: "${userContext}"`;
+    userContent += `. The goal is ${goal}.`;
+    
+    // Add notes as additional instructions if enabled
+    if (includeNotesInGeneration && notes.trim()) {
+      userContent += `\n\nAdditional instructions or context for generating this message: "${notes.trim()}"`;
+    }
+    
+    const response = await fetch('/api/anthropic', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': localStorage.getItem('anthropicKey')
+      },
+      body: JSON.stringify({
+        temperature: 0.7,
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: userContent
+        }],
+        system: systemPrompt,
+        model: "claude-3-5-sonnet-20241022",
+        claudapikey: getAnthropicKey()
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    setGeneratedMessage(data.content[0].text);
+  } catch (error) {
+    console.error('Error generating message:', error);
+    toast.error(`Failed to generate message: ${error.message}`);
+  } finally {
+    setIsGenerating(false);
+  }
+};
 
   const copyToClipboard = () => {
     if (!generatedMessage) return;

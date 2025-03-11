@@ -308,7 +308,7 @@ const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
 
 // Main Dashboard Component
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('BrandTraning');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoSrc, setLogoSrc] = useState('/logo.png');
   const [isLoading, setIsLoading] = useState(true);
@@ -339,6 +339,39 @@ export default function Dashboard() {
      { icon: Handshake, label: 'Affiliate', id: 'affiliate' },
      { icon: Heart, label: 'Feedback', id: 'feedback' }*/
   ];
+
+
+  useEffect(() => {
+    // Initialize training data in localStorage if it doesn't exist
+    const initializeLocalStorage = () => {
+      try {
+        // Check if getTrainingData exists
+        let trainingData = localStorage.getItem('getTrainingData');
+        
+        if (!trainingData) {
+          // If it doesn't exist, create it with an empty object
+          localStorage.setItem('getTrainingData', JSON.stringify({}));
+          console.log('Initialized empty getTrainingData in localStorage');
+        } else {
+          // If it does exist, make sure it's valid JSON
+          try {
+            const parsed = JSON.parse(trainingData);
+            console.log('Verified getTrainingData exists in localStorage');
+          } catch (parseError) {
+            // If it's not valid JSON, reset it
+            localStorage.setItem('getTrainingData', JSON.stringify({}));
+            console.error('Found corrupted getTrainingData, reset to empty object');
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing localStorage:', error);
+      }
+    };
+
+    initializeLocalStorage();
+  }, []);
+  
+
 
   useEffect(() => {
     const checkLoginState = async () => {

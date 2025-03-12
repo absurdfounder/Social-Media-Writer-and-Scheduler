@@ -225,6 +225,7 @@ import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
 import OutreachAgent from './dashboard_pages/Outreach';
 import Crypto from './dashboard_pages/crypto';
+import Captions from './dashboard_pages/captions';
 import MemeEditor from './dashboard_pages/MemeEditor';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
@@ -333,6 +334,7 @@ export default function Dashboard() {
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
     { icon: ShieldAlert, label: 'C-Internal', id: 'Crypto' },
+    { icon: ShieldAlert, label: 'Captions', id: 'Captions' },
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 
@@ -438,6 +440,8 @@ export default function Dashboard() {
         return <OutreachAgent />;
       case 'Crypto':
         return <Crypto />;
+        case 'Captions':
+          return <Captions />;
       case 'MemeEditor':
         return <MemeEditor />;
       default:

@@ -329,6 +329,7 @@ export default function Dashboard() {
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor' },
+    { icon: Handshake, label: 'Scheduler', id: 'planner' },
   ];
 
   const bottomNavItems = [
@@ -338,7 +339,6 @@ export default function Dashboard() {
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 
-     { icon: Handshake, label: 'Affiliate', id: 'affiliate' },
      { icon: Heart, label: 'Feedback', id: 'feedback' }*/
   ];
 
@@ -415,8 +415,8 @@ export default function Dashboard() {
       case 'extension':
         window.open('https://chrome.google.com/webstore/category/extensions', '_blank');
         break;
-      case 'affiliate':
-        window.open('https://your-affiliate-program-link.com', '_blank');
+      case 'planner':
+        window.open('https://www.canva.com/planner', '_blank');
         break;
       default:
         setActiveTab(id);

@@ -329,7 +329,7 @@ export default function Dashboard() {
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor' },
-    { icon: Handshake, label: 'Scheduler', id: 'planner' },
+    { icon: Calender, label: 'Scheduler', id: 'planner' },
   ];
 
   const bottomNavItems = [

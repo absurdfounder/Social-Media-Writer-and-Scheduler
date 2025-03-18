@@ -322,7 +322,7 @@ export default function Dashboard() {
 
   // Navigation items configuration
   const mainNavItems = [
-    { icon: HandMetal, label: 'Marketing Week', id: 'dashboard' },
+    // Marketing Week removed from here and handled separately
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
     { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
@@ -342,7 +342,6 @@ export default function Dashboard() {
      { icon: Chrome, label: 'Extension', id: 'extension' }, 
      { icon: Heart, label: 'Feedback', id: 'feedback' }*/
   ];
-
 
   useEffect(() => {
     // Initialize training data in localStorage if it doesn't exist
@@ -374,8 +373,6 @@ export default function Dashboard() {
     initializeLocalStorage();
   }, []);
   
-
-
   useEffect(() => {
     const checkLoginState = async () => {
       try {
@@ -495,8 +492,22 @@ export default function Dashboard() {
             </button>
           </div>
 
+          {/* Marketing Week Button (special treatment) */}
+          <div className="px-6 mb-6">
+            <button
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center
+                ${activeTab === 'dashboard' 
+                ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+              onClick={() => handleNavItemClick('dashboard')}
+            >
+              <HandMetal className="mr-2 h-5 w-5" />
+              <span>Marketing Week</span>
+            </button>
+          </div>
+
           {/* Main navigation */}
-          <nav className="mt-6 px-6 space-y-1 flex-grow">
+          <nav className="mt-2 px-6 space-y-1 flex-grow">
             {mainNavItems.map((item) => (
               <NavItem
                 key={item.id}
@@ -529,7 +540,9 @@ export default function Dashboard() {
           <SubscriptionBanner onUpgrade={() => handleNavItemClick('billing')} />
           <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">
-              {[...mainNavItems, ...bottomNavItems].find(item => item.id === activeTab)?.label}
+              {activeTab === 'dashboard' 
+                ? 'Marketing Week' 
+                : [...mainNavItems, ...bottomNavItems].find(item => item.id === activeTab)?.label}
             </h2>
             {renderContent()}
           </div>
@@ -539,6 +552,15 @@ export default function Dashboard() {
       {/* Mobile navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
         <div className="flex justify-around p-2">
+          {/* Marketing Week as special button in mobile nav */}
+          <MobileNavItem
+            key="dashboard"
+            icon={HandMetal}
+            label="Marketing Week"
+            active={activeTab === 'dashboard'}
+            onClick={() => handleNavItemClick('dashboard')}
+          />
+          
           {mainNavItems.map((item) => (
             <MobileNavItem
               key={item.id}
@@ -557,7 +579,6 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* Modals */}
       {/* Modals */}
       <OnBoardingPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
       <BillingModal isOpen={isBillingOpen} onClose={() => setIsBillingOpen(false)} />

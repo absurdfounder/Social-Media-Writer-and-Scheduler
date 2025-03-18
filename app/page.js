@@ -5,8 +5,7 @@ import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
-  DollarSign, Chrome, Handshake, Heart, Check, Calendar, CheckCircle2, LaughIcon, MailIcon,
-  ShieldAlert
+  DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, LaughIcon, MailIcon,calendar,CalendarRange,ShieldAlert, HandMetal
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -179,7 +178,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
           <div className="space-y-6 p-4">
             <div className="text-center space-y-4">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100">
-                <Calendar className="h-8 w-8 text-blue-600" />
+                <calendar className="h-8 w-8 text-blue-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Schedule a 1-on-1 Call</h3>
@@ -231,6 +230,7 @@ import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
 import CollectionThisWeek from './dashboard_pages/CollectionThisWeek';
 import ThreadWriter from './dashboard_pages/ThreadReply';
+import MarketingDashboard from './dashboard_pages/Dashboard';
 import VideoScriptConstructor from './dashboard_pages/VideoConstruct';
 import OnBoardingPopup from './Components/OnBoardingPopup';
 import UserProfileSection from './Components/UserProfileSection';
@@ -322,20 +322,21 @@ export default function Dashboard() {
 
   // Navigation items configuration
   const mainNavItems = [
-    { icon: Twitter, label: 'Build On X', id: 'dashboard' },
+    { icon: HandMetal, label: 'Marketing Week', id: 'dashboard' },
+    { icon: Twitter, label: 'Build On X', id: 'twitter' },
     { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor' },
-    { icon: Calender, label: 'Scheduler', id: 'planner' },
+    { icon: CalendarRange, label: 'Scheduler', id: 'planner' },
   ];
 
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
-    { icon: ShieldAlert, label: 'C-Internal', id: 'Crypto' },
-    { icon: ShieldAlert, label: 'Captions', id: 'Captions' },
+    //{ icon: ShieldAlert, label: 'C-Internal', id: 'Crypto' },
+    //{ icon: ShieldAlert, label: 'Captions', id: 'Captions' },
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 
@@ -427,6 +428,8 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
+        return <MarketingDashboard />;
+      case 'twitter':
         return <ThreadWriter />;
       case 'videoconstructor':
         return <VideoScriptConstructor />;

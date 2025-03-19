@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   PlusCircle,
@@ -578,8 +580,8 @@ const AIChatModal = ({ isOpen, onClose }) => {
               className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            />
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
             <button
               onClick={handleSendMessage}
               className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
@@ -658,8 +660,9 @@ const MarketingDashboard = () => {
     };
     
     generateActivityData();
+    // No dependencies needed here as this should only run once on mount
   }, []);
-  
+
   // Task management functions
   const handleTaskToggle = (taskId) => {
     setTasks(tasks.map(task => 

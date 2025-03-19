@@ -1,25 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Key, Eye, EyeOff, Copy, CheckCheck } from 'lucide-react';
+import { Key, Eye, EyeOff, Copy, CheckCheck, AlertTriangle } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-
-// Encryption/decryption functions
-const encryptKey = (text) => {
-  return btoa(text.split('').map((char, i) =>
-    String.fromCharCode(char.charCodeAt(0) + (i % 4) + 1)
-  ).join(''));
-};
-
-const decryptKey = (encoded) => {
-  try {
-    const decoded = atob(encoded);
-    return decoded.split('').map((char, i) =>
-      String.fromCharCode(char.charCodeAt(0) - (i % 4) - 1)
-    ).join('');
-  } catch {
-    return '';
-  }
-};
+import { encryptKey, decryptKey } from '../Utils/getApikey';
 
 const ApiKeyManager = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,6 +13,7 @@ const ApiKeyManager = () => {
   const [openAICopied, setOpenAICopied] = useState(false);
   const [anthropicCopied, setAnthropicCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [keyError, setKeyError] = useState(null);
 
   const auth = getAuth();
   const db = getFirestore();
@@ -63,6 +47,7 @@ const ApiKeyManager = () => {
         }
       } catch (error) {
         console.error('Error fetching API keys:', error);
+        setKeyError('Failed to fetch API keys. Please try again later.');
       }
     };
 
@@ -71,7 +56,16 @@ const ApiKeyManager = () => {
 
   const handleSaveKeys = async () => {
     setLoading(true);
+    setKeyError(null);
+    
     try {
+      // Basic validation for OpenAI key
+      if (openAIKey && !openAIKey.startsWith('sk-')) {
+        setKeyError('OpenAI API key should start with "sk-"');
+        setLoading(false);
+        return;
+      }
+      
       if (auth.currentUser) {
         const userRef = doc(db, 'users', auth.currentUser.uid);
         const updates = {
@@ -100,12 +94,14 @@ const ApiKeyManager = () => {
       setIsOpen(false);
     } catch (error) {
       console.error('Error saving API keys:', error);
+      setKeyError('Failed to save API keys. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleRemoveKeys = async () => {
+    setKeyError(null);
     try {
       if (auth.currentUser) {
         const userRef = doc(db, 'users', auth.currentUser.uid);
@@ -123,6 +119,7 @@ const ApiKeyManager = () => {
       setIsOpen(false);
     } catch (error) {
       console.error('Error removing API keys:', error);
+      setKeyError('Failed to remove API keys. Please try again later.');
     }
   };
 
@@ -161,11 +158,20 @@ const ApiKeyManager = () => {
             <h2 className="text-xl font-bold">API Key Management</h2>
             <p className='text-sm opacity-50'>All keys are encrypted.</p>
 
+            {keyError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                <div className="flex items-center">
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  <span>{keyError}</span>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-4">
               <div>
                 <div className='flex'>
-                  <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-8 h-8" />
-                  <label className="block text-sm font-medium text-gray-700 text-center m-auto mx-0">Open API Key</label>
+                  <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-8 h-8" alt="OpenAI Logo" />
+                  <label className="block text-sm font-medium text-gray-700 text-center m-auto mx-0">OpenAI API Key</label>
                 </div>
                 <div className="relative">
                   <input
@@ -190,11 +196,14 @@ const ApiKeyManager = () => {
                     </button>
                   </div>
                 </div>
+                <p className="text-xs text-gray-500 mt-1">
+  Enter your OpenAI API key to begin using AI features
+</p>
               </div>
 
               <div>
                 <div className='flex'>
-                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtUnGYPe67wuzVDjTujZ21UV38Y6KQ290fow&s" className="w-8 h-8" />
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtUnGYPe67wuzVDjTujZ21UV38Y6KQ290fow&s" className="w-8 h-8" alt="Anthropic Logo" />
                   <label className="block text-sm font-medium text-gray-700 text-center m-auto mx-0">Anthropic API Key</label>
                 </div>
                 <div className="relative">
@@ -226,12 +235,12 @@ const ApiKeyManager = () => {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleRemoveKeys}
-                className="px-4 py-2 bg-red-200 text-red-600 rounded hover:bg-red-600"
+                className="px-4 py-2 bg-red-100 text-red-600 rounded hover:bg-red-200"
               >
                 Delete Keys
               </button>
               <div className="space-x-2">
-                <button
+              <button
                   onClick={handleSaveKeys}
                   disabled={loading}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"

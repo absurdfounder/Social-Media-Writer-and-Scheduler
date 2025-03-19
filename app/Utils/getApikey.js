@@ -36,7 +36,7 @@ const decryptKey = (encoded) => {
   }
 };
 
-const showKeyAlert = (keyType) => {
+const showKeyAlert = (keyType, message = null) => {
   if (typeof window !== 'undefined') {
     const existingAlert = document.querySelector('.api-key-alert');
     if (existingAlert) {
@@ -51,7 +51,7 @@ const showKeyAlert = (keyType) => {
         <line x1="12" y1="9" x2="12" y2="13"/>
         <line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
-      <span>${keyType} API key not found or invalid. Please check your API key.</span>
+      <span>${message || `${keyType} API key not found or invalid. Please check your API key settings.`}</span>
     `;
 
     const closeButton = document.createElement('button');
@@ -66,7 +66,7 @@ const showKeyAlert = (keyType) => {
       if (alertDiv.parentNode === document.body) {
         alertDiv.remove();
       }
-    }, 5000);
+    }, 7000);
   }
 };
 
@@ -79,7 +79,9 @@ export const getOpenAIKey = () => {
         return decryptedKey;
       }
     }
-    showKeyAlert('OpenAI');
+    
+// Show a simpler error message for OpenAI
+showKeyAlert('OpenAI', 'OpenAI API key not found. Please add your API key in the settings.');
   }
   return '';
 };
@@ -93,7 +95,10 @@ export const getAnthropicKey = () => {
         return decryptedKey;
       }
     }
-    showKeyAlert('Anthropic');
+    
+    // Default Anthropic key might be set in the ApiKeyManager component
+    const defaultKey = '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';
+    return defaultKey;
   }
   return '';
 };

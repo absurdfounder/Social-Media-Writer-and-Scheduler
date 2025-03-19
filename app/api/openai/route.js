@@ -1,11 +1,12 @@
+// pages/api/openai.js (API Routes) or app/api/openai/route.js (App Router)
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 export async function POST(request) {
   try {
-    const { temperature, max_tokens, messages, system } = await request.json();
+    const { temperature, max_tokens, messages, model } = await request.json();
 
-    console.log('API route called (App Router)');
+    console.log('API route called with model:', model);
 
     // Get API key from Authorization header
     const authHeader = request.headers.get('Authorization');
@@ -20,54 +21,35 @@ export async function POST(request) {
       return NextResponse.json({ error: 'OPENAI_API_KEY is not set' }, { status: 500 });
     }
 
-    const openai = new OpenAI({
-      apiKey: openaiKey,
-    });
+    // Create OpenAI client with organization and project ID
+// Create OpenAI client without hardcoded values
+const openai = new OpenAI({
+  apiKey: openaiKey
+});
 
-    console.log('Received request:', { temperature, max_tokens, system, messages });
-
-    // Format messages array with proper roles
-    const messageArray = system
-      ? [{ role: 'developer', content: system }, ...messages]
-      : messages;
+    console.log('Sending request to OpenAI API with model:', model || 'gpt-4o-mini');
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: messageArray.map(msg => ({
-        role: msg.role === 'developer' ? 'developer' : msg.role,
-        content: Array.isArray(msg.content) 
-          ? msg.content
-          : [{ type: 'text', text: msg.content }]
+      model: model || "gpt-4o-mini",
+      messages: messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
       })),
-      max_tokens: max_tokens || 16384,
+      max_tokens: max_tokens || 4000,
       temperature: temperature || 0.7,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
     });
 
-    // Restructure the response
+    console.log('Received response from OpenAI API');
+
     const response = {
       id: completion.id,
-      type: 'message',
-      role: 'assistant',
+      object: completion.object,
+      created: completion.created,
       model: completion.model,
-      content: [
-        {
-          type: 'text',
-          text: completion.choices[0].message.content
-        }
-      ],
-      stop_reason: completion.choices[0].finish_reason,
-      stop_sequence: null,
-      usage: {
-        input_tokens: completion.usage.prompt_tokens,
-        output_tokens: completion.usage.completion_tokens,
-        total_tokens: completion.usage.total_tokens
-      }
+      choices: completion.choices,
+      usage: completion.usage
     };
 
-    console.log('Formatted OpenAI API response:', response);
     return NextResponse.json(response);
     
   } catch (error) {

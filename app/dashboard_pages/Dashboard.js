@@ -101,7 +101,7 @@ const ContributionGraph = ({ data }) => {
       
       {/* Added quote section */}
       <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
-        <p className="text-sm text-gray-700 italic">"{randomQuote.quote}"</p>
+        <p className="text-sm text-gray-700 italic">{randomQuote.quote}</p>
         <p className="text-xs text-gray-500 mt-1 text-right">— {randomQuote.author}</p>
       </div>
     </div>

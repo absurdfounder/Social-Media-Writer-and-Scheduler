@@ -12,7 +12,9 @@ const ElevenLabsScriptOptimizer = () => {
   const [selectedVoiceStyle, setSelectedVoiceStyle] = useState('neutral');
   const [attentionDeficit, setAttentionDeficit] = useState(true);
   const [activeTab, setActiveTab] = useState('input');
-  
+  const [apiKey, setApiKey] = useState('');
+  const [error, setError] = useState(null);
+
   const voiceStyles = {
     neutral: "Standard speaking style",
     energetic: "High-energy and enthusiastic delivery",
@@ -21,16 +23,26 @@ const ElevenLabsScriptOptimizer = () => {
     narrative: "Storytelling with dramatic elements"
   };
   
-  const PROMPT_TEMPLATE = `
+  const handleOptimize = async () => {
+    // Reset previous state
+    setIsLoading(true);
+    setError(null);
+
+    if (!inputScript.trim()) {
+      setIsLoading(false);
+      return;
+    }
+
+    const PROMPT_TEMPLATE = `
 You are an expert script optimizer for ElevenLabs text-to-speech system. Your job is to take a raw script and optimize it with proper SSML tags to make it sound more natural and engaging.
 
 ${attentionDeficit ? "IMPORTANT: The audience has a very limited attention span. Use audio techniques to maintain focus throughout." : ""}
 
 INSTRUCTIONS:
 1. Format the script with the following ElevenLabs controls:
-${includeEmphasis ? "- Use &lt;emphasis level=&quot;strong&quot;&gt; or &lt;emphasis level=&quot;moderate&quot;&gt; for IMPORTANT keywords and phrases" : ""}
-${includePauses ? "- Add &lt;break time=&quot;x.xs&quot; /&gt; for strategic pauses (use sparingly to avoid instability)" : ""}
-${includePronunciation ? "- Use &lt;phoneme alphabet=&quot;cmu-arpabet&quot; ph=&quot;PRONUNCIATION&quot;&gt; for difficult words" : ""}
+${includeEmphasis ? "- Use <emphasis level=\"strong\"> or <emphasis level=\"moderate\"> for IMPORTANT keywords and phrases" : ""}
+${includePauses ? "- Add <break time=\"x.xs\" /> for strategic pauses (use sparingly to avoid instability)" : ""}
+${includePronunciation ? "- Use <phoneme alphabet=\"cmu-arpabet\" ph=\"PRONUNCIATION\"> for difficult words" : ""}
 
 2. Normalize text for optimal speech:
 - Format numbers properly (cardinal, ordinal, phone numbers, dates)
@@ -49,7 +61,7 @@ ${attentionDeficit ? `
 - Use strategic pauses before important information
 - Create tonal variation with rising and falling emphasis
 - Make transitions very clear with emphasis markers
-- Use emphasis to create &quot;peaks&quot; of engagement at regular intervals
+- Use emphasis to create "peaks" of engagement at regular intervals
 ` : ""}
 
 ORIGINAL SCRIPT:
@@ -59,40 +71,36 @@ ${inputScript}
 
 Return ONLY the optimized script with appropriate SSML tags, with no explanations.`;
 
-  const handleOptimize = () => {
-    // In a real application, this would call an API
-    // This is a simplified mockup showing the UI functionality
-    if (!inputScript.trim()) return;
-    
-    setIsLoading(true);
-    
-    // Simulating API call delay
-    setTimeout(() => {
-      // Example output with SSML tags - in a real app, this would be the AI response
-      let exampleOutput = inputScript;
-      
-      // Add some mock formatting based on user options
-      if (includeEmphasis) {
-        const keywords = ['space', 'astronauts', 'mission', 'SpaceX', 'NASA', 'International'];
-        keywords.forEach(keyword => {
-          const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-          exampleOutput = exampleOutput.replace(regex, `<emphasis level="strong">${keyword.toUpperCase()}</emphasis>`);
-        });
+    try {
+      const response = await fetch('/api/anthropic', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 4000,
+          temperature: 0.7,
+          messages: [{ role: 'user', content: PROMPT_TEMPLATE }],
+          system: 'You are an expert at optimizing scripts for text-to-speech, focusing on natural and engaging delivery.'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to optimize script');
       }
-      
-      if (includePauses) {
-        // Add some breaks at periods
-        exampleOutput = exampleOutput.replace(/\.\s+/g, '. <break time="0.3s" /> ');
-      }
-      
-      if (includePronunciation) {
-        // Add phonetic pronunciation for SpaceX
-        exampleOutput = exampleOutput.replace(/SpaceX/g, '<phoneme alphabet="cmu-arpabet" ph="S P EY1 S EH0 K S">SpaceX</phoneme>');
-      }
-      
-      setOutputScript(exampleOutput);
+
+      const data = await response.json();
+      const optimizedScript = data.content[0].text.trim();
+
+      setOutputScript(optimizedScript);
+      setActiveTab('output');
+    } catch (err) {
+      setError(err.message || 'An unknown error occurred');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const copyToClipboard = () => {
@@ -138,6 +146,25 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
         
         {/* Content */}
         <div className="p-6">
+          {/* API Key Input */}
+          <div className="mb-4">
+            <input
+              type="password"
+              placeholder="Anthropic API Key"
+              className="w-full p-3 border rounded-lg"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+            />
+          </div>
+
+          {/* Error Handling */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <strong className="font-bold">Error: </strong>
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+
           {/* Input Tab */}
           {activeTab === 'input' && (
             <div className="space-y-4">
@@ -149,8 +176,12 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
               />
               <button 
                 onClick={handleOptimize} 
-                disabled={isLoading || !inputScript.trim()} 
-                className={`w-full py-2 px-4 rounded-md text-white font-medium ${isLoading || !inputScript.trim() ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} flex items-center justify-center`}
+                disabled={isLoading || !inputScript.trim() || !apiKey} 
+                className={`w-full py-2 px-4 rounded-md text-white font-medium ${
+                  isLoading || !inputScript.trim() || !apiKey 
+                    ? 'bg-blue-300 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                } flex items-center justify-center`}
               >
                 {isLoading && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
                 {isLoading ? 'Optimizing...' : 'Optimize Script'}

@@ -28,7 +28,7 @@ ${attentionDeficit ? "IMPORTANT: The audience has a very limited attention span.
 
 INSTRUCTIONS:
 1. Format the script with the following ElevenLabs controls:
-${includeEmphasis ? "- Use <emphasis level=\"strong\"> or <emphasis level=\"moderate\"> for IMPORTANT keywords and phrases" : ""}
+${includeEmphasis ? "- Use &lt;emphasis level=&quot;strong&quot;&gt; or &lt;emphasis level=&quot;moderate&quot;&gt; for IMPORTANT keywords and phrases" : ""}
 ${includePauses ? "- Add <break time=\"x.xs\" /> for strategic pauses (use sparingly to avoid instability)" : ""}
 ${includePronunciation ? "- Use <phoneme alphabet=\"cmu-arpabet\" ph=\"PRONUNCIATION\"> for difficult words" : ""}
 

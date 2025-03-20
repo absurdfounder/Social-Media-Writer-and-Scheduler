@@ -224,6 +224,7 @@ import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
 import OutreachAgent from './dashboard_pages/Outreach';
 import Crypto from './dashboard_pages/crypto';
+import HackerNewsPostGenerator from './dashboard_pages/Hackernews_Post';
 import ElevenLabsScriptOptimizer from './dashboard_pages/ElevenLabsScriptOptimizer';
 import Captions from './dashboard_pages/captions';
 import MemeEditor from './dashboard_pages/MemeEditor';
@@ -337,6 +338,7 @@ export default function Dashboard() {
   const bottomNavItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
     //{ icon: ShieldAlert, label: 'C-Internal', id: 'Crypto' },
+    { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
     { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
@@ -441,6 +443,8 @@ export default function Dashboard() {
         return <OutreachAgent />;
       case 'Crypto':
         return <Crypto />;
+        case 'HackerNewsPost':
+          return <HackerNewsPostGenerator />;
         case 'ElevenLabsScriptOptimizer':
           return <ElevenLabsScriptOptimizer />;
       case 'MemeEditor':

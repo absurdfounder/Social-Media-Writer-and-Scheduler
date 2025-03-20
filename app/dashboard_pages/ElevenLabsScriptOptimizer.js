@@ -29,8 +29,8 @@ ${attentionDeficit ? "IMPORTANT: The audience has a very limited attention span.
 INSTRUCTIONS:
 1. Format the script with the following ElevenLabs controls:
 ${includeEmphasis ? "- Use &lt;emphasis level=&quot;strong&quot;&gt; or &lt;emphasis level=&quot;moderate&quot;&gt; for IMPORTANT keywords and phrases" : ""}
-${includePauses ? "- Add <break time=\"x.xs\" /> for strategic pauses (use sparingly to avoid instability)" : ""}
-${includePronunciation ? "- Use <phoneme alphabet=\"cmu-arpabet\" ph=\"PRONUNCIATION\"> for difficult words" : ""}
+${includePauses ? "- Add &lt;break time=&quot;x.xs&quot; /&gt; for strategic pauses (use sparingly to avoid instability)" : ""}
+${includePronunciation ? "- Use &lt;phoneme alphabet=&quot;cmu-arpabet&quot; ph=&quot;PRONUNCIATION&quot;&gt; for difficult words" : ""}
 
 2. Normalize text for optimal speech:
 - Format numbers properly (cardinal, ordinal, phone numbers, dates)
@@ -49,7 +49,7 @@ ${attentionDeficit ? `
 - Use strategic pauses before important information
 - Create tonal variation with rising and falling emphasis
 - Make transitions very clear with emphasis markers
-- Use emphasis to create "peaks" of engagement at regular intervals
+- Use emphasis to create &quot;peaks&quot; of engagement at regular intervals
 ` : ""}
 
 ORIGINAL SCRIPT:

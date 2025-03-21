@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import _ from 'lodash';
+import { getAnthropicKey, decryptKey } from '../Utils/getApikey';
 
 const CLOSING_LINES = [
   "Technical overhead? Deleted.",
@@ -54,12 +55,25 @@ const HackerNewsPostGenerator = () => {
     ],
     projectLink: '',
     generatedPosts: [],
-    aiSuggestions: [],
-    apiKey: ''
+    aiSuggestions: []
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [apiKeyValid, setApiKeyValid] = useState(false);
+
+  useEffect(() => {
+    const checkApiKey = () => {
+      const key = localStorage.getItem('anthropicKey');
+      if (key && key.startsWith('sk-')) {
+        setApiKeyValid(true);
+      } else {
+        setApiKeyValid(false);
+      }
+    };
+    
+    checkApiKey();
+  }, []);
 
   const updateFeature = useCallback((index, field, value) => {
     setState(prev => ({
@@ -100,14 +114,15 @@ Generate 3 unique, compelling Hacker News-style post variations that capture the
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': state.apiKey
+          'x-api-key': localStorage.getItem('anthropicKey')
         },
         body: JSON.stringify({
           model: 'claude-3-5-sonnet-20241022',
           max_tokens: 1000,
           temperature: 0.7,
           messages: [{ role: 'user', content: prompt }],
-          system: 'You are an expert at generating concise, technical Hacker News launch posts that capture the essence of innovative software projects.'
+          system: 'You are an expert at generating concise, technical Hacker News launch posts that capture the essence of innovative software projects.',
+          claudapikey: getAnthropicKey()
         })
       });
 
@@ -169,17 +184,6 @@ ${CLOSING_LINES[Math.floor(Math.random() * CLOSING_LINES.length)]}
         <h1 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">
           Hacker News Post Generator
         </h1>
-
-        {/* API Key Input */}
-        <div className="mb-4">
-          <input
-            type="password"
-            placeholder="Anthropic API Key"
-            className="w-full p-3 border rounded-lg"
-            value={state.apiKey}
-            onChange={(e) => setState(prev => ({ ...prev, apiKey: e.target.value }))}
-          />
-        </div>
 
         {/* Project Core Information */}
         <div className="grid md:grid-cols-2 gap-6">
@@ -263,9 +267,9 @@ ${CLOSING_LINES[Math.floor(Math.random() * CLOSING_LINES.length)]}
           </button>
           <button
             onClick={generateAISuggestions}
-            disabled={isLoading || !state.apiKey}
+            disabled={isLoading || !apiKeyValid}
             className={`flex-1 text-white p-3 rounded-lg transition ${
-              isLoading || !state.apiKey 
+              isLoading || !apiKeyValid 
                 ? 'bg-gray-400 cursor-not-allowed' 
                 : 'bg-green-500 hover:bg-green-600'
             }`}

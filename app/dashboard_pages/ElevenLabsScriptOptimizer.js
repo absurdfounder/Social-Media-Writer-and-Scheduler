@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy, Check, RefreshCw, AlertCircle } from 'lucide-react';
+import { getAnthropicKey, decryptKey } from '../Utils/getApikey';
 
 const ElevenLabsScriptOptimizer = () => {
   const [inputScript, setInputScript] = useState('');
@@ -12,8 +13,21 @@ const ElevenLabsScriptOptimizer = () => {
   const [selectedVoiceStyle, setSelectedVoiceStyle] = useState('neutral');
   const [attentionDeficit, setAttentionDeficit] = useState(true);
   const [activeTab, setActiveTab] = useState('input');
-  const [apiKey, setApiKey] = useState('');
+  const [apiKeyValid, setApiKeyValid] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const checkApiKey = () => {
+      const key = localStorage.getItem('anthropicKey');
+      if (key && key.startsWith('sk-')) {
+        setApiKeyValid(true);
+      } else {
+        setApiKeyValid(false);
+      }
+    };
+    
+    checkApiKey();
+  }, []);
 
   const voiceStyles = {
     neutral: "Standard speaking style",
@@ -76,14 +90,15 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey
+          'x-api-key': localStorage.getItem('anthropicKey')
         },
         body: JSON.stringify({
           model: 'claude-3-5-sonnet-20241022',
           max_tokens: 4000,
           temperature: 0.7,
           messages: [{ role: 'user', content: PROMPT_TEMPLATE }],
-          system: 'You are an expert at optimizing scripts for text-to-speech, focusing on natural and engaging delivery.'
+          system: 'You are an expert at optimizing scripts for text-to-speech, focusing on natural and engaging delivery.',
+          claudapikey: getAnthropicKey()
         })
       });
 
@@ -146,17 +161,6 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
         
         {/* Content */}
         <div className="p-6">
-          {/* API Key Input */}
-          <div className="mb-4">
-            <input
-              type="password"
-              placeholder="Anthropic API Key"
-              className="w-full p-3 border rounded-lg"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-            />
-          </div>
-
           {/* Error Handling */}
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -176,9 +180,9 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
               />
               <button 
                 onClick={handleOptimize} 
-                disabled={isLoading || !inputScript.trim() || !apiKey} 
+                disabled={isLoading || !inputScript.trim() || !apiKeyValid} 
                 className={`w-full py-2 px-4 rounded-md text-white font-medium ${
-                  isLoading || !inputScript.trim() || !apiKey 
+                  isLoading || !inputScript.trim() || !apiKeyValid 
                     ? 'bg-blue-300 cursor-not-allowed' 
                     : 'bg-blue-600 hover:bg-blue-700'
                 } flex items-center justify-center`}

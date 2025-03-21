@@ -30,11 +30,11 @@ const ElevenLabsScriptOptimizer = () => {
   }, []);
 
   const voiceStyles = {
-    neutral: "Standard speaking style",
-    energetic: "High-energy and enthusiastic delivery",
-    professional: "Clear and formal presentation style",
-    conversational: "Casual and natural speaking style",
-    narrative: "Storytelling with dramatic elements"
+    neutral: 'Standard speaking style',
+    energetic: 'High-energy and enthusiastic delivery',
+    professional: 'Clear and formal presentation style',
+    conversational: 'Casual and natural speaking style',
+    narrative: 'Storytelling with dramatic elements'
   };
   
   const handleOptimize = async () => {
@@ -47,16 +47,35 @@ const ElevenLabsScriptOptimizer = () => {
       return;
     }
 
+    // Prepare template strings with consistent quote usage
+    const emphasisTag = includeEmphasis ? '- Use <emphasis level=\'strong\'> or <emphasis level=\'moderate\'> for IMPORTANT keywords and phrases' : '';
+    const pausesTag = includePauses ? '- Add <break time=\'x.xs\' /> for strategic pauses (use sparingly to avoid instability)' : '';
+    const pronunciationTag = includePronunciation ? '- Use <phoneme alphabet=\'cmu-arpabet\' ph=\'PRONUNCIATION\'> for difficult words' : '';
+    
+    const energeticStyle = selectedVoiceStyle === 'energetic' ? '- Add more emphasis and varied pacing to create excitement' : '';
+    const professionalStyle = selectedVoiceStyle === 'professional' ? '- Use measured pacing and clear articulation' : '';
+    const conversationalStyle = selectedVoiceStyle === 'conversational' ? '- Add natural speech patterns, slight hesitations' : '';
+    const narrativeStyle = selectedVoiceStyle === 'narrative' ? '- Create dramatic pauses and emotional emphasis' : '';
+    
+    const attentionTechniques = attentionDeficit ? `
+4. ATTENTION MANAGEMENT TECHNIQUES:
+- Emphasize a keyword every 5-7 seconds to recapture wandering attention
+- Use strategic pauses before important information
+- Create tonal variation with rising and falling emphasis
+- Make transitions very clear with emphasis markers
+- Use emphasis to create "peaks" of engagement at regular intervals
+` : '';
+
     const PROMPT_TEMPLATE = `
 You are an expert script optimizer for ElevenLabs text-to-speech system. Your job is to take a raw script and optimize it with proper SSML tags to make it sound more natural and engaging.
 
-${attentionDeficit ? "IMPORTANT: The audience has a very limited attention span. Use audio techniques to maintain focus throughout." : ""}
+${attentionDeficit ? 'IMPORTANT: The audience has a very limited attention span. Use audio techniques to maintain focus throughout.' : ''}
 
 INSTRUCTIONS:
 1. Format the script with the following ElevenLabs controls:
-${includeEmphasis ? "- Use <emphasis level=\"strong\"> or <emphasis level=\"moderate\"> for IMPORTANT keywords and phrases" : ""}
-${includePauses ? "- Add <break time=\"x.xs\" /> for strategic pauses (use sparingly to avoid instability)" : ""}
-${includePronunciation ? "- Use <phoneme alphabet=\"cmu-arpabet\" ph=\"PRONUNCIATION\"> for difficult words" : ""}
+${emphasisTag}
+${pausesTag}
+${pronunciationTag}
 
 2. Normalize text for optimal speech:
 - Format numbers properly (cardinal, ordinal, phone numbers, dates)
@@ -64,19 +83,12 @@ ${includePronunciation ? "- Use <phoneme alphabet=\"cmu-arpabet\" ph=\"PRONUNCIA
 - Format symbols, URLs, and special characters for clear pronunciation
 
 3. Voice style: ${selectedVoiceStyle.toUpperCase()}
-${selectedVoiceStyle === 'energetic' ? "- Add more emphasis and varied pacing to create excitement" : ""}
-${selectedVoiceStyle === 'professional' ? "- Use measured pacing and clear articulation" : ""}
-${selectedVoiceStyle === 'conversational' ? "- Add natural speech patterns, slight hesitations" : ""}
-${selectedVoiceStyle === 'narrative' ? "- Create dramatic pauses and emotional emphasis" : ""}
+${energeticStyle}
+${professionalStyle}
+${conversationalStyle}
+${narrativeStyle}
 
-${attentionDeficit ? `
-4. ATTENTION MANAGEMENT TECHNIQUES:
-- Emphasize a keyword every 5-7 seconds to recapture wandering attention
-- Use strategic pauses before important information
-- Create tonal variation with rising and falling emphasis
-- Make transitions very clear with emphasis markers
-- Use emphasis to create "peaks" of engagement at regular intervals
-` : ""}
+${attentionTechniques}
 
 ORIGINAL SCRIPT:
 """
@@ -227,7 +239,7 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500">
-                  <p>No optimized script yet. Enter your script and click "Optimize Script".</p>
+                  <p>No optimized script yet. Enter your script and click {'Optimize Script'}.</p>
                 </div>
               )}
             </div>

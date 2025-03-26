@@ -1132,7 +1132,7 @@ if (!isAuthenticated) {
             <div className='grid w-full'>
               <label className='font-bold text-xs'>Tone</label>
               <div className="mt-1 text-xs text-gray-500 pb-2">
-                What's your style?
+                What is your style?
               </div>
               <select
                 value={contentMood}
@@ -1155,7 +1155,7 @@ if (!isAuthenticated) {
               className="w-full p-3 md:p-4 rounded-md bg-blue-50 text-blue-900 text-sm min-h-[80px] md:min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={overallPrompt}
               onChange={(e) => setOverallPrompt(e.target.value)}
-              placeholder="Describe your video concept. What's the main message or story?"
+              placeholder="Describe your video concept. What is the main message or story?"
               rows={isMobileView ? 3 : 4}
             />
             {error && (

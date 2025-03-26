@@ -195,7 +195,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
       setTraningData(storedData);
     }
   }, []);
-  
+
   // Log training data when it changes
   useEffect(() => {
     if (TrainingData) {
@@ -254,7 +254,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   useEffect(() => {
     setIsClient(true);
     validateApiKey();
-    
+
     const loadProfiles = async () => {
       try {
         const auth = getAuth();
@@ -270,7 +270,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
           });
           return;
         }
-        
+
         // If we already have a user, fetch profiles directly
         fetchProfiles(auth.currentUser.uid);
       } catch (error) {
@@ -284,7 +284,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
         }
       }
     };
-    
+
     const fetchProfiles = async (userId) => {
       try {
         console.log("Fetching profiles for user:", userId);
@@ -292,17 +292,17 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
         const profilesRef = collection(db, 'profiles');
         const q = query(profilesRef, where('userId', '==', userId));
         const querySnapshot = await getDocs(q);
-        
+
         if (querySnapshot.empty) {
           console.log("No profiles found for this user");
           return;
         }
-        
+
         const loadedProfiles = [];
         querySnapshot.forEach((doc) => {
           loadedProfiles.push({ id: doc.id, ...doc.data() });
         });
-        
+
         console.log("Loaded profiles:", loadedProfiles.length);
         setProfiles(loadedProfiles);
       } catch (error) {
@@ -310,22 +310,22 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
         toast.error("Failed to load profiles");
       }
     };
-    
+
     loadProfiles();
   }, []);
 
   // Handler for single profile selection
   const handleProfileSelect = (profileId) => {
     setSelectedProfile(profileId);
-    
+
     // Find the selected profile from the profiles array
     const profile = profiles.find(p => p.id === profileId);
-    
+
     // If a profile was found, set its data as training data
     if (profile) {
       // You can update the training data based on the selected profile
       setTraningData(profile.description || '');
-      
+
       // And save to localStorage if needed
       localStorage.setItem("getTrainingData", profile.description || '');
     }
@@ -862,412 +862,411 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
     `;
   };
 
-// Updated generateAIThread function to call Anthropic API directly
-// Add this to your imports if not already there
-// import { getAnthropicKey } from '../Utils/getApikey';
+  // Updated generateAIThread function to call Anthropic API directly
+  // Add this to your imports if not already there
+  // import { getAnthropicKey } from '../Utils/getApikey';
 
-// Replace your generateAIThread function with this version
-const generateAIThread = async () => {
-  playSound(sentSound);
-  setIsGenerating(true);
-  try {
-    let maxTweets;
-    switch (threadType) {
-      case 'single': maxTweets = 1; break;
-      case 'three': maxTweets = 3; break;
-      case 'full': maxTweets = 10; break;
-      default: maxTweets = 1;
-    }
-
-    let promptContent = overallPrompt;
-    if (includeProduct) {
-      const storedProductInfo = localStorage.getItem('productQuestionnaire');
-      if (storedProductInfo) {
-        const productData = JSON.parse(storedProductInfo);
-        promptContent += "\n\nIncorporate the following information about my product/service into the tweet(s), blending it naturally with my personal journey as an indie founder:\n";
-        promptContent += JSON.stringify(productData, null, 2);
+  // Replace your generateAIThread function with this version
+  const generateAIThread = async () => {
+    playSound(sentSound);
+    setIsGenerating(true);
+    try {
+      let maxTweets;
+      switch (threadType) {
+        case 'single': maxTweets = 1; break;
+        case 'three': maxTweets = 3; break;
+        case 'full': maxTweets = 10; break;
+        default: maxTweets = 1;
       }
+
+      let promptContent = overallPrompt;
+      if (includeProduct) {
+        const storedProductInfo = localStorage.getItem('productQuestionnaire');
+        if (storedProductInfo) {
+          const productData = JSON.parse(storedProductInfo);
+          promptContent += "\n\nIncorporate the following information about my product/service into the tweet(s), blending it naturally with my personal journey as an indie founder:\n";
+          promptContent += JSON.stringify(productData, null, 2);
+        }
+      }
+
+      const feelingPrompt = getFeelingPrompt(feeling);
+
+      // Build system prompt based on mode
+      let systemPrompt = mode === 'reply'
+        ? getReplyStylePrompt(replyLength, replyStance)
+        : getBaseSystemPrompt(maxTweets);
+
+      // Append celebrity prompt if celebrity mode is selected
+      if (celebrityMode && celebrityPrompts[celebrityMode]) {
+        systemPrompt += `\n\nCelebrity Mode Instruction:\n${celebrityPrompts[celebrityMode]}`;
+      }
+
+      // Add existing training data
+      if (TrainingData) {
+        systemPrompt = `${systemPrompt} Here Training Data for this response ${TrainingData}`;
+      }
+
+      // Call Anthropic API through our /api/anthropic endpoint
+      const response = await fetch('/api/anthropic', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': localStorage.getItem('anthropicKey')
+        },
+        body: JSON.stringify({
+          temperature: 0.7,
+          max_tokens: 1000,
+          messages: [{
+            role: "user",
+            content: `${mode === 'reply' ? 'Generate a reply' : 'Generate a new tweet or thread'} ${threadType === 'single' ? '(single tweet)' : `(thread of ${maxTweets} tweets)`} ${mode === 'reply' ? 'in response to' : 'about'} the following ${mode === 'share' ? 'update' : 'tweet'}: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet content without any extra text. Don't use emojis unless specifically requested. Don't write numbers in front of each tweet. Include one media suggestion (image or video) per tweet. In the URL, provide text describing what the image or video should show. Use spacing and line breaks to make the tweet stand out.`
+          }],
+          system: systemPrompt,
+          model: "claude-3-5-sonnet-20241022",
+          claudapikey: getAnthropicKey()
+        })
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      const generatedThreadContent = data.content[0].text.split('/endtweet').filter(tweet => tweet.trim() !== '');
+
+      const generatedThread = generatedThreadContent.map((tweetContent) => {
+        const { content, images, links, videos } = parseAIResponse(tweetContent);
+        return {
+          id: Date.now() + Math.random(),
+          content,
+          images,
+          links,
+          videos,
+          key: Date.now() + Math.random()
+        };
+      });
+
+      setTweets(generatedThread);
+      playSound(receivedSound);
+    } catch (error) {
+      console.error('Error generating AI thread:', error);
+      alert(`Failed to generate AI thread: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
     }
+  };
 
-    const feelingPrompt = getFeelingPrompt(feeling);
-
-    // Build system prompt based on mode
-    let systemPrompt = mode === 'reply' 
-      ? getReplyStylePrompt(replyLength, replyStance) 
-      : getBaseSystemPrompt(maxTweets);
-
-    // Append celebrity prompt if celebrity mode is selected
-    if (celebrityMode && celebrityPrompts[celebrityMode]) {
-      systemPrompt += `\n\nCelebrity Mode Instruction:\n${celebrityPrompts[celebrityMode]}`;
+  useEffect(() => {
+    const key = localStorage.getItem('anthropicKey');
+    if (key && key.startsWith('sk-')) {
+      setApikeyAdded(true);
     }
+  }, []);
 
-    // Add existing training data
-    if (TrainingData) {
-      systemPrompt = `${systemPrompt} Here Training Data for this response ${TrainingData}`;
-    }
-
-    // Call Anthropic API through our /api/anthropic endpoint
-    const response = await fetch('/api/anthropic', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': localStorage.getItem('anthropicKey')
-      },
-      body: JSON.stringify({
-        temperature: 0.7,
-        max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: `${mode === 'reply' ? 'Generate a reply' : 'Generate a new tweet or thread'} ${threadType === 'single' ? '(single tweet)' : `(thread of ${maxTweets} tweets)`} ${mode === 'reply' ? 'in response to' : 'about'} the following ${mode === 'share' ? 'update' : 'tweet'}: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet content without any extra text. Don't use emojis unless specifically requested. Don't write numbers in front of each tweet. Include one media suggestion (image or video) per tweet. In the URL, provide text describing what the image or video should show. Use spacing and line breaks to make the tweet stand out.`
-        }],
-        system: systemPrompt,
-        model: "claude-3-5-sonnet-20241022",
-        claudapikey: getAnthropicKey()
-      })
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-    const data = await response.json();
-    const generatedThreadContent = data.content[0].text.split('/endtweet').filter(tweet => tweet.trim() !== '');
-
-    const generatedThread = generatedThreadContent.map((tweetContent) => {
-      const { content, images, links, videos } = parseAIResponse(tweetContent);
-      return {
-        id: Date.now() + Math.random(),
-        content,
-        images,
-        links,
-        videos,
-        key: Date.now() + Math.random()
-      };
-    });
-
-    setTweets(generatedThread);
-    playSound(receivedSound);
-  } catch (error) {
-    console.error('Error generating AI thread:', error);
-    alert(`Failed to generate AI thread: ${error.message}`);
-  } finally {
-    setIsGenerating(false);
-  }
-};
-
-useEffect(() => {
-  const key = localStorage.getItem('anthropicKey');
-  if (key && key.startsWith('sk-')) {
-    setApikeyAdded(true);
-  }
-}, []);
-
-return (
-  <div className="bg-white rounded-md overflow-hidden p-4">
-    <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
-      <div className='bg-white rounded-md p-2 sm:p-4'>
-        <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
-          <div className='grid gap-2'>
-            <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
-            {!apikeyAdded ? (
-              <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'>
-                <InfoIcon size={20} />
-                Claude API key added seems wrong or invalid - save again.
-              </div>
-            ) : null}
-          </div>
-
-          <div className={`flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
-            <button
-              onClick={() => {
-                setMode('share');
-                playSound(toggleSound);
-              }}
-              className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'share'
-                ? 'text-white bg-blue-500'
-                : 'text-gray-500 hover:text-gray-500'
-                }`}
-              aria-pressed={mode === 'share'}
-            >
-              <span className="relative z-10">Share</span>
-              {mode === 'share' && <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />}
-            </button>
-            <button
-              onClick={() => {
-                setMode('reply');
-                playSound(toggleSound);
-              }}
-              className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'reply'
-                ? 'text-white bg-blue-500'
-                : 'text-gray-500 hover:text-gray-500'
-                }`}
-              aria-pressed={mode === 'reply'}
-            >
-              <span className="relative z-10">Reply</span>
-              {mode === 'reply' && <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />}
-            </button>
-          </div>
-        </div>
-        <textarea
-          className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-blue-50 text-blue-900 text-sm sm:text-base'
-          value={overallPrompt}
-          onChange={(e) => setOverallPrompt(e.target.value)}
-          placeholder={mode === 'share' ? "I need to share an update with the community.." : "I want to reply to..."}
-          rows={4}
-        />
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
-          <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto gap-4'>
-            {mode === 'reply' ? (
-              <>
-                <div className='grid'>
-                  <label className="font-bold text-xs flex gap-2 mb-2"><LetterText size={14} /> Reply Length</label>
-                  <select
-                    value={replyLength}
-                    onChange={(e) => setReplyLength(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="super_short">Ultra-Brief Reply</option>
-                    <option value="medium">Standard Reply</option>
-                    <option value="detailed">Detailed Reply</option>
-                  </select>
+  return (
+    <div className="bg-white rounded-md overflow-hidden p-4">
+      <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
+        <div className='bg-white rounded-md p-2 sm:p-4'>
+          <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
+            <div className='grid gap-2'>
+              <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">What is this update about?</h1>
+              {!apikeyAdded ? (
+                <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'>
+                  <InfoIcon size={20} />
+                  Claude API key added seems wrong or invalid - save again.
                 </div>
-                <div className='grid'>
-                  <label className="font-bold text-xs flex gap-2 mb-2"> <Eclipse size={14} />Stance</label>
-                  <select
-                    value={replyStance}
-                    onChange={(e) => setReplyStance(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="neutral">Neutral Stance</option>
-                    <option value="in_favour">In Favor</option>
-                    <option value="not_in_favour">Not in Favor</option>
-                    <option value="controversial">Controversial</option>
-                  </select>
-                </div>
-              </>
-            ) : (
-              <div className='flex gap-2'>
-                <div className='grid'>
-                  <label className="font-bold text-xs flex gap-2 mb-2"><LetterText size={14} />Post Length</label>
-                  <select
-                    value={threadType}
-                    onChange={(e) => setThreadType(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="single">Single Tweet</option>
-                    <option value="three">3 Tweet Thread</option>
-                    <option value="full">Full Thread</option>
-                  </select>
-                </div>
-                <div className='grid'>
-                  <label className="font-bold text-xs flex gap-2 mb-2"><HeartCrackIcon size={14} />Prespective</label>
-                  <select
-                    value={feeling}
-                    onChange={(e) => setFeeling(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="not_specified">Not Specified</option>
-                    <option value="curiosity">🔍 Curiosity</option>
-                    <option value="insight">💡 Insight</option>
-                    <option value="authenticity">🎭 Authenticity</option>
-                    <option value="achievement">🏆 Achievement</option>
-                    <option value="helpful">🤝 Helpful</option>
-                    <option value="reflection">🤔 Reflection</option>
-                    <option value="encouragement">💪 Encouragement</option>
-                    <option value="process">⚙️ Process</option>
-                    <option value="observation">👀 Observation</option>
-                  </select>
-                </div>
-                {/* Celebrity Mode Dropdown */}
-                <div className='grid'>
-                  <label className="font-bold text-xs flex gap-2 mb-2"><User size={14} /> Celebrity Mode</label>
-                  <select
-                    value={celebrityMode}
-                    onChange={(e) => setCelebrityMode(e.target.value)}
-                    className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
-                  >
-                    <option value="">None</option>
-                    <option value="marclou">Marc Lou</option>
-                    <option value="johnrush">John Rush</option>
-                    <option value="examplecelebrity">Example Celebrity</option>
-                  </select>
-                </div>
-              </div>
-            )}
-          </div>
+              ) : null}
+            </div>
 
-          {/* Training Data button and multi-select placed side-by-side */}
-          <div className="flex items-center gap-2">
-
-          <button
-              className='flex gap-2 bg-blue-100 text-blue-600 p-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm'
-              onClick={() => setIsTrainingPopupOpen(true)}
-            >
-              Training Data
-            </button>
-
-            {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
+            <div className={`flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
               <button
-                className="bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm"
-                onClick={generateAIThread}
-                disabled={isGenerating || apiKeyStatus === 'validating'}
+                onClick={() => {
+                  setMode('share');
+                  playSound(toggleSound);
+                }}
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'share'
+                  ? 'text-white bg-blue-500'
+                  : 'text-gray-500 hover:text-gray-500'
+                  }`}
+                aria-pressed={mode === 'share'}
               >
-                {isGenerating || apiKeyStatus === 'validating' ? (
-                  <Loader size={14} className="animate-spin" />
-                ) : (
-                  <Wand2 size={14} />
-                )}
-                {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
+                <span className="relative z-10">Share</span>
+                {mode === 'share' && <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />}
               </button>
-            )}
-
-
+              <button
+                onClick={() => {
+                  setMode('reply');
+                  playSound(toggleSound);
+                }}
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${mode === 'reply'
+                  ? 'text-white bg-blue-500'
+                  : 'text-gray-500 hover:text-gray-500'
+                  }`}
+                aria-pressed={mode === 'reply'}
+              >
+                <span className="relative z-10">Reply</span>
+                {mode === 'reply' && <span className="absolute inset-0 rounded-full bg-blue-500 animate-fadeIn" />}
+              </button>
+            </div>
           </div>
-        </div>
+          <textarea
+            className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-blue-50 text-blue-900 text-sm sm:text-base'
+            value={overallPrompt}
+            onChange={(e) => setOverallPrompt(e.target.value)}
+            placeholder={mode === 'share' ? "I need to share an update with the community.." : "I want to reply to..."}
+            rows={4}
+          />
+          <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0'>
+            <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
+              {mode === 'reply' ? (
+                <>
+                  <div className='grid'>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><LetterText size={14} /> Reply Length</label>
+                    <select
+                      value={replyLength}
+                      onChange={(e) => setReplyLength(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <option value="super_short">Ultra-Brief Reply</option>
+                      <option value="medium">Standard Reply</option>
+                      <option value="detailed">Detailed Reply</option>
+                    </select>
+                  </div>
+                  <div className='grid'>
+                    <label className="font-bold text-xs flex gap-2 mb-2"> <Eclipse size={14} />Stance</label>
+                    <select
+                      value={replyStance}
+                      onChange={(e) => setReplyStance(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full sm:w-auto"
+                    >
+                      <option value="neutral">Neutral Stance</option>
+                      <option value="in_favour">In Favor</option>
+                      <option value="not_in_favour">Not in Favor</option>
+                      <option value="controversial">Controversial</option>
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
+                  <div>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><LetterText size={14} />Post Length</label>
+                    <select
+                      value={threadType}
+                      onChange={(e) => setThreadType(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full"
+                    >
+                      <option value="single">Single Tweet</option>
+                      <option value="three">3 Tweet Thread</option>
+                      <option value="full">Full Thread</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><HeartCrackIcon size={14} />Perspective</label>
+                    <select
+                      value={feeling}
+                      onChange={(e) => setFeeling(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full"
+                    >
+                      <option value="not_specified">Not Specified</option>
+                      <option value="curiosity">🔍 Curiosity</option>
+                      <option value="insight">💡 Insight</option>
+                      <option value="authenticity">🎭 Authenticity</option>
+                      <option value="achievement">🏆 Achievement</option>
+                      <option value="helpful">🤝 Helpful</option>
+                      <option value="reflection">🤔 Reflection</option>
+                      <option value="encouragement">💪 Encouragement</option>
+                      <option value="process">⚙️ Process</option>
+                      <option value="observation">👀 Observation</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-bold text-xs flex gap-2 mb-2"><User size={14} /> Celebrity Mode</label>
+                    <select
+                      value={celebrityMode}
+                      onChange={(e) => setCelebrityMode(e.target.value)}
+                      className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-full"
+                    >
+                      <option value="">None</option>
+                      <option value="marclou">Marc Lou</option>
+                      <option value="johnrush">John Rush</option>
+                      <option value="examplecelebrity">Example Celebrity</option>
+                    </select>
+                  </div>
+                </div>
 
-        {/* Popup Modal for Training Data & Multi-select */}
-{/* Profile Selection Modal */}
-{isTrainingPopupOpen && (
-<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div className="bg-white rounded-md p-4 sm:p-6 w-80 sm:w-96 max-h-[80vh] overflow-y-auto">
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="text-lg font-bold">Select Profile</h2>
-      <button 
-        onClick={() => setIsTrainingPopupOpen(false)}
-        className="text-gray-500 hover:text-red-500"
-      >
-        <X size={18} />
-      </button>
-    </div>
-    
-    <div className="mb-4">
-      <p className="text-sm text-gray-500 mb-2">
-        Select a profile to personalize your outreach messages with your information and style.
-      </p>
-      
-      {profiles && profiles.length > 0 ? (
-        <div className="space-y-2">
-          {profiles.map((profile) => (
-            <div 
-              key={profile.id}
-              onClick={() => {
-                handleProfileSelect(profile.id);
-                toast.success(`Profile "${profile.name}" selected`);
-                setIsTrainingPopupOpen(false);
-              }}
-              className={`p-3 rounded-md cursor-pointer flex items-center ${
-                selectedProfile === profile.id 
-                  ? 'bg-blue-100 border border-blue-300' 
-                  : 'bg-gray-50 hover:bg-gray-100'
-              }`}
-            >
-              <User size={18} className="mr-2 text-blue-500" />
-              <div className="flex-1">
-                <div className="font-medium">{profile.name || "Unnamed Profile"}</div>
-                {profile.description && (
-                  <div className="text-xs text-gray-500">{profile.description}</div>
-                )}
+              )}
+            </div>
+
+            {/* Training Data button and multi-select placed side-by-side */}
+            <div className="flex items-center gap-2">
+
+              <button
+                className='flex gap-2 bg-blue-100 text-blue-600 p-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm'
+                onClick={() => setIsTrainingPopupOpen(true)}
+              >
+                Training Data
+              </button>
+
+              {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
+                <button
+                  className="bg-blue-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-blue-900 text-xs sm:text-sm"
+                  onClick={generateAIThread}
+                  disabled={isGenerating || apiKeyStatus === 'validating'}
+                >
+                  {isGenerating || apiKeyStatus === 'validating' ? (
+                    <Loader size={14} className="animate-spin" />
+                  ) : (
+                    <Wand2 size={14} />
+                  )}
+                  {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
+                </button>
+              )}
+
+
+            </div>
+          </div>
+
+          {/* Popup Modal for Training Data & Multi-select */}
+          {/* Profile Selection Modal */}
+          {isTrainingPopupOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white rounded-md p-4 sm:p-6 w-80 sm:w-96 max-h-[80vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold">Select Profile</h2>
+                  <button
+                    onClick={() => setIsTrainingPopupOpen(false)}
+                    className="text-gray-500 hover:text-red-500"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-sm text-gray-500 mb-2">
+                    Select a profile to personalize your outreach messages with your information and style.
+                  </p>
+
+                  {profiles && profiles.length > 0 ? (
+                    <div className="space-y-2">
+                      {profiles.map((profile) => (
+                        <div
+                          key={profile.id}
+                          onClick={() => {
+                            handleProfileSelect(profile.id);
+                            toast.success(`Profile "${profile.name}" selected`);
+                            setIsTrainingPopupOpen(false);
+                          }}
+                          className={`p-3 rounded-md cursor-pointer flex items-center ${selectedProfile === profile.id
+                              ? 'bg-blue-100 border border-blue-300'
+                              : 'bg-gray-50 hover:bg-gray-100'
+                            }`}
+                        >
+                          <User size={18} className="mr-2 text-blue-500" />
+                          <div className="flex-1">
+                            <div className="font-medium">{profile.name || "Unnamed Profile"}</div>
+                            {profile.description && (
+                              <div className="text-xs text-gray-500">{profile.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center p-4 bg-gray-100 rounded-md">
+                      <p className="text-gray-500">No profiles found. Please create a profile first.</p>
+                      <button
+                        className="mt-2 text-sm text-blue-500 hover:underline"
+                        onClick={() => {
+                          // You can add navigation to profile manager here
+                          setIsTrainingPopupOpen(false);
+                          // window.location.href = '/profile-manager';
+                          toast.info("Please create a profile in the Profile Manager");
+                        }}
+                      >
+                        Create a Profile
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between">
+                  {selectedProfile && (
+                    <button
+                      onClick={() => {
+                        setSelectedProfile(null);
+                        setTraningData('');
+                        toast.info("Profile selection cleared");
+                      }}
+                      className="bg-red-50 text-red-600 px-4 py-2 rounded-md"
+                    >
+                      Clear Selection
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setIsTrainingPopupOpen(false)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+      <div className='bg-blue-200 p-2 sm:p-4 rounded-md'>
+        <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-4 sm:mb-8 bg-white">
+          {tweets.map((tweet, index) => (
+            <div key={tweet.key} className="relative border-b border-gray-200 last:border-b-0">
+              <div className="absolute left-0 top-0 -ml-4 sm:-ml-6 mt-2 text-xs font-bold text-blue-500">
+                {index + 1}
+              </div>
+              <div className="p-2 sm:p-4">
+                <div className="flex items-center mb-2 sm:mb-4">
+                  <img src="https://placehold.co/40x40/333333/ffffff?text=B&font=Raleway" alt="User avatar" className="w-6 h-6 sm:w-8 sm:h-8 rounded-full mr-2" />
+                  <div>
+                    <h2 className="font-bold text-xs sm:text-sm">Big Mouth</h2>
+                    <p className="text-gray-500 text-xs">@absurdfounder</p>
+                  </div>
+                  {tweets.length > 1 && (
+                    <button
+                      onClick={() => removeTweet(tweet.id)}
+                      className="ml-auto text-gray-500 hover:text-red-500"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                <TipTapEditor
+                  key={tweet.key}
+                  content={tweet.content}
+                  onUpdate={(content) => handleEditorChange(tweet.id, content)}
+                  onImageUpload={() => handleImageUpload(tweet.id)}
+                  onVideoUpload={() => handleVideoUpload(tweet.id)}
+                  onLinkAdd={() => handleLinkAdd(tweet.id)}
+                />
+                <TweetContent
+                  images={tweet.images}
+                  links={tweet.links}
+                  videos={tweet.videos}
+                />
+                <div className="flex space-x-2 mt-2">
+                  {/* Additional tweet-specific actions can go here */}
+                </div>
               </div>
             </div>
           ))}
-        </div>
-      ) : (
-        <div className="text-center p-4 bg-gray-100 rounded-md">
-          <p className="text-gray-500">No profiles found. Please create a profile first.</p>
-          <button 
-            className="mt-2 text-sm text-blue-500 hover:underline"
-            onClick={() => {
-              // You can add navigation to profile manager here
-              setIsTrainingPopupOpen(false);
-              // window.location.href = '/profile-manager';
-              toast.info("Please create a profile in the Profile Manager");
-            }}
-          >
-            Create a Profile
-          </button>
-        </div>
-      )}
-    </div>
-    
-    <div className="flex justify-between">
-      {selectedProfile && (
-        <button
-          onClick={() => {
-            setSelectedProfile(null);
-            setTraningData('');
-            toast.info("Profile selection cleared");
-          }}
-          className="bg-red-50 text-red-600 px-4 py-2 rounded-md"
-        >
-          Clear Selection
-        </button>
-      )}
-      <button
-        onClick={() => setIsTrainingPopupOpen(false)}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md"
-      >
-        Close
-      </button>
-    </div>
-  </div>
-</div>
-)}
-
-      </div>
-    </div>
-    <div className='bg-blue-200 p-2 sm:p-4 rounded-md'>
-      <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-4 sm:mb-8 bg-white">
-        {tweets.map((tweet, index) => (
-          <div key={tweet.key} className="relative border-b border-gray-200 last:border-b-0">
-            <div className="absolute left-0 top-0 -ml-4 sm:-ml-6 mt-2 text-xs font-bold text-blue-500">
-              {index + 1}
-            </div>
-            <div className="p-2 sm:p-4">
-              <div className="flex items-center mb-2 sm:mb-4">
-                <img src="https://placehold.co/40x40/333333/ffffff?text=B&font=Raleway" alt="User avatar" className="w-6 h-6 sm:w-8 sm:h-8 rounded-full mr-2" />
-                <div>
-                  <h2 className="font-bold text-xs sm:text-sm">Big Mouth</h2>
-                  <p className="text-gray-500 text-xs">@absurdfounder</p>
-                </div>
-                {tweets.length > 1 && (
-                  <button
-                    onClick={() => removeTweet(tweet.id)}
-                    className="ml-auto text-gray-500 hover:text-red-500"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-              <TipTapEditor
-                key={tweet.key}
-                content={tweet.content}
-                onUpdate={(content) => handleEditorChange(tweet.id, content)}
-                onImageUpload={() => handleImageUpload(tweet.id)}
-                onVideoUpload={() => handleVideoUpload(tweet.id)}
-                onLinkAdd={() => handleLinkAdd(tweet.id)}
-              />
-              <TweetContent
-                images={tweet.images}
-                links={tweet.links}
-                videos={tweet.videos}
-              />
-              <div className="flex space-x-2 mt-2">
-                {/* Additional tweet-specific actions can go here */}
-              </div>
-            </div>
+          <div className="p-2 sm:p-4">
+            <button
+              onClick={addNewTweet}
+              className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm gap-4"
+            >
+              <PlusCircle size={14} className="mr-1" />
+              Add another tweet
+            </button>
           </div>
-        ))}
-        <div className="p-2 sm:p-4">
-          <button
-            onClick={addNewTweet}
-            className="flex items-center text-blue-500 hover:text-blue-500 text-xs sm:text-sm gap-4"
-          >
-            <PlusCircle size={14} className="mr-1" />
-            Add another tweet
-          </button>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default ThreadWriter;

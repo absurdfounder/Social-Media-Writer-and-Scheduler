@@ -346,6 +346,20 @@ export default function Dashboard() {
      { icon: Heart, label: 'Feedback', id: 'feedback' }*/
   ];
 
+  // Primary mobile nav items - limited to only the most important ones
+  const primaryMobileNavItems = [
+    { icon: HandMetal, label: 'Marketing', id: 'dashboard' },
+    { icon: Twitter, label: 'Build On X', id: 'twitter' },
+    { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
+    { icon: Brain, label: 'Preach', id: 'ledger-db' },
+  ];
+
+  // Medium screen mobile items - add one more option
+  const mediumScreenItems = [
+    ...primaryMobileNavItems,
+    { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
+  ];
+
   useEffect(() => {
     // Initialize training data in localStorage if it doesn't exist
     const initializeLocalStorage = () => {
@@ -454,6 +468,65 @@ export default function Dashboard() {
     }
   };
 
+  // Enhanced Mobile Menu Component
+  const MobileMenu = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    
+    // Group items for better organization in the mobile menu
+    const menuGroups = [
+      { 
+        category: "Main Tools",
+        items: mainNavItems
+      },
+      { 
+        category: "Other Tools",
+        items: bottomNavItems
+      }
+    ];
+    
+    return (
+      <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b z-10">
+          <div className="flex justify-between items-center p-4">
+            <h2 className="text-xl font-bold">Menu</h2>
+            <button onClick={onClose} className="p-2 text-gray-600 hover:text-gray-900">
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-4 pb-24">
+          {menuGroups.map((group, index) => (
+            <div key={index} className="mb-6">
+              <h3 className="text-sm font-medium text-gray-500 mb-3">{group.category}</h3>
+              <div className="grid grid-cols-3 gap-4">
+                {group.items.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavItemClick(item.id)}
+                    className={`flex flex-col items-center justify-center p-4 rounded-lg border
+                      ${activeTab === item.id 
+                        ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                        : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+                  >
+                    <item.icon className="h-6 w-6 mb-2" />
+                    <span className="text-sm text-center">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          
+          {/* User profile section for mobile menu */}
+          <div className="mt-8 pt-6 border-t">
+            <ApiKeyManager />
+            <UserProfileSection />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -469,16 +542,14 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-100 text-gray-900">
       <ToastContainer />
       <div className="flex h-screen overflow-hidden">
-        {/* Mobile menu overlay */}
-        {isMobileMenuOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
+        {/* Mobile Menu Component */}
+        <MobileMenu 
+          isOpen={isMobileMenuOpen} 
+          onClose={() => setIsMobileMenuOpen(false)} 
+        />
 
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 left-0 z-20 w-64 bg-white transform 
+        <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white transform 
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
           <div className="p-8 flex justify-between items-center">
@@ -554,19 +625,30 @@ export default function Dashboard() {
         </main>
       </div>
 
-      {/* Mobile navigation */}
+      {/* Mobile navigation - Limited to few options with responsive variants */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
-        <div className="flex justify-around p-2">
-          {/* Marketing Week as special button in mobile nav */}
+        {/* Smallest screens - Only show 4 main items + menu */}
+        <div className="grid grid-cols-5 sm:hidden">
+          {primaryMobileNavItems.map((item) => (
+            <MobileNavItem
+              key={item.id}
+              icon={item.icon}
+              label={item.label}
+              active={activeTab === item.id}
+              onClick={() => handleNavItemClick(item.id)}
+            />
+          ))}
           <MobileNavItem
-            key="dashboard"
-            icon={HandMetal}
-            label="Marketing Week"
-            active={activeTab === 'dashboard'}
-            onClick={() => handleNavItemClick('dashboard')}
+            icon={Menu}
+            label="More"
+            active={false}
+            onClick={() => setIsMobileMenuOpen(true)}
           />
-          
-          {mainNavItems.map((item) => (
+        </div>
+
+        {/* Medium mobile screens - Show 5 items + menu */}
+        <div className="hidden sm:grid sm:grid-cols-6 md:hidden">
+          {mediumScreenItems.map((item) => (
             <MobileNavItem
               key={item.id}
               icon={item.icon}

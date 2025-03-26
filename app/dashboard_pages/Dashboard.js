@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   PlusCircle,
@@ -15,6 +13,9 @@ import {
   MessageSquare,
   MessageCircle
 } from 'lucide-react';
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { toast } from 'react-toastify';
 
 // Component for GitHub-style contribution graph
 const ContributionGraph = ({ data }) => {
@@ -111,7 +112,7 @@ const ContributionGraph = ({ data }) => {
 };
 
 // Component for Marketing Milestones
-const MarketingMilestones = ({ milestones, onAddMilestone }) => {
+const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => {
   const [showForm, setShowForm] = useState(false);
   const [newMilestone, setNewMilestone] = useState({
     title: '',
@@ -120,19 +121,40 @@ const MarketingMilestones = ({ milestones, onAddMilestone }) => {
     impact: ''
   });
   
-  const handleSubmit = () => {
+  const auth = getAuth();
+  const db = getFirestore();
+  
+  const handleSubmit = async () => {
     if (newMilestone.title.trim() && newMilestone.description.trim()) {
-      onAddMilestone({
-        ...newMilestone,
-        id: Date.now()
-      });
-      setNewMilestone({
-        title: '',
-        date: new Date().toISOString().split('T')[0],
-        description: '',
-        impact: ''
-      });
-      setShowForm(false);
+      try {
+        const milestoneToAdd = {
+          ...newMilestone,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString(),
+          profileId: currentProfile?.id,
+          userId: auth.currentUser?.uid
+        };
+        
+        // Save to Firestore
+        if (auth.currentUser && currentProfile) {
+          const milestonesRef = collection(db, 'marketing_milestones');
+          await addDoc(milestonesRef, milestoneToAdd);
+          
+          toast.success('Milestone saved successfully!');
+        }
+        
+        onAddMilestone(milestoneToAdd);
+        setNewMilestone({
+          title: '',
+          date: new Date().toISOString().split('T')[0],
+          description: '',
+          impact: ''
+        });
+        setShowForm(false);
+      } catch (error) {
+        console.error('Error saving milestone:', error);
+        toast.error('Failed to save milestone');
+      }
     }
   };
   
@@ -248,24 +270,83 @@ const MarketingMilestones = ({ milestones, onAddMilestone }) => {
 };
 
 // Component for marketing task list with proof and notes
-const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onProofAttach, onAddNotes }) => {
+const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onProofAttach, onAddNotes, currentProfile }) => {
   const [newTaskText, setNewTaskText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('content');
   const fileInputRef = useRef(null);
   const [expandedTask, setExpandedTask] = useState(null);
   const [noteText, setNoteText] = useState('');
   
-  const handleAddTask = () => {
+  const auth = getAuth();
+  const db = getFirestore();
+  
+  const handleAddTask = async () => {
     if (newTaskText.trim()) {
-      onTaskAdd({
-        id: Date.now(),
-        text: newTaskText,
-        completed: false,
-        category: selectedCategory,
-        proofs: [],
-        notes: ''
-      });
-      setNewTaskText('');
+      try {
+        const newTask = {
+          id: Date.now().toString(),
+          text: newTaskText,
+          completed: false,
+          category: selectedCategory,
+          proofs: [],
+          notes: '',
+          userId: auth.currentUser?.uid,
+          profileId: currentProfile?.id,
+          createdAt: new Date().toISOString()
+        };
+        
+        // Add to UI first for immediate feedback
+        onTaskAdd(newTask);
+        setNewTaskText('');
+        
+        // Then save to Firebase if user is logged in
+        if (auth.currentUser && currentProfile) {
+          // Get reference to the tasks document for this user and profile
+          const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
+          
+          // Get current tasks or create new array
+          const tasksDoc = await getDoc(tasksDocRef);
+          let currentTasks = [];
+          
+          if (tasksDoc.exists()) {
+            currentTasks = tasksDoc.data().tasks || [];
+            await updateDoc(tasksDocRef, { 
+              tasks: [...currentTasks, newTask],
+              updatedAt: new Date().toISOString()
+            });
+          } else {
+            await setDoc(tasksDocRef, {
+              tasks: [newTask],
+              profileId: currentProfile.id,
+              userId: auth.currentUser.uid,
+              createdAt: new Date().toISOString()
+            });
+          }
+          
+          // Update contribution data for today
+          const today = new Date().toISOString().split('T')[0];
+          const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
+          const contributionDoc = await getDoc(contributionRef);
+          
+          if (contributionDoc.exists()) {
+            const contributionData = contributionDoc.data().data || {};
+            contributionData[today] = (contributionData[today] || 0) + 1;
+            await updateDoc(contributionRef, { data: contributionData });
+          } else {
+            await setDoc(contributionRef, {
+              data: { [today]: 1 },
+              userId: auth.currentUser.uid,
+              profileId: currentProfile.id,
+              createdAt: new Date().toISOString()
+            });
+          }
+          
+          toast.success('Task saved successfully!');
+        }
+      } catch (error) {
+        console.error('Error adding task:', error);
+        toast.error('Failed to save task to database');
+      }
     }
   };
   
@@ -274,28 +355,87 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
     fileInputRef.current.click();
   };
   
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     const taskId = fileInputRef.current.taskId;
     
     if (files.length > 0 && taskId) {
-      const proofs = files.map(file => ({
-        id: Date.now() + Math.random(),
-        name: file.name,
-        url: URL.createObjectURL(file),
-        type: file.type,
-        size: file.size,
-        uploadDate: new Date().toISOString()
-      }));
-      
-      onProofAttach(taskId, proofs);
+      try {
+        const proofs = files.map(file => ({
+          id: Date.now() + Math.random(),
+          name: file.name,
+          url: URL.createObjectURL(file),
+          type: file.type,
+          size: file.size,
+          uploadDate: new Date().toISOString()
+        }));
+        
+        // Update task in Firebase
+        if (auth.currentUser && currentProfile) {
+          // Find the task document
+          const taskQuery = collection(db, 'marketing_tasks');
+          const taskSnapshot = await getDoc(doc(db, 'marketing_tasks', taskId));
+          
+          if (taskSnapshot.exists()) {
+            const taskData = taskSnapshot.data();
+            const updatedProofs = [...(taskData.proofs || []), ...proofs];
+            
+            await updateDoc(doc(db, 'marketing_tasks', taskId), {
+              proofs: updatedProofs
+            });
+            
+            // Update contribution data for today
+            const today = new Date().toISOString().split('T')[0];
+            const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
+            
+            const contributionDoc = await getDoc(contributionRef);
+            if (contributionDoc.exists()) {
+              const contributionData = contributionDoc.data().data || {};
+              contributionData[today] = (contributionData[today] || 0) + 1;
+              
+              await updateDoc(contributionRef, { data: contributionData });
+            } else {
+              await setDoc(contributionRef, {
+                data: { [today]: 1 },
+                userId: auth.currentUser.uid,
+                profileId: currentProfile.id
+              });
+            }
+          }
+        }
+        
+        onProofAttach(taskId, proofs);
+        toast.success('Proof attached successfully!');
+      } catch (error) {
+        console.error('Error attaching proof:', error);
+        toast.error('Failed to attach proof');
+      }
     }
   };
   
-  const handleAddNotes = (taskId) => {
+  const handleAddNotes = async (taskId) => {
     if (noteText.trim()) {
-      onAddNotes(taskId, noteText);
-      setNoteText('');
+      try {
+        // Update task in Firebase
+        if (auth.currentUser && currentProfile) {
+          // Find the task document
+          const taskSnapshot = await getDoc(doc(db, 'marketing_tasks', taskId));
+          
+          if (taskSnapshot.exists()) {
+            await updateDoc(doc(db, 'marketing_tasks', taskId), {
+              notes: noteText
+            });
+            
+            toast.success('Notes added successfully!');
+          }
+        }
+        
+        onAddNotes(taskId, noteText);
+        setNoteText('');
+      } catch (error) {
+        console.error('Error adding notes:', error);
+        toast.error('Failed to add notes');
+      }
     }
   };
   
@@ -481,233 +621,189 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
   );
 };
 
-// AI Chat Button Component
-const AIChatButton = ({ onClick }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  
-  return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {/* Message bubble */}
-      {isHovered && (
-        <div className="absolute bottom-16 right-0 bg-white shadow-lg rounded-lg p-3 mb-2 max-w-xs animate-fade-in">
-          <p className="text-sm">Have any doubts about how to market?</p>
-          <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-3 h-3 bg-white"></div>
-        </div>
-      )}
-      
-      {/* Chat button */}
-      <button
-        onClick={onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg transition-all duration-200 hover:scale-105"
-      >
-        <MessageCircle size={24} />
-      </button>
-    </div>
-  );
-};
-
-// AI Chat Modal Component
-const AIChatModal = ({ isOpen, onClose }) => {
-  const [messages, setMessages] = useState([
-    { type: 'bot', text: 'Hi there! How can I help with your marketing today?' }
-  ]);
-  const [inputValue, setInputValue] = useState('');
-  
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      // Add user message
-      setMessages([...messages, { type: 'user', text: inputValue }]);
-      
-      // Simulate AI response (in a real app, this would call an API)
-      setTimeout(() => {
-        const botResponses = [
-          "That's a great marketing question! I'd recommend focusing on identifying your target audience first, then crafting messaging that speaks directly to their needs.",
-          "For content marketing, consistency is key. Having a regular publishing schedule helps build audience expectation and improves engagement over time.",
-          "Social media marketing works best when you're actively engaging with your community, not just broadcasting messages. Try asking questions and responding to comments.",
-          "Email marketing still has one of the highest ROIs of any marketing channel. Make sure your subject lines are compelling and your content provides real value.",
-          "When measuring marketing success, look beyond vanity metrics like followers. Focus on conversions, engagement rates, and ultimately revenue attributed to your campaigns."
-        ];
-        
-        const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-        setMessages(prev => [...prev, { type: 'bot', text: randomResponse }]);
-      }, 1000);
-      
-      setInputValue('');
-    }
-  };
-  
-  if (!isOpen) return null;
-  
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] flex flex-col h-full">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b p-4">
-          <h3 className="font-medium">Marketing GOD</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X size={20} />
-          </button>
-        </div>
-        
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((message, index) => (
-            <div 
-              key={index} 
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div 
-                className={`max-w-xs px-4 py-2 rounded-lg ${
-                  message.type === 'user' 
-                    ? 'bg-blue-500 text-white rounded-br-none' 
-                    : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                }`}
-              >
-                {message.text}
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Input */}
-        <div className="border-t p-4">
-          <div className="flex">
-            <input
-              type="text"
-              placeholder="Ask about marketing strategies..."
-              className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-            <button
-              onClick={handleSendMessage}
-              className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
-            >
-              <Send size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Main Marketing Dashboard Component
-const MarketingDashboard = () => {
+const MarketingDashboard = ({ currentProfile }) => {
   // State for AI chat
   const [chatOpen, setChatOpen] = useState(false);
   
-  // Task state
-  const [tasks, setTasks] = useState([
-    { id: 1, text: 'Create blog post about customer success story', completed: true, category: 'content', proofs: [
-      { id: 101, name: 'blog-post-screenshot.png', url: '#', type: 'image/png', size: 245000, uploadDate: '2023-03-15T10:30:00Z' }
-    ], notes: 'Published on the company blog and shared to social media channels' },
-    { id: 2, text: 'Schedule social media posts for the week', completed: false, category: 'social', proofs: [], notes: '' },
-    { id: 3, text: 'Analyze February campaign metrics', completed: false, category: 'analysis', proofs: [], notes: '' },
-    { id: 4, text: 'Design and send monthly newsletter', completed: true, category: 'email', proofs: [
-      { id: 102, name: 'newsletter-feb-2023.pdf', url: '#', type: 'application/pdf', size: 1245000, uploadDate: '2023-02-28T14:20:00Z' }
-    ], notes: 'Achieved 24% open rate and 3.1% click-through rate' },
-    { id: 5, text: 'Optimize website meta descriptions', completed: true, category: 'seo', proofs: [
-      { id: 103, name: 'meta-descriptions-updated.pdf', url: '#', type: 'application/pdf', size: 124000, uploadDate: '2023-03-16T14:20:00Z' }
-    ], notes: 'Updated all product pages with keyword-rich descriptions' },
-    { id: 6, text: 'Reach out to potential podcast partners', completed: false, category: 'partnership', proofs: [], notes: '' },
-  ]);
+  // Firebase references
+  const auth = getAuth();
+  const db = getFirestore();
   
-  // Milestones state
-  const [milestones, setMilestones] = useState([
-    {
-      id: 1,
-      title: 'Reached 10,000 Email Subscribers',
-      date: '2023-02-28',
-      description: 'Achieved our Q1 goal of 10k subscribers through combined lead generation campaigns.',
-      impact: 'Increased our potential marketing reach by 40% compared to last quarter.'
-    },
-    {
-      id: 2,
-      title: 'First Guest Post on Major Industry Blog',
-      date: '2023-01-15',
-      description: 'Published guest article on TechCrunch about marketing automation trends.',
-      impact: 'Drove 2,500 new visitors to our website and generated 120 leads.'
-    }
-  ]);
-  
-  // Activity data for contribution graph
+  // State for data
+  const [tasks, setTasks] = useState([]);
+  const [milestones, setMilestones] = useState([]);
   const [activityData, setActivityData] = useState({});
   
+  // Loading states
+  const [isLoading, setIsLoading] = useState(true);
+  const hasLoadedRef = useRef({});
+  
+  // Load data when profile changes
   useEffect(() => {
-    // Generate sample activity data
-    const generateActivityData = () => {
-      const data = {};
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setDate(startDate.getDate() - 364);
+    // Only load data if we haven't loaded them for this profile yet
+    if (currentProfile && auth.currentUser && !hasLoadedRef.current[currentProfile.id]) {
+      loadData();
+      hasLoadedRef.current[currentProfile.id] = true;
+    } else if (!currentProfile) {
+      // Set default sample data if no profile selected
+      setTasks([
+        { id: '1', text: 'Create blog post about customer success story', completed: true, category: 'content', proofs: [
+          { id: '101', name: 'blog-post-screenshot.png', url: '#', type: 'image/png', size: 245000, uploadDate: '2023-03-15T10:30:00Z' }
+        ], notes: 'Published on the company blog and shared to social media channels' },
+        { id: '2', text: 'Schedule social media posts for the week', completed: false, category: 'social', proofs: [], notes: '' },
+        { id: '3', text: 'Analyze February campaign metrics', completed: false, category: 'analysis', proofs: [], notes: '' }
+      ]);
       
-      let currentDate = new Date(startDate);
-      while (currentDate <= today) {
-        const dateString = currentDate.toISOString().split('T')[0];
-        const dayOfWeek = currentDate.getDay();
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        const maxActivity = isWeekend ? 5 : 10;
-        data[dateString] = Math.floor(Math.random() * maxActivity);
-        
-        currentDate.setDate(currentDate.getDate() + 1);
+      setMilestones([
+        {
+          id: '1',
+          title: 'Reached 10,000 Email Subscribers',
+          date: '2023-02-28',
+          description: 'Achieved our Q1 goal of 10k subscribers through combined lead generation campaigns.',
+          impact: 'Increased our potential marketing reach by 40% compared to last quarter.'
+        }
+      ]);
+      
+      setActivityData({
+        "2023-03-15": 5,
+        "2023-03-16": 3,
+        "2023-03-17": 7
+      });
+      
+      setIsLoading(false);
+    }
+  }, [currentProfile, auth.currentUser]);
+  
+  // Function to load all data
+  const loadData = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Load tasks
+      const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
+      const tasksDoc = await getDoc(tasksDocRef);
+      
+      if (tasksDoc.exists()) {
+        console.log('Loaded tasks:', tasksDoc.data().tasks);
+        setTasks(tasksDoc.data().tasks || []);
+      } else {
+        console.log('No tasks found, setting empty array');
+        setTasks([]);
       }
       
-      setActivityData(data);
-    };
-    
-    generateActivityData();
-    // No dependencies needed here as this should only run once on mount
-  }, []);
-
-  // Task management functions
-  const handleTaskToggle = (taskId) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
-    
-    // Update activity data for today when completing a task
-    const today = new Date().toISOString().split('T')[0];
-    setActivityData(prev => ({
-      ...prev,
-      [today]: (prev[today] || 0) + 1
-    }));
+      // Load milestones
+      const milestonesDocRef = doc(db, 'marketing_milestones', `${currentProfile.id}_${auth.currentUser.uid}`);
+      const milestonesDoc = await getDoc(milestonesDocRef);
+      
+      if (milestonesDoc.exists()) {
+        console.log('Loaded milestones:', milestonesDoc.data().milestones);
+        setMilestones(milestonesDoc.data().milestones || []);
+      } else {
+        console.log('No milestones found, setting empty array');
+        setMilestones([]);
+      }
+      
+      // Load contribution data
+      const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
+      const contributionDoc = await getDoc(contributionRef);
+      
+      if (contributionDoc.exists()) {
+        console.log('Loaded contribution data:', contributionDoc.data().data);
+        setActivityData(contributionDoc.data().data || {});
+      } else {
+        console.log('No contribution data found, setting empty object');
+        setActivityData({});
+      }
+      
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Failed to load data from database');
+    } finally {
+      setIsLoading(false);
+    }
   };
+  
+  // Simple direct task management functions
+// Task management functions with Firebase integration
+const handleTaskToggle = async (taskId) => {
+  try {
+    // Update locally first for immediate UI response
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    );
+    setTasks(updatedTasks);
+    
+    if (auth.currentUser && currentProfile) {
+      // Update in Firebase
+      const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
+      await updateDoc(tasksDocRef, { 
+        tasks: updatedTasks,
+        updatedAt: new Date().toISOString()
+      });
+      
+      // Update contribution data for today
+      const today = new Date().toISOString().split('T')[0];
+      const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
+      const contributionDoc = await getDoc(contributionRef);
+      
+      if (contributionDoc.exists()) {
+        const contributionData = contributionDoc.data().data || {};
+        contributionData[today] = (contributionData[today] || 0) + 1;
+        await updateDoc(contributionRef, { data: contributionData });
+      } else {
+        await setDoc(contributionRef, {
+          data: { [today]: 1 },
+          userId: auth.currentUser.uid,
+          profileId: currentProfile.id,
+          createdAt: new Date().toISOString()
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error toggling task:', error);
+    toast.error('Failed to update task status');
+  }
+};
   
   const handleTaskAdd = (newTask) => {
-    setTasks([...tasks, newTask]);
-    
-    // Update activity data for today when adding a task
-    const today = new Date().toISOString().split('T')[0];
-    setActivityData(prev => ({
-      ...prev,
-      [today]: (prev[today] || 0) + 1
-    }));
+    console.log('Adding new task:', newTask);
+    setTasks(prevTasks => [...prevTasks, newTask]);
   };
   
-  const handleTaskDelete = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+  const handleTaskDelete = async (taskId) => {
+    try {
+      // Update locally first
+      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      setTasks(updatedTasks);
+      
+      if (auth.currentUser && currentProfile) {
+        // Update in Firebase
+        const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
+        await updateDoc(tasksDocRef, { 
+          tasks: updatedTasks,
+          updatedAt: new Date().toISOString()
+        });
+        
+        toast.success('Task deleted');
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast.error('Failed to delete task from database');
+    }
   };
   
   const handleProofAttach = (taskId, proofs) => {
+    console.log('Attaching proof to task:', taskId, proofs);
     setTasks(tasks.map(task => 
       task.id === taskId 
         ? { ...task, proofs: [...(task.proofs || []), ...proofs] }
         : task
     ));
-    
-    // Update activity data for today when attaching proof
-    const today = new Date().toISOString().split('T')[0];
-    setActivityData(prev => ({
-      ...prev,
-      [today]: (prev[today] || 0) + 1
-    }));
   };
   
   const handleAddNotes = (taskId, notes) => {
+    console.log('Adding notes to task:', taskId, notes);
     setTasks(tasks.map(task => 
       task.id === taskId ? { ...task, notes } : task
     ));
@@ -715,14 +811,8 @@ const MarketingDashboard = () => {
   
   // Add milestone
   const handleAddMilestone = (newMilestone) => {
+    console.log('Adding new milestone:', newMilestone);
     setMilestones([...milestones, newMilestone]);
-    
-    // Update activity data for today
-    const today = new Date().toISOString().split('T')[0];
-    setActivityData(prev => ({
-      ...prev,
-      [today]: (prev[today] || 0) + 1
-    }));
   };
   
   // Calculate task completion stats
@@ -730,9 +820,126 @@ const MarketingDashboard = () => {
   const completedTasks = tasks.filter(task => task.completed).length;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   
+  // AI Chat Button Component
+  const AIChatButton = ({ onClick }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    return (
+      <div className="fixed bottom-6 right-6 z-50">
+        {/* Message bubble */}
+        {isHovered && (
+          <div className="absolute bottom-16 right-0 bg-white shadow-lg rounded-lg p-3 mb-2 max-w-xs animate-fade-in">
+            <p className="text-sm">Have any doubts about how to market?</p>
+            <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-3 h-3 bg-white"></div>
+          </div>
+        )}
+        
+        {/* Chat button */}
+        <button
+          onClick={onClick}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg transition-all duration-200 hover:scale-105"
+        >
+          <MessageCircle size={24} />
+        </button>
+      </div>
+    );
+  };
+  
+  // AI Chat Modal Component
+  const AIChatModal = ({ isOpen, onClose }) => {
+    const [messages, setMessages] = useState([
+      { type: 'bot', text: 'Hi there! How can I help with your marketing today?' }
+    ]);
+    const [inputValue, setInputValue] = useState('');
+    
+    const handleSendMessage = () => {
+      if (inputValue.trim()) {
+        // Add user message
+        setMessages([...messages, { type: 'user', text: inputValue }]);
+        
+        // Simulate AI response (in a real app, this would call an API)
+        setTimeout(() => {
+          const botResponses = [
+            "That's a great marketing question! I'd recommend focusing on identifying your target audience first, then crafting messaging that speaks directly to their needs.",
+            "For content marketing, consistency is key. Having a regular publishing schedule helps build audience expectation and improves engagement over time.",
+            "Social media marketing works best when you're actively engaging with your community, not just broadcasting messages. Try asking questions and responding to comments.",
+            "Email marketing still has one of the highest ROIs of any marketing channel. Make sure your subject lines are compelling and your content provides real value.",
+            "When measuring marketing success, look beyond vanity metrics like followers. Focus on conversions, engagement rates, and ultimately revenue attributed to your campaigns."
+          ];
+          
+          const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+          setMessages(prev => [...prev, { type: 'bot', text: randomResponse }]);
+        }, 1000);
+        
+        setInputValue('');
+      }
+    };
+    
+    if (!isOpen) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b p-4">
+            <h3 className="font-medium">Marketing GOD</h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <X size={20} />
+            </button>
+          </div>
+          
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map((message, index) => (
+              <div 
+                key={index} 
+                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div 
+                  className={`max-w-xs px-4 py-2 rounded-lg ${
+                    message.type === 'user' 
+                      ? 'bg-blue-500 text-white rounded-br-none' 
+                      : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                  }`}
+                >
+                  {message.text}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Input */}
+          <div className="border-t p-4">
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="Ask about marketing strategies..."
+                className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
+              <button
+                onClick={handleSendMessage}
+                className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
   return (
     <div className="bg-gray-100 min-h-screen p-4">
       <div className="max-w-4xl mx-auto">
+        <h2 className="text-2xl text-center mb-4 text-blue-800">
+          Marketing Dashboard {currentProfile ? `for Profile: ${currentProfile.name}` : ''}
+        </h2>
         
         {/* Contribution graph at the top */}
         <ContributionGraph data={activityData} />
@@ -761,11 +968,13 @@ const MarketingDashboard = () => {
             onTaskDelete={handleTaskDelete}
             onProofAttach={handleProofAttach}
             onAddNotes={handleAddNotes}
+            currentProfile={currentProfile}
           />
           
           <MarketingMilestones 
             milestones={milestones}
             onAddMilestone={handleAddMilestone}
+            currentProfile={currentProfile}
           />
         </div>
       </div>

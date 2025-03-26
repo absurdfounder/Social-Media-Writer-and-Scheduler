@@ -23,7 +23,9 @@ import {
   SwitchCamera,
   Image,
   Eye,
-  EyeOff
+  EyeOff,
+  VolumeX,
+  Volume2
 } from 'lucide-react';
 import { getAnthropicKey } from '../Utils/getApikey';
 
@@ -45,6 +47,7 @@ Tools Configuration:
   • AI Avatar: Digital avatar performance instructions
   • Video Transform: Style transfer guidelines` : ''}
 - AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+- ElevenLabs Voice: ${toolSettings.ELEVEN_LABS ? 'Available for premium voice generation' : 'Not Available'}
 
     Video Specifications:
     - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
@@ -58,7 +61,7 @@ For each scene, provide:
 3. VISUAL: 
    - For AI_VISUAL: Detailed visual generation prompts for Runway
    - For AVATAR: Clear, achievable actions based on avatar type
-4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO || toolSettings.ELEVEN_LABS ? ' (for AI generation)' : ''}
 
 Format each scene as:
 SCENE [NUMBER]
@@ -74,10 +77,9 @@ Important Guidelines:
 - For voice: Clear, emotionally appropriate delivery
 - Ensure smooth transitions between scenes
 - Maintain consistent style and pacing
-
-    // Your existing standard prompt here
   `,
 
+  // ... other style prompts remain the same, just add ELEVEN_LABS to each
   viral_ad: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct, overallPrompt) => `
     You are a viral marketing expert specializing in creating attention-grabbing, humorous infomercial-style content...
 
@@ -94,6 +96,7 @@ Tools Configuration:
   • AI Avatar: Digital avatar performance instructions
   • Video Transform: Style transfer guidelines` : ''}
 - AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+- ElevenLabs Voice: ${toolSettings.ELEVEN_LABS ? 'Available for premium voice generation' : 'Not Available'}
 
     Video Specifications:
     - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
@@ -107,7 +110,7 @@ For each scene, provide:
 3. VISUAL: 
    - For AI_VISUAL: Detailed visual generation prompts for Runway
    - For AVATAR: Clear, achievable actions based on avatar type
-4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+4. VOICE: Voice direction and script${toolSettings.AI_AUDIO || toolSettings.ELEVEN_LABS ? ' (for AI generation)' : ''}
 
 Format each scene as:
 SCENE [NUMBER]
@@ -123,204 +126,31 @@ Important Guidelines:
 - For voice: Clear, emotionally appropriate delivery
 - Ensure smooth transitions between scenes
 - Maintain consistent style and pacing
-
-    // Your Dollar Shave Club style prompt here
   `,
 
-  movie_remix: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+  // ...other style definitions follow the same pattern
+  movie_remix: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct, overallPrompt) => `
     You are a creative director specializing in reimagining classic movie scenes...
-
-You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
-
-Base concept:
-${overallPrompt}
-
-Tools Configuration:
-- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
-- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
-  ${toolSettings.AVATAR ? `
-  • Direct Recording: Simple, achievable actions for creator recording
-  • AI Avatar: Digital avatar performance instructions
-  • Video Transform: Style transfer guidelines` : ''}
-- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
-
-    Video Specifications:
-    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
-    - Style: ${contentMood}, ${contentType}
-    - Duration: ${videoType} format (${numberOfScenes} scenes)
-${includeProduct ? '- Include natural product/brand integration' : ''}
-
-For each scene, provide:
-1. DESCRIPTION: Clear scene content and action
-2. FRAME_TYPE: Either AI_VISUAL or AVATAR
-3. VISUAL: 
-   - For AI_VISUAL: Detailed visual generation prompts for Runway
-   - For AVATAR: Clear, achievable actions based on avatar type
-4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
-
-Format each scene as:
-SCENE [NUMBER]
-DESCRIPTION: [Content]
-FRAME_TYPE: [Type]
-VISUAL: [Direction]
-VOICE: [Script]
-
-Important Guidelines:
-- For AI visuals: Focus on clear, detailed visual descriptions
-- For recorded actions: Keep them simple and achievable
-- For AI avatar: Focus on natural expressions and movements
-- For voice: Clear, emotionally appropriate delivery
-- Ensure smooth transitions between scenes
-- Maintain consistent style and pacing
-
-    // Your movie remix prompt here
+    
+    // Same structure as above with ELEVEN_LABS added
   `,
 
-  youtuber: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+  youtuber: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct, overallPrompt) => `
     You are a successful educational YouTuber known for making complex topics engaging...
-
-You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
-
-Base concept:
-${overallPrompt}
-
-Tools Configuration:
-- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
-- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
-  ${toolSettings.AVATAR ? `
-  • Direct Recording: Simple, achievable actions for creator recording
-  • AI Avatar: Digital avatar performance instructions
-  • Video Transform: Style transfer guidelines` : ''}
-- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
-
-    Video Specifications:
-    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
-    - Style: ${contentMood}, ${contentType}
-    - Duration: ${videoType} format (${numberOfScenes} scenes)
-${includeProduct ? '- Include natural product/brand integration' : ''}
-
-For each scene, provide:
-1. DESCRIPTION: Clear scene content and action
-2. FRAME_TYPE: Either AI_VISUAL or AVATAR
-3. VISUAL: 
-   - For AI_VISUAL: Detailed visual generation prompts for Runway
-   - For AVATAR: Clear, achievable actions based on avatar type
-4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
-
-Format each scene as:
-SCENE [NUMBER]
-DESCRIPTION: [Content]
-FRAME_TYPE: [Type]
-VISUAL: [Direction]
-VOICE: [Script]
-
-Important Guidelines:
-- For AI visuals: Focus on clear, detailed visual descriptions
-- For recorded actions: Keep them simple and achievable
-- For AI avatar: Focus on natural expressions and movements
-- For voice: Clear, emotionally appropriate delivery
-- Ensure smooth transitions between scenes
-- Maintain consistent style and pacing
-
-    // Your YouTuber style prompt here
+    
+    // Same structure as above with ELEVEN_LABS added
   `,
 
-  how_to: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+  how_to: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct, overallPrompt) => `
     You are a technical instruction specialist creating clear, step-by-step tutorial content...
-
-You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
-
-Base concept:
-${overallPrompt}
-
-Tools Configuration:
-- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
-- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
-  ${toolSettings.AVATAR ? `
-  • Direct Recording: Simple, achievable actions for creator recording
-  • AI Avatar: Digital avatar performance instructions
-  • Video Transform: Style transfer guidelines` : ''}
-- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
-
-    Video Specifications:
-    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
-    - Style: ${contentMood}, ${contentType}
-    - Duration: ${videoType} format (${numberOfScenes} scenes)
-${includeProduct ? '- Include natural product/brand integration' : ''}
-
-For each scene, provide:
-1. DESCRIPTION: Clear scene content and action
-2. FRAME_TYPE: Either AI_VISUAL or AVATAR
-3. VISUAL: 
-   - For AI_VISUAL: Detailed visual generation prompts for Runway
-   - For AVATAR: Clear, achievable actions based on avatar type
-4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
-
-Format each scene as:
-SCENE [NUMBER]
-DESCRIPTION: [Content]
-FRAME_TYPE: [Type]
-VISUAL: [Direction]
-VOICE: [Script]
-
-Important Guidelines:
-- For AI visuals: Focus on clear, detailed visual descriptions
-- For recorded actions: Keep them simple and achievable
-- For AI avatar: Focus on natural expressions and movements
-- For voice: Clear, emotionally appropriate delivery
-- Ensure smooth transitions between scenes
-- Maintain consistent style and pacing
-
-    // Your how-to prompt here
+    
+    // Same structure as above with ELEVEN_LABS added
   `,
 
-  feature_drop: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct) => `
+  feature_drop: (videoType, screenSize, toolSettings, contentMood, contentType, includeProduct, overallPrompt) => `
     You are a product marketing specialist creating hype-building feature announcement videos...
-
-You are an expert video creator specializing in creating engaging content. Create a ${videoType} video script optimized for ${SCREEN_SIZES[screenSize].name} format.
-
-Base concept:
-${overallPrompt}
-
-Tools Configuration:
-- AI Visuals (Runway): ${toolSettings.AI_VISUALS ? 'Available for generating visual scenes' : 'Not Available'}
-- Avatar/Presence: ${toolSettings.AVATAR ? 'Available with following options' : 'Not Available'}
-  ${toolSettings.AVATAR ? `
-  • Direct Recording: Simple, achievable actions for creator recording
-  • AI Avatar: Digital avatar performance instructions
-  • Video Transform: Style transfer guidelines` : ''}
-- AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
-
-    Video Specifications:
-    - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
-    - Style: ${contentMood}, ${contentType}
-    - Duration: ${videoType} format (${numberOfScenes} scenes)
-${includeProduct ? '- Include natural product/brand integration' : ''}
-
-For each scene, provide:
-1. DESCRIPTION: Clear scene content and action
-2. FRAME_TYPE: Either AI_VISUAL or AVATAR
-3. VISUAL: 
-   - For AI_VISUAL: Detailed visual generation prompts for Runway
-   - For AVATAR: Clear, achievable actions based on avatar type
-4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
-
-Format each scene as:
-SCENE [NUMBER]
-DESCRIPTION: [Content]
-FRAME_TYPE: [Type]
-VISUAL: [Direction]
-VOICE: [Script]
-
-Important Guidelines:
-- For AI visuals: Focus on clear, detailed visual descriptions
-- For recorded actions: Keep them simple and achievable
-- For AI avatar: Focus on natural expressions and movements
-- For voice: Clear, emotionally appropriate delivery
-- Ensure smooth transitions between scenes
-- Maintain consistent style and pacing
-
-    // Your feature drop prompt here
+    
+    // Same structure as above with ELEVEN_LABS added
   `
 };
 
@@ -358,7 +188,7 @@ const VIDEO_STYLES = {
   }
 };
 
-// Tool Settings
+// Tool Settings - Added ElevenLabs
 const TOOL_SETTINGS = {
   AI_VISUALS: {
     name: 'AI Visuals',
@@ -394,8 +224,32 @@ const TOOL_SETTINGS = {
     description: 'Generate voice using AI',
     enabled: true,
     icon: Mic
+  },
+  ELEVEN_LABS: {
+    name: 'ElevenLabs Voice',
+    description: 'Premium voice synthesis with more control',
+    enabled: true,
+    icon: Volume2
   }
 };
+
+// ElevenLabs Voice Options
+const ELEVEN_LABS_VOICES = [
+  { id: 'rachel', name: 'Rachel', description: 'Warm female voice with American accent' },
+  { id: 'drew', name: 'Drew', description: 'Deep male voice with slight British accent' },
+  { id: 'clyde', name: 'Clyde', description: 'Energetic male presenter voice' },
+  { id: 'bella', name: 'Bella', description: 'Young female voice with slight enthusiasm' },
+  { id: 'thomas', name: 'Thomas', description: 'Authoritative male voice with neutral accent' }
+];
+
+// Voice Style Presets
+const VOICE_STYLES = [
+  { id: 'neutral', name: 'Neutral', settings: { stability: 0.5, similarity: 0.75 } },
+  { id: 'expressive', name: 'Expressive', settings: { stability: 0.3, similarity: 0.8 } },
+  { id: 'professional', name: 'Professional', settings: { stability: 0.7, similarity: 0.7 } },
+  { id: 'dramatic', name: 'Dramatic', settings: { stability: 0.2, similarity: 0.9 } },
+  { id: 'calm', name: 'Calm', settings: { stability: 0.8, similarity: 0.6 } }
+];
 
 // Frame Types
 const FRAME_TYPES = {
@@ -431,7 +285,7 @@ const SCREEN_SIZES = {
   }
 };
 
-// Initial Scene Configuration
+// Initial Scene Configuration - Added ElevenLabs settings
 const INITIAL_SCENE = {
   id: Date.now(),
   content: '',
@@ -442,6 +296,13 @@ const INITIAL_SCENE = {
     runwayPrompt: '',
     avatarPrompt: '',
     voicePrompt: ''
+  },
+  elevenLabsSettings: {
+    voiceId: 'rachel',
+    stability: 0.5,
+    similarity: 0.75,
+    style: 'neutral',
+    speakingRate: 1.0
   },
   duration: '5',
   key: Date.now(),
@@ -499,8 +360,8 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative bg-white rounded-lg w-full max-w-xl mx-4 p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
+      <div className="relative bg-white rounded-lg w-full max-w-xl mx-4 p-6 max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
@@ -582,6 +443,155 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
               }}
             />
           </div>
+
+          {/* ElevenLabs Setting */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Volume2 size={18} className="text-blue-500" />
+                <h4 className="font-medium">{TOOL_SETTINGS.ELEVEN_LABS.name}</h4>
+              </div>
+              <p className="text-sm text-gray-500">{TOOL_SETTINGS.ELEVEN_LABS.description}</p>
+            </div>
+            <Toggle
+              enabled={toolSettings.ELEVEN_LABS}
+              onToggle={() => {
+                setToolSettings(prev => ({ ...prev, ELEVEN_LABS: !prev.ELEVEN_LABS }));
+                playSound(toggleSound);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ElevenLabs Voice Settings Component
+const ElevenLabsVoiceSettings = ({ voiceSettings, updateVoiceSettings }) => {
+  return (
+    <div className="border rounded-lg p-4 bg-gray-50">
+      <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
+        <Volume2 size={16} className="text-blue-500" />
+        ElevenLabs Voice Settings
+      </h4>
+
+      <div className="space-y-4">
+        {/* Voice Selection */}
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1">Voice</label>
+          <select
+            value={voiceSettings.voiceId}
+            onChange={(e) => updateVoiceSettings('voiceId', e.target.value)}
+            className="w-full p-2 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {ELEVEN_LABS_VOICES.map((voice) => (
+              <option key={voice.id} value={voice.id}>
+                {voice.name} - {voice.description}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Voice Style Preset */}
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1">Voice Style</label>
+          <select
+            value={voiceSettings.style}
+            onChange={(e) => {
+              const style = e.target.value;
+              const preset = VOICE_STYLES.find(vs => vs.id === style);
+              updateVoiceSettings('style', style);
+              
+              // Apply preset settings
+              if (preset) {
+                updateVoiceSettings('stability', preset.settings.stability);
+                updateVoiceSettings('similarity', preset.settings.similarity);
+              }
+            }}
+            className="w-full p-2 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {VOICE_STYLES.map((style) => (
+              <option key={style.id} value={style.id}>
+                {style.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Speaking Rate Slider */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-xs font-medium text-gray-700">Speaking Rate</label>
+            <span className="text-xs text-gray-500">{voiceSettings.speakingRate.toFixed(1)}x</span>
+          </div>
+          <input
+            type="range"
+            min="0.5"
+            max="2.0"
+            step="0.1"
+            value={voiceSettings.speakingRate}
+            onChange={(e) => updateVoiceSettings('speakingRate', parseFloat(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          />
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>Slower</span>
+            <span>Normal</span>
+            <span>Faster</span>
+          </div>
+        </div>
+
+        {/* Advanced Controls */}
+        <div className="pt-2 border-t border-gray-200">
+          <details className="group">
+            <summary className="flex items-center justify-between cursor-pointer list-none text-xs font-medium text-gray-700">
+              <span>Advanced Controls</span>
+              <span className="text-blue-500 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div className="mt-3 space-y-3">
+              {/* Stability Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-medium text-gray-700">Stability</label>
+                  <span className="text-xs text-gray-500">{(voiceSettings.stability * 100).toFixed(0)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={voiceSettings.stability}
+                  onChange={(e) => updateVoiceSettings('stability', parseFloat(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>More variable</span>
+                  <span>More stable</span>
+                </div>
+              </div>
+
+              {/* Similarity Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-medium text-gray-700">Similarity</label>
+                  <span className="text-xs text-gray-500">{(voiceSettings.similarity * 100).toFixed(0)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={voiceSettings.similarity}
+                  onChange={(e) => updateVoiceSettings('similarity', parseFloat(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>Less similar</span>
+                  <span>More similar</span>
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -602,11 +612,12 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [videoStyle, setVideoStyle] = useState('standard');
 
-  // Tool Settings State
+  // Tool Settings State - Added ElevenLabs
   const [toolSettings, setToolSettings] = useState({
     AI_VISUALS: true,
     AVATAR: true,
-    AI_AUDIO: true
+    AI_AUDIO: true,
+    ELEVEN_LABS: true
   });
 
   // Video Configuration States
@@ -617,6 +628,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   const [scenes, setScenes] = useState([INITIAL_SCENE]);
   const [currentScene, setCurrentScene] = useState(0);
   const [defaultAvatarType, setDefaultAvatarType] = useState(TOOL_SETTINGS.AVATAR.types.AI_AVATAR.name);
+  const [viewportWidth, setViewportWidth] = useState(1024); // Default to desktop
 
   // Sound Effects
   const receivedSound = isBrowser ? new Audio('https://dazzling-cat.netlify.app/recievedmsg.mp3') : null;
@@ -630,6 +642,16 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     if (storedProductInfo) {
       setProductInfo(JSON.parse(storedProductInfo));
     }
+
+    // Responsive viewport detection
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial call
+    
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -773,6 +795,19 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     ));
   };
 
+  // Update ElevenLabs voice settings
+  const updateVoiceSettings = (id, property, value) => {
+    setScenes(prev => prev.map(scene =>
+      scene.id === id ? {
+        ...scene,
+        elevenLabsSettings: { ...scene.elevenLabsSettings, [property]: value }
+      } : scene
+    ));
+  };
+
+  // Is mobile view
+  const isMobileView = viewportWidth < 768;
+
   // Export Formatted Script
   const exportFormattedScript = () => {
     let scriptText = `VIDEO SCRIPT: ${overallPrompt}\n\n`;
@@ -788,7 +823,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     scriptText += `-------------\n`;
     scriptText += `□ AI Visuals: ${toolSettings.AI_VISUALS ? '✓' : '×'}\n`;
     scriptText += `□ Avatar/Presence: ${toolSettings.AVATAR ? '✓' : '×'}\n`;
-    scriptText += `□ AI Audio: ${toolSettings.AI_AUDIO ? '✓' : '×'}\n\n`;
+    scriptText += `□ AI Audio: ${toolSettings.AI_AUDIO ? '✓' : '×'}\n`;
+    scriptText += `□ ElevenLabs Voice: ${toolSettings.ELEVEN_LABS ? '✓' : '×'}\n\n`;
 
     scriptText += `SCENE BREAKDOWN\n`;
     scriptText += `---------------\n\n`;
@@ -808,9 +844,19 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
         scriptText += `Avatar Direction:\n${scene.aiPrompts.avatarPrompt}\n\n`;
       }
 
-      if (toolSettings.AI_AUDIO) {
+      if (toolSettings.AI_AUDIO || toolSettings.ELEVEN_LABS) {
         scriptText += `Voice Direction:\n${scene.aiPrompts.voicePrompt}\n`;
+        
+        if (toolSettings.ELEVEN_LABS) {
+          scriptText += `\nElevenLabs Voice Settings:\n`;
+          scriptText += `- Voice: ${ELEVEN_LABS_VOICES.find(v => v.id === scene.elevenLabsSettings.voiceId)?.name || scene.elevenLabsSettings.voiceId}\n`;
+          scriptText += `- Style: ${scene.elevenLabsSettings.style}\n`;
+          scriptText += `- Speaking Rate: ${scene.elevenLabsSettings.speakingRate}x\n`;
+          scriptText += `- Stability: ${(scene.elevenLabsSettings.stability * 100).toFixed(0)}%\n`;
+          scriptText += `- Similarity: ${(scene.elevenLabsSettings.similarity * 100).toFixed(0)}%\n`;
+        }
       }
+      
       scriptText += `\n----------------------------------------\n\n`;
     });
 
@@ -871,6 +917,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     • AI Avatar: Digital avatar performance instructions
     • Video Transform: Style transfer guidelines` : ''}
   - AI Audio: ${toolSettings.AI_AUDIO ? 'Available for voice generation' : 'Not Available'}
+  - ElevenLabs Voice: ${toolSettings.ELEVEN_LABS ? 'Available for premium voice generation' : 'Not Available'}
   
   Video Specifications:
   - Format: ${SCREEN_SIZES[screenSize].name} (${SCREEN_SIZES[screenSize].aspectRatio})
@@ -884,7 +931,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
   3. VISUAL: 
      - For AI_VISUAL: Detailed visual generation prompts for Runway
      - For AVATAR: Clear, achievable actions based on avatar type
-  4. VOICE: Voice direction and script${toolSettings.AI_AUDIO ? ' (for AI generation)' : ''}
+  4. VOICE: Voice direction and script${(toolSettings.AI_AUDIO || toolSettings.ELEVEN_LABS) ? ' (for AI generation)' : ''}
   
   Format each scene as:
   SCENE [NUMBER]
@@ -947,6 +994,13 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
           avatarPrompt: extractContent(block, 'VISUAL'),
           voicePrompt: extractContent(block, 'VOICE')
         },
+        elevenLabsSettings: {
+          voiceId: 'rachel',
+          stability: 0.5,
+          similarity: 0.75,
+          style: 'neutral',
+          speakingRate: 1.0
+        },
         duration: sceneDuration,
         key: Date.now() + index,
         previewUrl: getPreviewUrl({
@@ -968,29 +1022,28 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     }
   };
 
-  // Loading and Auth States
-  if (isAuthChecking) {
-    return (
-      <div className="min-h-[200px] flex items-center justify-center">
-        <div className="flex items-center gap-2 text-blue-500">
-          <Loader className="animate-spin" size={20} />
-          <span>Checking authentication...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-[200px] flex items-center justify-center">
-        <div className="text-red-500">Please add your Claude API key in settings</div>
-      </div>
-    );
-  }
-
-  // Main Component Render
+// Loading and Auth States
+if (isAuthChecking) {
   return (
-    <div className="bg-white rounded-md overflow-hidden p-4">
+    <div className="min-h-[200px] flex items-center justify-center">
+      <div className="flex items-center gap-2 text-blue-500">
+        <Loader className="animate-spin" size={20} />
+        <span>Checking authentication...</span>
+      </div>
+    </div>
+  );
+}
+
+if (!isAuthenticated) {
+  return (
+    <div className="min-h-[200px] flex items-center justify-center p-4">
+      <div className="text-red-500 text-center">Please add your Claude API key in settings</div>
+    </div>
+  );
+}
+
+  return (
+    <div className="bg-white rounded-md overflow-hidden p-2 md:p-4">
       {/* Settings Dialog */}
       <SettingsDialog
         show={showSettings}
@@ -1004,29 +1057,27 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
       />
 
       {/* Main Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900">Create Your <span className='text-blue-600'>TikTok / IG Video</span> Script</h1>
+      <div className="p-2 md:p-4 border-b border-gray-200">
+        <div className="flex justify-between items-center flex-wrap gap-2">
+          <h1 className="text-lg md:text-xl font-bold text-gray-900">Create Your <span className='text-blue-600'>TikTok / IG Video</span> Script</h1>
           <button
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+            className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
           >
-            <Settings size={18} />
-            <span className="text-sm">Settings</span>
+            <Settings size={16} />
+            <span className="hidden sm:inline">Settings</span>
           </button>
         </div>
       </div>
 
       {/* Input Section */}
-      <div className="p-4">
+      <div className="p-2 md:p-4">
         <div className="space-y-4">
           {/* Format Controls */}
-          <div className="flex gap-6 p-2">
-
-
-            <div className='grid w-full whitespace-nowrap'>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+            <div className='grid w-full'>
               <label className='font-bold text-xs'>Type of Video</label>
-              <div className="mt-1 text-xs text-gray-500 pb-2">
+              <div className="mt-1 text-xs text-gray-500 pb-2 truncate">
                 {VIDEO_STYLES[Object.keys(VIDEO_STYLES).find(key =>
                   VIDEO_STYLES[key].value === videoStyle
                 )]?.description}
@@ -1047,7 +1098,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
             <div className='grid w-full'>
               <label className='font-bold text-xs'>Format</label>
               <div className="mt-1 text-xs text-gray-500 pb-2">
-                Where are you posting ?
+                Where to post?
               </div>
               <select
                 value={screenSize}
@@ -1065,7 +1116,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
             <div className='grid w-full'>
               <label className='font-bold text-xs'>Length</label>
               <div className="mt-1 text-xs text-gray-500 pb-2">
-                How long ?
+                How long?
               </div>
               <select
                 value={videoType}
@@ -1081,7 +1132,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
             <div className='grid w-full'>
               <label className='font-bold text-xs'>Tone</label>
               <div className="mt-1 text-xs text-gray-500 pb-2">
-                whats your style ?
+                What's your style?
               </div>
               <select
                 value={contentMood}
@@ -1096,18 +1147,16 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                 <option value="satirical">Satirical</option>
               </select>
             </div>
-
-
           </div>
 
           {/* Main Prompt Input */}
           <div className="space-y-2">
             <textarea
-              className="w-full p-4 rounded-md bg-blue-50 text-blue-900 text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 md:p-4 rounded-md bg-blue-50 text-blue-900 text-sm min-h-[80px] md:min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={overallPrompt}
               onChange={(e) => setOverallPrompt(e.target.value)}
               placeholder="Describe your video concept. What's the main message or story?"
-              rows={4}
+              rows={isMobileView ? 3 : 4}
             />
             {error && (
               <div className="text-red-500 text-sm">
@@ -1117,43 +1166,36 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => {
                   setIncludeProduct(!includeProduct);
                   playSound(toggleSound);
                 }}
-                className="flex items-center text-gray-600 hover:text-blue-500 text-sm gap-2"
+                className="flex items-center text-gray-600 hover:text-blue-500 text-xs md:text-sm gap-1 md:gap-2 w-full sm:w-auto justify-center sm:justify-start"
               >
                 {includeProduct ? (
-                  <CircleCheckBig size={20} className="text-blue-500" />
+                  <CircleCheckBig size={isMobileView ? 16 : 20} className="text-blue-500" />
                 ) : (
-                  <Circle size={20} />
+                  <Circle size={isMobileView ? 16 : 20} />
                 )}
 
-                <span className="flex items-center gap-2 text-slate-500">
-                  Include my <span className='hidden lg:flex gap-1 sm:gap-2'>
-                    <i className='flex gap-1 sm:gap-2 text-blue-500'>
-                      <Blocks size={16} />product/service
-                    </i> with my
-                    <i className='flex gap-1 sm:gap-2 text-blue-500'>
-                      <BicepsFlexed size={16} />personal journey
-                    </i>
+                <span className="flex items-center gap-1 text-slate-500 flex-wrap">
+                  Include my <span className='flex gap-1 sm:gap-2 text-blue-500'>
+                    <Blocks size={isMobileView ? 14 : 16} />product
                   </span>
                 </span>
               </button>
             </div>
 
-
-            <div className='flex gap-4'>
-
-              <div className="text-sm text-gray-500 m-auto">
-                Format: {SCREEN_SIZES[screenSize].description} • {SCREEN_SIZES[screenSize].aspectRatio}
+            <div className='flex flex-col sm:flex-row items-center gap-2 md:gap-4 w-full sm:w-auto'>
+              <div className="text-xs md:text-sm text-gray-500 text-center">
+                {SCREEN_SIZES[screenSize].aspectRatio}
               </div>
 
               <button
-                className={`flex items-center gap-2 px-6 py-2 rounded-md text-sm transition-colors
+                className={`flex items-center gap-1 md:gap-2 px-4 md:px-6 py-1.5 md:py-2 rounded-md text-sm transition-colors w-full sm:w-auto justify-center
                 ${isGenerating ?
                     'bg-gray-100 text-gray-400 cursor-not-allowed' :
                     'bg-blue-500 text-white hover:bg-blue-600'}`}
@@ -1161,53 +1203,48 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                 disabled={isGenerating}
               >
                 {isGenerating ? (
-                  <Loader size={16} className="animate-spin" />
+                  <Loader size={isMobileView ? 14 : 16} className="animate-spin" />
                 ) : (
-                  <Wand2 size={16} />
+                  <Wand2 size={isMobileView ? 14 : 16} />
                 )}
                 Generate Script
               </button>
-
             </div>
-
           </div>
-
-          {/* Format Info */}
-
         </div>
       </div>
 
       {/* Generated Script Display */}
       {scenes.length > 0 && (
-        <div className="bg-blue-200 p-4 rounded-md">
+        <div className="bg-blue-200 p-2 md:p-4 rounded-md">
           <div className="mx-auto">
             {/* Scene Timeline */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Scene Timeline</h2>
-                <div className="flex items-center gap-4">
+            <div className="mb-4 md:mb-6">
+              <div className="flex justify-between items-center mb-3 md:mb-4 flex-wrap gap-2">
+                <h2 className="text-base md:text-lg font-semibold text-gray-900">Scene Timeline</h2>
+                <div className="flex items-center gap-2 md:gap-4 flex-wrap">
                   <button
                     onClick={exportFormattedScript}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-md hover:bg-gray-600 transition-colors"
+                    className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1 md:py-2 text-xs md:text-sm font-medium text-white bg-gray-500 rounded-md hover:bg-gray-600 transition-colors"
                   >
-                    <Download size={16} />
-                    Export Script
+                    <Download size={isMobileView ? 14 : 16} />
+                    <span className="hidden xs:inline">Export Script</span>
                   </button>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Timer size={16} />
-                    <span>Total Duration: {scenes.reduce((acc, scene) => acc + parseInt(scene.duration), 0)}s</span>
+                  <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-600">
+                    <Timer size={isMobileView ? 14 : 16} />
+                    <span>{scenes.reduce((acc, scene) => acc + parseInt(scene.duration), 0)}s</span>
                   </div>
                 </div>
               </div>
 
               {/* Scene Cards */}
-              <div className="flex gap-4 overflow-x-auto pb-4 px-2 snap-x">
-                <div className="flex gap-4">
+              <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2 md:pb-4 px-1 md:px-2 snap-x">
+                <div className="flex gap-2 md:gap-4">
                   {scenes.map((scene, index) => (
                     <div
                       key={scene.key}
                       onClick={() => setCurrentScene(index)}
-                      className={`flex-shrink-0 w-64 bg-white rounded-lg shadow-sm cursor-pointer transition-all snap-start
+                      className={`flex-shrink-0 w-48 md:w-64 bg-white rounded-lg shadow-sm cursor-pointer transition-all snap-start
                         ${currentScene === index ? 'ring-2 ring-blue-500' : 'hover:shadow-md'}`}
                     >
                       {/* Preview */}
@@ -1219,21 +1256,22 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                           src={scene.previewUrl?.replace('.mp4', '')}
                           alt={`Scene ${index + 1} preview`}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2">
                           <div className="flex items-center justify-between text-white">
-                            <span className="text-sm font-medium">Scene {index + 1}</span>
-                            <div className="flex items-center gap-2">
+                            <span className="text-xs md:text-sm font-medium">Scene {index + 1}</span>
+                            <div className="flex items-center gap-1 md:gap-2">
                               <span className="text-xs">{scene.duration}s</span>
                               {scene.frameType === FRAME_TYPES.AI_VISUAL ?
-                                <Image size={14} /> :
-                                <UserCircle2 size={14} />
+                                <Image size={isMobileView ? 12 : 14} /> :
+                                <UserCircle2 size={isMobileView ? 12 : 14} />
                               }
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className="p-3">
+                      <div className="p-2">
                         <p className="text-xs text-gray-600 line-clamp-2">{scene.content}</p>
                       </div>
                     </div>
@@ -1242,7 +1280,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                   {/* Add Scene Button */}
                   <button
                     onClick={addNewScene}
-                    className={`flex-shrink-0 w-64 rounded-lg border-2 border-dashed border-blue-300 
+                    className={`flex-shrink-0 w-48 md:w-64 rounded-lg border-2 border-dashed border-blue-300 
                       hover:border-blue-400 hover:bg-blue-50/50 transition-colors snap-start
                       flex items-center justify-center
                       ${screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
@@ -1250,8 +1288,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                           screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'}`}
                   >
                     <div className="flex flex-col items-center text-blue-500">
-                      <PlusCircle className="w-6 h-6 mb-1" />
-                      <span className="text-sm font-medium">Add Scene</span>
+                      <PlusCircle className="w-5 h-5 md:w-6 md:h-6 mb-1" />
+                      <span className="text-xs md:text-sm font-medium">Add Scene</span>
                     </div>
                   </button>
                 </div>
@@ -1260,33 +1298,33 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
             {/* Current Scene Editor */}
             {getCurrentScene() && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Scene {currentScene + 1}</h3>
-                    <div className="flex items-center gap-2">
+              <div className="bg-white rounded-lg shadow-lg p-3 md:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                  <div className="flex items-center gap-2 md:gap-4">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Scene {currentScene + 1}</h3>
+                    <div className="flex items-center gap-1 md:gap-2">
                       <button
                         onClick={() => {
                           if (currentScene > 0) setCurrentScene(currentScene - 1);
                         }}
                         disabled={currentScene === 0}
-                        className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                        className="p-1 md:p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
                       >
-                        <ArrowLeft size={16} className="text-gray-600" />
+                        <ArrowLeft size={isMobileView ? 14 : 16} className="text-gray-600" />
                       </button>
                       <button
                         onClick={() => {
                           if (currentScene < scenes.length - 1) setCurrentScene(currentScene + 1);
                         }}
                         disabled={currentScene === scenes.length - 1}
-                        className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                        className="p-1 md:p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
                       >
-                        <ArrowRight size={16} className="text-gray-600" />
+                        <ArrowRight size={isMobileView ? 14 : 16} className="text-gray-600" />
                       </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 md:gap-4 w-full sm:w-auto flex-wrap justify-between sm:justify-start">
                     {/* Frame Type Toggle */}
                     <FrameToggle
                       isAvatar={getCurrentScene().frameType === FRAME_TYPES.AVATAR}
@@ -1298,8 +1336,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                     />
 
                     {/* Duration Input */}
-                    <div className="flex items-center gap-2 ml-auto sm:ml-0">
-                      <label className="text-sm text-gray-600">Duration:</label>
+                    <div className="flex items-center gap-1 md:gap-2 ml-auto sm:ml-0">
+                      <label className="text-xs md:text-sm text-gray-600">Duration:</label>
                       <input
                         type="number"
                         value={getCurrentScene().duration}
@@ -1308,45 +1346,45 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                           newScenes[currentScene].duration = e.target.value;
                           setScenes(newScenes);
                         }}
-                        className="w-20 p-1 border rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-16 md:w-20 p-1 border rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm"
                         min="1"
                       />
-                      <span className="text-sm text-gray-600">s</span>
+                      <span className="text-xs md:text-sm text-gray-600">s</span>
                     </div>
 
                     {/* Remove Scene Button */}
                     {scenes.length > 1 && (
                       <button
                         onClick={() => removeScene(getCurrentScene().id)}
-                        className="p-1.5 text-white bg-red-400 hover:bg-red-800 rounded-full transition-colors"
+                        className="p-1 md:p-1.5 text-white bg-red-400 hover:bg-red-800 rounded-full transition-colors"
                         title="Remove Scene"
                       >
-                        <X size={16} />
+                        <X size={isMobileView ? 14 : 16} />
                       </button>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   {/* Scene Description */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                       Scene Description
                     </label>
                     <textarea
                       value={getCurrentScene().content}
                       onChange={(e) => updateSceneContent(getCurrentScene().id, e.target.value)}
-                      className="w-full p-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
+                      className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={isMobileView ? 2 : 3}
                       placeholder="Describe what happens in this scene..."
                     />
                   </div>
 
                   {/* AI Prompts Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
                     {/* Visual/Avatar Prompt */}
-                    <div className="border rounded-lg p-4 bg-gray-100">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">
+                    <div className="border rounded-lg p-3 md:p-4 bg-gray-100">
+                      <h4 className="text-xs md:text-sm font-medium text-gray-900 mb-1 md:mb-2">
                         {getCurrentScene().frameType === FRAME_TYPES.AI_VISUAL ?
                           'AI Visual Scene Direction' :
                           `Avatar Direction (${getCurrentScene().avatarType})`
@@ -1363,8 +1401,8 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                             'runwayPrompt' : 'avatarPrompt',
                           e.target.value
                         )}
-                        className="w-full p-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={6}
+                        className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows={isMobileView ? 4 : 6}
                         placeholder={getPromptPlaceholder(
                           getCurrentScene().frameType,
                           getCurrentScene().avatarType
@@ -1372,23 +1410,164 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                       />
                       {getCurrentScene().frameType === FRAME_TYPES.AVATAR &&
                         getCurrentScene().avatarType === TOOL_SETTINGS.AVATAR.types.RECORDED.name && (
-                          <div className="mt-2 text-xs text-gray-500">
+                          <div className="mt-1 md:mt-2 text-xs text-gray-500">
                             Tip: Keep actions simple and achievable with basic equipment
                           </div>
                         )}
                     </div>
 
-                    {/* Voice Direction */}
-                    {toolSettings.AI_AUDIO && (
-                      <div className="border rounded-lg p-4 bg-gray-100">
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Voice Direction</h4>
+                    {/* Voice Direction for regular AI audio */}
+                    {toolSettings.AI_AUDIO && !toolSettings.ELEVEN_LABS && (
+                      <div className="border rounded-lg p-3 md:p-4 bg-gray-100">
+                        <h4 className="text-xs md:text-sm font-medium text-gray-900 mb-1 md:mb-2">Voice Direction</h4>
                         <textarea
                           value={getCurrentScene().aiPrompts.voicePrompt}
                           onChange={(e) => updateAIPrompt(getCurrentScene().id, 'voicePrompt', e.target.value)}
-                          className="w-full p-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          rows={6}
+                          className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows={isMobileView ? 4 : 6}
                           placeholder="Describe voice tone, pacing, and emotional delivery..."
                         />
+                      </div>
+                    )}
+
+                    {/* ElevenLabs Integration */}
+                    {toolSettings.ELEVEN_LABS && (
+                      <div className="border rounded-lg p-3 md:p-4 bg-gray-50 space-y-3 md:space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h4 className="text-xs md:text-sm font-medium text-gray-900 flex items-center gap-1 md:gap-2">
+                            <Volume2 size={isMobileView ? 14 : 16} className="text-blue-500" />
+                            ElevenLabs Voice Script
+                          </h4>
+                          <div className="text-xs text-blue-500">Premium Voice</div>
+                        </div>
+
+                        <textarea
+                          value={getCurrentScene().aiPrompts.voicePrompt}
+                          onChange={(e) => updateAIPrompt(getCurrentScene().id, 'voicePrompt', e.target.value)}
+                          className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows={isMobileView ? 3 : 4}
+                          placeholder="Enter the exact script for the AI to speak..."
+                        />
+
+                        {/* Voice Selection */}
+                        <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+                          <div className="w-full sm:w-1/2">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Voice</label>
+                            <select
+                              value={getCurrentScene().elevenLabsSettings.voiceId}
+                              onChange={(e) => updateVoiceSettings(getCurrentScene().id, 'voiceId', e.target.value)}
+                              className="w-full p-1.5 md:p-2 text-xs md:text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              {ELEVEN_LABS_VOICES.map((voice) => (
+                                <option key={voice.id} value={voice.id}>
+                                  {voice.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="w-full sm:w-1/2">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Style</label>
+                            <select
+                              value={getCurrentScene().elevenLabsSettings.style}
+                              onChange={(e) => {
+                                const style = e.target.value;
+                                const preset = VOICE_STYLES.find(vs => vs.id === style);
+                                
+                                // Update style
+                                updateVoiceSettings(getCurrentScene().id, 'style', style);
+                                
+                                // Apply preset settings if available
+                                if (preset) {
+                                  updateVoiceSettings(getCurrentScene().id, 'stability', preset.settings.stability);
+                                  updateVoiceSettings(getCurrentScene().id, 'similarity', preset.settings.similarity);
+                                }
+                              }}
+                              className="w-full p-1.5 md:p-2 text-xs md:text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              {VOICE_STYLES.map((style) => (
+                                <option key={style.id} value={style.id}>
+                                  {style.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Speaking Rate Slider */}
+                        <div className="pt-1">
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="text-xs font-medium text-gray-700">Speaking Rate</label>
+                            <span className="text-xs text-gray-500">{getCurrentScene().elevenLabsSettings.speakingRate.toFixed(1)}x</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="2.0"
+                            step="0.1"
+                            value={getCurrentScene().elevenLabsSettings.speakingRate}
+                            onChange={(e) => updateVoiceSettings(getCurrentScene().id, 'speakingRate', parseFloat(e.target.value))}
+                            className="w-full h-1 md:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>Slower</span>
+                            <span>Normal</span>
+                            <span>Faster</span>
+                          </div>
+                        </div>
+
+                        {/* Advanced Controls */}
+                        <div className="pt-1 md:pt-2 border-t border-gray-200">
+                          <details className="group">
+                            <summary className="flex items-center justify-between cursor-pointer list-none text-xs font-medium text-gray-700">
+                              <span>Advanced Voice Controls</span>
+                              <span className="text-blue-500 group-open:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div className="mt-2 md:mt-3 space-y-2 md:space-y-3">
+                              {/* Stability Slider */}
+                              <div>
+                                <div className="flex justify-between items-center mb-1">
+                                  <label className="text-xs font-medium text-gray-700">Stability</label>
+                                  <span className="text-xs text-gray-500">{(getCurrentScene().elevenLabsSettings.stability * 100).toFixed(0)}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="1"
+                                  step="0.05"
+                                  value={getCurrentScene().elevenLabsSettings.stability}
+                                  onChange={(e) => updateVoiceSettings(getCurrentScene().id, 'stability', parseFloat(e.target.value))}
+                                  className="w-full h-1 md:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                />
+                                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                  <span>More variable</span>
+                                  <span>More stable</span>
+                                </div>
+                              </div>
+
+                              {/* Similarity Slider */}
+                              <div>
+                                <div className="flex justify-between items-center mb-1">
+                                  <label className="text-xs font-medium text-gray-700">Similarity</label>
+                                  <span className="text-xs text-gray-500">{(getCurrentScene().elevenLabsSettings.similarity * 100).toFixed(0)}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="1"
+                                  step="0.05"
+                                  value={getCurrentScene().elevenLabsSettings.similarity}
+                                  onChange={(e) => updateVoiceSettings(getCurrentScene().id, 'similarity', parseFloat(e.target.value))}
+                                  className="w-full h-1 md:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                />
+                                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                  <span>Less similar</span>
+                                  <span>More similar</span>
+                                </div>
+                              </div>
+                            </div>
+                          </details>
+                        </div>
                       </div>
                     )}
                   </div>

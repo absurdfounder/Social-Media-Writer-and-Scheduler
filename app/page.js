@@ -628,7 +628,7 @@ export default function Dashboard() {
       {/* Mobile navigation - Limited to few options with responsive variants */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
         {/* Smallest screens - Only show 4 main items + menu */}
-        <div className="grid grid-cols-5 sm:hidden">
+        <div className="grid grid-cols-5 sm:hidden p-4">
           {primaryMobileNavItems.map((item) => (
             <MobileNavItem
               key={item.id}

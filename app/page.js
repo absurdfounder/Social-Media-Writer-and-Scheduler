@@ -647,7 +647,7 @@ export default function Dashboard() {
         </div>
 
         {/* Medium mobile screens - Show 5 items + menu */}
-        <div className="hidden sm:grid sm:grid-cols-6 md:hidden">
+        <div className="hidden sm:grid sm:grid-cols-6 md:hidden p-4">
           {mediumScreenItems.map((item) => (
             <MobileNavItem
               key={item.id}

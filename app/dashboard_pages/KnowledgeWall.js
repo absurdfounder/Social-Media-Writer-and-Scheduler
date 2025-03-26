@@ -675,7 +675,7 @@ const ContentGrid = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="container mx-auto p-8 bg-gray-100 min-h-screen">
+      <div className="container mx-auto p-4 bg-gray-100 min-h-screen">
         <AddContentForm onAdd={handleAddContent} />
         <TagSummary 
           tags={tagSummary}

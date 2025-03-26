@@ -267,7 +267,6 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
 
                   <li className="flex items-start justify-start leading-normal text-left sm:leading-7 md:leading-10 relative">
                     <span className="text-sm sm:text-base">
-                      ... and the list goes on. <br />
                       <strong className="font-sans text-xl sm:text-2xl">
                         Let
                         <span className="inline-flex">

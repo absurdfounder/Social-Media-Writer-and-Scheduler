@@ -616,7 +616,15 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
           "plot twist its actually the opposite",
           "unpopular opinion but"
         ]
-      }
+      },
+      advice: {
+        instruction: "Helping other users based on your experience, pointing them in the right direction.",
+        examples: [
+          "with my app i use to face this issue, i started doing this..",
+          "your right, that greatly helps but you could also do this  ______ on the side it works great.",
+          "unpopular opinion but i think you should take 15 min power naps boosts my productivity i feel quite focused. i dont slack anymore."
+        ]
+      }      
     };
 
     const selectedLength = replyStyles[length];
@@ -1040,6 +1048,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                       <option value="in_favour">In Favor</option>
                       <option value="not_in_favour">Not in Favor</option>
                       <option value="controversial">Controversial</option>
+                      <option value="advice">Advice</option>
                     </select>
                   </div>
                 </>

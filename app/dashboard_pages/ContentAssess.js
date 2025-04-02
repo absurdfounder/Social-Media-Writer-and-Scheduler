@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { Play, Cpu, Zap, ArrowRight, Check, Settings, Power } from 'lucide-react';
+
+import SocialBotTable from "./ai-reply-table";
 
 const PostExtractor = () => {
   // State for post type selection and raw HTML input
@@ -11,6 +14,22 @@ const PostExtractor = () => {
   const [aiReply, setAiReply] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiError, setAiError] = useState(null);
+
+  const [activeStates, setActiveStates] = useState({
+    button1: false,
+    button2: false,
+    button3: false,
+    button4: false,
+    button5: false,
+    button6: false,
+  });
+
+  const toggleActive = (buttonId) => {
+    setActiveStates(prev => ({
+      ...prev,
+      [buttonId]: !prev[buttonId]
+    }));
+  };
 
   // --- Extraction Functions ---
   const extractData = (html) => {
@@ -52,7 +71,7 @@ const PostExtractor = () => {
       likeCount = 0,
       retweetCount = 0,
       replyCount = 0;
-      
+
     // Extract user name
     const userNameElem = doc.querySelector('[data-testid="User-Name"]');
     if (userNameElem) {
@@ -385,96 +404,150 @@ const PostExtractor = () => {
 
   // --- Render ---
   return (
-    <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-center mb-6">
-        Social Post Extractor & AI Reply (INSECURE TESTING MODE)
-      </h1>
+    <div className="w-full max-w-6xl mx-auto my-6 px-4 sm:px-6 md:my-10">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h1 className="text-xl sm:text-2xl font-bold">
+            Extract & Generate Reply
+          </h1>
 
-      <div className="mb-4 p-3 bg-red-100 text-red-900 border border-red-400 rounded">
-        <strong>🚨 HIGH RISK WARNING:</strong> AI generation uses a <strong>HARDCODED API KEY</strong> in this version. This is <strong>extremely insecure</strong> and exposes your key directly in the code. <strong>Local testing ONLY. DO NOT commit or share!</strong>
-      </div>
+          <div className="flex items-center bg-gray-50 p-2 rounded-full">
+            <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
+              <Check size={16} className="mr-1 hidden sm:inline" />
+              <span className="truncate">Connected</span>
+            </span>
+            <button className="p-1 sm:p-2 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+              <Settings size={16} className="text-slate-700" />
+            </button>
+          </div>
+        </div>
 
-      <div className="flex justify-center flex-wrap gap-4 mb-4">
-        {["twitter", "reddit", "telegram", "discord"].map((type) => (
+        {/* Automation Button */}
+        <div className="rounded-lg shadow-md mb-6">
           <button
-            key={type}
-            onClick={() => setPostType(type)}
-            className={`px-4 py-2 rounded transition-colors duration-150 ${
-              postType === type
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+            onClick={() => toggleActive('button3')}
+            className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-300 ${
+              activeStates.button3
+                ? "bg-teal-50 text-teal-600 border border-teal-500"
+                : "bg-teal-600 hover:bg-teal-700 text-white"
             }`}
           >
-            {type.charAt(0).toUpperCase() + type.slice(1)}
+            {activeStates.button3 ? (
+              <>
+                <span className="relative flex h-2 sm:h-3 w-2 sm:w-3">
+                  <span className="animate-ping absolute h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                  <span className="rounded-full h-2 sm:h-3 w-2 sm:w-3 bg-teal-500"></span>
+                </span>
+                <span className="text-sm sm:text-base">Running</span>
+              </>
+            ) : (
+              <>
+                <Zap size={16} className="sm:size-18" />
+                <span className="text-sm sm:text-base">Start Automation</span>
+              </>
+            )}
           </button>
-        ))}
-      </div>
-
-      <form onSubmit={handleSubmit} className="mb-6">
-        <textarea
-          value={rawHTML}
-          onChange={(e) => setRawHTML(e.target.value)}
-          placeholder={`Paste raw ${postType} post HTML here...`}
-          rows={8}
-          className="w-full p-3 border border-gray-300 rounded mb-4 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          aria-label="Raw HTML Input"
-        />
-        <button
-          type="submit"
-          className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-        >
-          Extract Data
-        </button>
-      </form>
-
-      {extractionError && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded">
-          <strong>Extraction Error:</strong> {extractionError}
         </div>
-      )}
 
-      {extractedData && (
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Extracted Data:</h2>
-          <pre className="bg-gray-100 p-4 rounded overflow-x-auto text-sm border border-gray-200">
-            {JSON.stringify(extractedData, null, 2)}
-          </pre>
+        {/* Channel Selection */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <h2 className="text-sm font-medium sm:text-base">Select Channel</h2>
+
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            {["twitter", "reddit", "telegram", "discord"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setPostType(type)}
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm rounded transition-colors duration-150 ${
+                  postType === type
+                    ? "bg-slate-600 text-white shadow-md"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+              >
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
-      )}
 
-      {extractedData && !extractionError && (
-        <div className="mt-6 border-t border-gray-200 pt-6">
-          <h2 className="text-xl font-semibold mb-3">Generate AI Reply</h2>
+        {/* Input Form */}
+        <form onSubmit={handleSubmit} className="mb-6">
+          <textarea
+            value={rawHTML}
+            onChange={(e) => setRawHTML(e.target.value)}
+            placeholder={`Paste raw ${postType} post HTML here...`}
+            rows={6}
+            className="w-full p-3 border border-gray-300 rounded mb-4 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+            aria-label="Raw HTML Input"
+          />
           <button
-            onClick={handleGenerateReply}
-            disabled={isGenerating}
-            className={`px-5 py-2 rounded text-white transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 ${
-              isGenerating ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
-            }`}
+            type="submit"
+            className="px-4 py-2 bg-green-600 text-white text-sm sm:text-base rounded hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
           >
-            {isGenerating ? "Generating..." : "Generate Reply with AI"}
+            Extract Data
           </button>
+        </form>
 
-          {aiError && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded">
-              <strong>AI Error:</strong> {aiError}
-            </div>
-          )}
+        {/* Error Messages */}
+        {extractionError && (
+          <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded text-sm">
+            <strong>Extraction Error:</strong> {extractionError}
+          </div>
+        )}
 
-          {aiReply && !isGenerating && (
-            <div className="mt-4">
-              <h3 className="font-semibold mb-2 text-gray-700">Suggested Reply:</h3>
-              <textarea
-                readOnly
-                value={aiReply}
-                rows={5}
-                className="w-full p-3 border border-gray-300 rounded bg-gray-50 font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                aria-label="Suggested AI Reply"
-              />
+        {/* Extracted Data Display */}
+        {extractedData && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-2">Extracted Data:</h2>
+            <div className="bg-gray-100 p-3 sm:p-4 rounded overflow-x-auto border border-gray-200">
+              <pre className="text-xs sm:text-sm whitespace-pre-wrap break-words">
+                {JSON.stringify(extractedData, null, 2)}
+              </pre>
             </div>
-          )}
+          </div>
+        )}
+
+        {/* AI Reply Section */}
+        {extractedData && !extractionError && (
+          <div className="mt-6 border-t border-gray-200 pt-6">
+            <h2 className="text-lg font-semibold mb-3">Generate AI Reply</h2>
+            <button
+              onClick={handleGenerateReply}
+              disabled={isGenerating}
+              className={`px-4 py-2 rounded text-white text-sm sm:text-base transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 ${
+                isGenerating ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
+              }`}
+            >
+              {isGenerating ? "Generating..." : "Generate Reply with AI"}
+            </button>
+
+            {aiError && (
+              <div className="mt-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded text-sm">
+                <strong>AI Error:</strong> {aiError}
+              </div>
+            )}
+
+            {aiReply && !isGenerating && (
+              <div className="mt-4">
+                <h3 className="font-semibold mb-2 text-gray-700">Suggested Reply:</h3>
+                <textarea
+                  readOnly
+                  value={aiReply}
+                  rows={4}
+                  className="w-full p-3 border border-gray-300 rounded bg-gray-50 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  aria-label="Suggested AI Reply"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Social Bot Table Component */}
+        <div className="mt-8">
+          <SocialBotTable />
         </div>
-      )}
+      </div>
     </div>
   );
 };

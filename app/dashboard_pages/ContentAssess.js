@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Check, Settings, Zap } from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
+
 const PostExtractor = () => {
   // State for post type and raw HTML input
   const [postType, setPostType] = useState("twitter");

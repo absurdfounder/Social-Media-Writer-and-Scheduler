@@ -105,7 +105,7 @@ const SocialBotTable = ({ posts }) => {
       ]
     };
 
-    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY`;
+    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
 
     try {
       const response = await fetch(API_ENDPOINT, {

@@ -228,6 +228,7 @@ import HackerNewsPostGenerator from './dashboard_pages/Hackernews_Post';
 import RedditPostGenerator from './dashboard_pages/Reddit_Post';
 
 import ElevenLabsScriptOptimizer from './dashboard_pages/ElevenLabsScriptOptimizer';
+import TweetExtractor from './dashboard_pages/ContentAssess';
 import Captions from './dashboard_pages/captions';
 import MemeEditor from './dashboard_pages/MemeEditor';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
@@ -343,6 +344,7 @@ export default function Dashboard() {
     { icon: ShieldAlert, label: 'Reddit Post', id: 'RedditPost' },
     { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
     { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
+    { icon: ShieldAlert, label: 'ContentAssess', id: 'TweetExtractor' },
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 
@@ -466,6 +468,8 @@ export default function Dashboard() {
             return <RedditPostGenerator />;   
         case 'ElevenLabsScriptOptimizer':
           return <ElevenLabsScriptOptimizer />;
+          case 'TweetExtractor':
+            return <TweetExtractor />;
       case 'MemeEditor':
         return <MemeEditor />;
       default:

@@ -1,20 +1,15 @@
 import React, { useState } from "react";
-import { Play, Cpu, Zap, ArrowRight, Check, Settings, Power } from 'lucide-react';
-
-import SocialBotTable from "./ai-reply-table";
+import { Check, Settings, Zap } from 'lucide-react';
+import SocialBotTable from "./SocialBotTable";
 
 const PostExtractor = () => {
-  // State for post type selection and raw HTML input
+  // State for post type and raw HTML input
   const [postType, setPostType] = useState("twitter");
   const [rawHTML, setRawHTML] = useState("");
   const [extractedData, setExtractedData] = useState(null);
   const [extractionError, setExtractionError] = useState("");
 
-  // State for AI reply generation
-  const [aiReply, setAiReply] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [aiError, setAiError] = useState(null);
-
+  // State for AI reply generation (not used here since reply generation is now in SocialBotTable)
   const [activeStates, setActiveStates] = useState({
     button1: false,
     button2: false,
@@ -23,6 +18,10 @@ const PostExtractor = () => {
     button5: false,
     button6: false,
   });
+
+  const [posts, setPosts] = useState([
+
+  ]);
 
   const toggleActive = (buttonId) => {
     setActiveStates(prev => ({
@@ -46,14 +45,10 @@ const PostExtractor = () => {
       }
       setExtractedData(data);
       setExtractionError("");
-      setAiReply(null);
-      setAiError(null);
       return data;
     } catch (err) {
       setExtractionError(err.message);
       setExtractedData(null);
-      setAiReply(null);
-      setAiError(null);
       throw err;
     }
   };
@@ -72,7 +67,6 @@ const PostExtractor = () => {
       retweetCount = 0,
       replyCount = 0;
 
-    // Extract user name
     const userNameElem = doc.querySelector('[data-testid="User-Name"]');
     if (userNameElem) {
       userName = userNameElem.textContent.trim();
@@ -85,12 +79,10 @@ const PostExtractor = () => {
         }
       }
     }
-    // Extract avatar URL
     const avatarElem = doc.querySelector('[data-testid^="UserAvatar-Container"] img');
     if (avatarElem) {
       avatarUrl = avatarElem.getAttribute("src") || "";
     }
-    // Extract tweet text
     const tweetTextElem = doc.querySelector('[data-testid="tweetText"]');
     if (tweetTextElem) {
       tweetText = tweetTextElem.textContent.trim();
@@ -103,24 +95,20 @@ const PostExtractor = () => {
       }
     }
     if (!tweetText) tweetText = "No text content found";
-    // Extract attachment URL (image) if present
     const imageElem = doc.querySelector('[data-testid="tweetPhoto"] img');
     if (imageElem) attachmentUrl = imageElem.getAttribute("src") || "";
-    // Extract tweet date
     const timeElem = doc.querySelector("time");
     if (timeElem && timeElem.getAttribute("datetime")) {
       date = timeElem.getAttribute("datetime");
       try {
         date = new Date(date).toLocaleString();
-      } catch (e) { /* keep original */ }
+      } catch (e) {}
     }
-    // Extract tweet URL
     const tweetLinkElem = doc.querySelector('a[role="link"][href*="/status/"]');
     if (tweetLinkElem) {
       const href = tweetLinkElem.getAttribute("href");
       if (href) tweetURL = href.startsWith("http") ? href : `https://twitter.com${href}`;
     }
-    // Extract user handle
     const userHandleElem = doc.querySelector('div[data-testid="User-Name"] + div span');
     if (userHandleElem && userHandleElem.textContent.trim().startsWith('@')) {
       userHandle = userHandleElem.textContent.trim();
@@ -134,7 +122,6 @@ const PostExtractor = () => {
         }
       }
     }
-    // Helper to extract metrics
     const extractMetric = (metricType) => {
       const metricElem = doc.querySelector(`[data-testid="${metricType.toLowerCase()}"]`);
       if (metricElem) {
@@ -305,104 +292,34 @@ const PostExtractor = () => {
     };
   };
 
-  // --- Event Handlers ---
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!rawHTML.trim()) {
       setExtractionError("Please paste post HTML content");
       setExtractedData(null);
-      setAiReply(null);
-      setAiError(null);
       return;
     }
     setExtractionError("");
     setExtractedData(null);
-    setAiReply(null);
-    setAiError(null);
     try {
-      extractData(rawHTML);
+      const data = extractData(rawHTML);
+      // Append the new post to the posts state
+      const newPost = {
+        id: posts.length + 1,
+        username: data.user_handle || data.author || "unknown",
+        platform: postType,
+        avatar: data.avatar_url || '/api/placeholder/40/40',
+        group: data.group || null,
+        content: data.tweet_text || data.content || data.message_text || data.message_content,
+        priority: "medium",
+        timestamp: new Date().toLocaleTimeString()
+      };
+      setPosts(prev => [...prev, newPost]);
     } catch (err) {
       console.error("Extraction failed:", err);
     }
   };
 
-  // AI reply generation using the correct payload structure
-  const handleGenerateReply = async () => {
-    if (!extractedData) {
-      setAiError("No extracted data available to generate a reply from.");
-      return;
-    }
-    // Determine the primary text content based on post type
-    let inputText = "";
-    switch (extractedData.postType) {
-      case "twitter":
-        inputText = extractedData.tweet_text;
-        break;
-      case "reddit":
-        inputText = extractedData.content || extractedData.post_title;
-        break;
-      case "telegram":
-        inputText = extractedData.message_text;
-        break;
-      case "discord":
-        inputText = extractedData.message_content;
-        break;
-      default:
-        setAiError(`AI reply generation not configured for post type: ${extractedData.postType}`);
-        return;
-    }
-    if (!inputText || inputText.trim() === "" || inputText.trim() === "No text content found") {
-      setAiError("No usable text content found in the extracted data to generate a reply.");
-      return;
-    }
-    setIsGenerating(true);
-    setAiError(null);
-    setAiReply(null);
-
-    // Build the prompt and payload using the correct structure
-    const prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${inputText}"\n\nReply:`;
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            { text: prompt }
-          ]
-        }
-      ]
-    };
-
-    // WARNING: Calling the Google API directly from the client exposes your API key.
-    // This code is for testing purposes only.
-    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
-
-    try {
-      const response = await fetch(API_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Failed to generate reply");
-      }
-      const data = await response.json();
-      let generatedText = "Error: Could not parse reply from API response.";
-      if (data.candidates && data.candidates[0]?.content?.parts && data.candidates[0].content.parts[0]?.text) {
-        generatedText = data.candidates[0].content.parts[0].text;
-      } else {
-        console.warn("Unexpected API response structure:", data);
-      }
-      setAiReply(generatedText.trim());
-    } catch (error) {
-      console.error("AI Generation Fetch Error:", error);
-      setAiError(error.message || "Failed to generate AI reply due to a network or API error.");
-      setAiReply(null);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // --- Render ---
   return (
     <div className="w-full max-w-6xl mx-auto my-6 px-4 sm:px-6 md:my-10">
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
@@ -411,7 +328,6 @@ const PostExtractor = () => {
           <h1 className="text-xl sm:text-2xl font-bold">
             Extract & Generate Reply
           </h1>
-
           <div className="flex items-center bg-gray-50 p-2 rounded-full">
             <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
               <Check size={16} className="mr-1 hidden sm:inline" />
@@ -453,7 +369,6 @@ const PostExtractor = () => {
         {/* Channel Selection */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
           <h2 className="text-sm font-medium sm:text-base">Select Channel</h2>
-
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             {["twitter", "reddit", "telegram", "discord"].map((type) => (
               <button
@@ -508,45 +423,8 @@ const PostExtractor = () => {
           </div>
         )}
 
-        {/* AI Reply Section */}
-        {extractedData && !extractionError && (
-          <div className="mt-6 border-t border-gray-200 pt-6">
-            <h2 className="text-lg font-semibold mb-3">Generate AI Reply</h2>
-            <button
-              onClick={handleGenerateReply}
-              disabled={isGenerating}
-              className={`px-4 py-2 rounded text-white text-sm sm:text-base transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 ${
-                isGenerating ? "bg-gray-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
-              }`}
-            >
-              {isGenerating ? "Generating..." : "Generate Reply with AI"}
-            </button>
-
-            {aiError && (
-              <div className="mt-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded text-sm">
-                <strong>AI Error:</strong> {aiError}
-              </div>
-            )}
-
-            {aiReply && !isGenerating && (
-              <div className="mt-4">
-                <h3 className="font-semibold mb-2 text-gray-700">Suggested Reply:</h3>
-                <textarea
-                  readOnly
-                  value={aiReply}
-                  rows={4}
-                  className="w-full p-3 border border-gray-300 rounded bg-gray-50 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  aria-label="Suggested AI Reply"
-                />
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Social Bot Table Component */}
-        <div className="mt-8">
-          <SocialBotTable />
-        </div>
+        <SocialBotTable posts={posts} />
       </div>
     </div>
   );

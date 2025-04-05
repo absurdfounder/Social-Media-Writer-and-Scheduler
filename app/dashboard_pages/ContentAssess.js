@@ -384,7 +384,6 @@ export default function PostExtractor() {
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h1 className="text-xl sm:text-2xl font-bold">Extract & Generate Reply</h1>
           <div className="flex items-center bg-gray-50 p-2 rounded-full">
             <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
               <Check size={16} className="mr-1 hidden sm:inline" />
@@ -423,6 +422,9 @@ export default function PostExtractor() {
           </button>
         </div>
 
+
+<div className="hidden">
+
         {/* Channel Selection */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
           <h2 className="text-sm font-medium sm:text-base">Select Channel</h2>
@@ -460,6 +462,8 @@ export default function PostExtractor() {
             Extract Data
           </button>
         </form>
+        </div>
+
 
         {/* Error */}
         {extractionError && (

@@ -279,24 +279,48 @@ const PostExtractor = () => {
   };
 
   // Listen for postMessage from sidepanel wrapper
-  useEffect(() => {
-    const handleMessage = (event) => {
-      const msg = event.data;
-      if (msg.type === 'PASTE_HTML') {
-        setRawHTML(msg.payload);
-        setExtractedData(null);
-        setExtractionError("");
-      } else if (msg.type === 'EXTRACTED_DATA') {
-        setExtractionError("");
-        setExtractedData(msg.payload);
-      } else if (msg.type === 'EXTRACT_ERROR') {
-        setExtractedData(null);
-        setExtractionError(msg.error);
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
+// Listen for postMessage from sidepanel wrapper
+useEffect(() => {
+  const handleMessage = (event) => {
+    const msg = event.data;
+    if (msg.type === 'PASTE_HTML') {
+      setRawHTML(msg.payload);
+      setExtractedData(null);
+      setExtractionError("");
+    } else if (msg.type === 'EXTRACTED_DATA') {
+      // clear any prior errors
+      setExtractionError("");
+      // show raw JSON
+      setExtractedData(msg.payload);
+
+      // also add to posts table
+      const data = msg.payload;
+      const newPost = {
+        id: Date.now(),  // unique ID
+        username: data.user_handle || data.author || 'unknown',
+        platform: data.postType,
+        avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
+        group: data.subreddit || data.group || null,
+        content:
+          data.tweet_text ||
+          data.content ||
+          data.message_text ||
+          data.message_content ||
+          '',
+        priority: 'medium',
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      setPosts(prev => [...prev, newPost]);
+    } else if (msg.type === 'EXTRACT_ERROR') {
+      setExtractedData(null);
+      setExtractionError(msg.error);
+    }
+  };
+
+  window.addEventListener('message', handleMessage);
+  return () => window.removeEventListener('message', handleMessage);
+}, []);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

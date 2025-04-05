@@ -26,6 +26,30 @@ export default function PostExtractor() {
   const [hideDuplicates, setHideDuplicates] = useState(false);
   const [showExtractedJSON, setShowExtractedJSON] = useState(false);
 
+  // — START_TRACKER → content script —
+  useEffect(() => {
+    if (activeStates.button3) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tabId = tabs[0]?.id;
+        if (!tabId) return;
+        chrome.tabs.sendMessage(tabId, { type: "START_TRACKER" });
+      });
+    }
+  }, [activeStates.button3]);
+  // — end START_TRACKER —
+
+  // FIFO PRUNE ON SCROLL —
+  const tableWrapperRef = useRef(null);
+
+  const handleTableScroll = () => {
+    const el = tableWrapperRef.current;
+    if (!el) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
+      setPosts(prev => prev.slice(1));
+    }
+  };
+  // — end FIFO PRUNE —
+
   const toggleActive = (buttonId) => {
     setActiveStates(prev => ({
       ...prev,
@@ -187,7 +211,6 @@ export default function PostExtractor() {
         permalink = `https://www.reddit.com${permalink}`;
       }
     } else {
-      // fallback
       const titleElem = doc.querySelector('[data-adclicklocation="title"] h1') || doc.querySelector("h1[slot='title']");
       if (titleElem) postTitle = titleElem.textContent.trim();
       const authorLink = doc.querySelector('a[data-testid="post_author_link"]');
@@ -395,73 +418,6 @@ export default function PostExtractor() {
           </div>
         </div>
 
-        {/* Automation Button */}
-        <div className="rounded-lg shadow-md mb-6">
-          <button
-            onClick={() => toggleActive('button3')}
-            className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-300 ${activeStates.button3
-                ? "bg-teal-50 text-teal-600 border border-teal-500"
-                : "bg-teal-600 hover:bg-teal-700 text-white"
-              }`}
-          >
-            {activeStates.button3 ? (
-              <>
-                <span className="relative flex h-2 sm:h-3 w-2 sm:w-3">
-                  <span className="animate-ping absolute h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                  <span className="rounded-full h-2 sm:h-3 w-2 sm:w-3 bg-teal-500"></span>
-                </span>
-                <span className="text-sm sm:text-base">Running</span>
-              </>
-            ) : (
-              <>
-                <Zap size={16} className="sm:size-18" />
-                <span className="text-sm sm:text-base">Start Tracker</span>
-              </>
-            )}
-          </button>
-        </div>
-
-
-        <div className="hidden">
-
-          {/* Channel Selection */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-            <h2 className="text-sm font-medium sm:text-base">Select Channel</h2>
-            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-              {["twitter", "reddit", "telegram", "discord"].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setPostType(type)}
-                  className={`px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm rounded transition-colors duration-150 ${postType === type
-                      ? "bg-slate-600 text-white shadow-md"
-                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    }`}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Input Form */}
-          <form onSubmit={handleSubmit} className="mb-6">
-            <textarea
-              value={rawHTML}
-              onChange={(e) => setRawHTML(e.target.value)}
-              placeholder={`Paste raw ${postType} post HTML here...`}
-              rows={6}
-              className="w-full p-3 border border-gray-300 rounded mb-4 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-              aria-label="Raw HTML Input"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-600 text-white text-sm sm:text-base rounded hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-            >
-              Extract Data
-            </button>
-          </form>
-        </div>
-
 
         {/* Error */}
         {extractionError && (
@@ -480,8 +436,6 @@ export default function PostExtractor() {
               >
                 {showExtractedJSON ? "Hide" : "Show"} Extracted Data JSON
               </button>
-
-              {/* Hide Duplicates Toggle */}
               <label className="flex items-center space-x-2 mb-4">
                 <input
                   type="checkbox"
@@ -492,8 +446,6 @@ export default function PostExtractor() {
                 <span className="text-sm">Hide duplicates</span>
               </label>
             </div>
-
-
             {showExtractedJSON && (
               <div className="bg-gray-100 p-3 rounded overflow-x-auto">
                 <pre className="text-xs whitespace-pre-wrap">
@@ -504,18 +456,22 @@ export default function PostExtractor() {
           </div>
         )}
 
-
-
         {/* Table */}
-        <SocialBotTable
-          posts={
-            hideDuplicates
-              ? posts.filter((post, idx, arr) =>
-                arr.findIndex(p => p.key === post.key) === idx
-              )
-              : posts
-          }
-        />
+        <div
+          ref={tableWrapperRef}
+          onScroll={handleTableScroll}
+          className="overflow-auto max-h-[60vh] border"
+        >
+          <SocialBotTable
+            posts={
+              hideDuplicates
+                ? posts.filter((post, idx, arr) =>
+                    arr.findIndex(p => p.key === post.key) === idx
+                  )
+                : posts
+            }
+          />
+        </div>
       </div>
     </div>
   );

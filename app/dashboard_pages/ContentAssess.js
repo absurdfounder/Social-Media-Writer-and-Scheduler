@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Settings, Zap } from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
@@ -20,7 +20,7 @@ export default function PostExtractor() {
 
   // Posts + dedupe
   const [posts, setPosts] = useState([]);
-  const seenKeys = useRef(new Set());
+  const seenKeys = React.useRef(new Set());
 
   // Toggles
   const [hideDuplicates, setHideDuplicates] = useState(false);
@@ -37,18 +37,6 @@ export default function PostExtractor() {
     }
   }, [activeStates.button3]);
   // — end START_TRACKER —
-
-  // FIFO PRUNE ON SCROLL —
-  const tableWrapperRef = useRef(null);
-
-  const handleTableScroll = () => {
-    const el = tableWrapperRef.current;
-    if (!el) return;
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
-      setPosts(prev => prev.slice(1));
-    }
-  };
-  // — end FIFO PRUNE —
 
   const toggleActive = (buttonId) => {
     setActiveStates(prev => ({
@@ -73,7 +61,6 @@ export default function PostExtractor() {
       retweetCount = 0,
       replyCount = 0;
 
-    // username
     const userNameElem = doc.querySelector('[data-testid="User-Name"]');
     if (userNameElem) {
       userName = userNameElem.textContent.trim();
@@ -87,11 +74,9 @@ export default function PostExtractor() {
       }
     }
 
-    // avatar
     const avatarElem = doc.querySelector('[data-testid^="UserAvatar-Container"] img');
     if (avatarElem) avatarUrl = avatarElem.src;
 
-    // tweet text
     const tweetTextElem = doc.querySelector('[data-testid="tweetText"]');
     if (tweetTextElem) {
       tweetText = tweetTextElem.textContent.trim();
@@ -104,24 +89,20 @@ export default function PostExtractor() {
       }
     }
 
-    // image
     const imageElem = doc.querySelector('[data-testid="tweetPhoto"] img');
     if (imageElem) attachmentUrl = imageElem.src;
 
-    // date
     const timeElem = doc.querySelector("time");
     if (timeElem && timeElem.dateTime) {
       date = new Date(timeElem.dateTime).toLocaleString();
     }
 
-    // url
     const tweetLinkElem = doc.querySelector('a[role="link"][href*="/status/"]');
     if (tweetLinkElem) {
       const href = tweetLinkElem.getAttribute("href");
       tweetURL = href.startsWith("http") ? href : `https://twitter.com${href}`;
     }
 
-    // handle
     const userHandleElem = doc.querySelector('div[data-testid="User-Name"] + div span');
     if (userHandleElem && userHandleElem.textContent.trim().startsWith('@')) {
       userHandle = userHandleElem.textContent.trim();
@@ -135,7 +116,6 @@ export default function PostExtractor() {
       });
     }
 
-    // metrics helper
     const extractMetric = (type) => {
       const el = doc.querySelector(`[data-testid="${type.toLowerCase()}"]`);
       if (!el) return 0;
@@ -404,7 +384,6 @@ export default function PostExtractor() {
   return (
     <div className="w-full max-w-6xl mx-auto my-6 px-4 sm:px-6 md:my-10">
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div className="flex items-center bg-gray-50 p-2 rounded-full">
@@ -417,7 +396,6 @@ export default function PostExtractor() {
             </button>
           </div>
         </div>
-
 
         {/* Error */}
         {extractionError && (
@@ -457,11 +435,7 @@ export default function PostExtractor() {
         )}
 
         {/* Table */}
-        <div
-          ref={tableWrapperRef}
-          onScroll={handleTableScroll}
-          className="overflow-auto max-h-[60vh] border"
-        >
+        <div className="overflow-auto max-h-[60vh] border">
           <SocialBotTable
             posts={
               hideDuplicates

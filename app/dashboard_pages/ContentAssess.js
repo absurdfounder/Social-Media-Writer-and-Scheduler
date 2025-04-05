@@ -415,7 +415,7 @@ export default function PostExtractor() {
             ) : (
               <>
                 <Zap size={16} className="sm:size-18" />
-                <span className="text-sm sm:text-base">Start Automation</span>
+                <span className="text-sm sm:text-base">Start Tracker</span>
               </>
             )}
           </button>

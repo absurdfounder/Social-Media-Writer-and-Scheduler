@@ -16,48 +16,36 @@ const SocialBotTable = ({ posts }) => {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState("all");
 
-  // State for view modal (to view post details)
+  // View modal
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // State for reply modal
+  // Reply modal
   const [replyPost, setReplyPost] = useState(null);
   const [replyLoading, setReplyLoading] = useState(false);
   const [replyGenerated, setReplyGenerated] = useState(null);
   const [replyError, setReplyError] = useState(null);
 
-  // Platform icon helper functions
   const getPlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter':
-        return <Twitter size={16} className="text-blue-400" />;
-      case 'reddit':
-        return <MessageCircle size={16} className="text-orange-500" />;
-      case 'facebook':
-        return <Facebook size={16} className="text-blue-600" />;
-      case 'discord':
-        return <MessageSquare size={16} className="text-indigo-500" />;
-      default:
-        return <MessageCircle size={16} className="text-gray-500" />;
+      case 'twitter': return <Twitter size={16} className="text-blue-400" />;
+      case 'reddit':  return <MessageCircle size={16} className="text-orange-500" />;
+      case 'facebook':return <Facebook size={16} className="text-blue-600" />;
+      case 'discord': return <MessageSquare size={16} className="text-indigo-500" />;
+      default:        return <MessageCircle size={16} className="text-gray-500" />;
     }
   };
 
   const getLargePlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter':
-        return <Twitter size={20} className="text-blue-400" />;
-      case 'reddit':
-        return <MessageCircle size={20} className="text-orange-500" />;
-      case 'facebook':
-        return <Facebook size={20} className="text-blue-600" />;
-      case 'discord':
-        return <MessageSquare size={20} className="text-indigo-500" />;
-      default:
-        return <MessageCircle size={20} className="text-gray-500" />;
+      case 'twitter': return <Twitter size={20} className="text-blue-400" />;
+      case 'reddit':  return <MessageCircle size={20} className="text-orange-500" />;
+      case 'facebook':return <Facebook size={20} className="text-blue-600" />;
+      case 'discord': return <MessageSquare size={20} className="text-indigo-500" />;
+      default:        return <MessageCircle size={20} className="text-gray-500" />;
     }
   };
 
-  // Priority badge helper
   const getPriorityBadge = (priority) => {
     switch (priority) {
       case 'high':
@@ -71,42 +59,31 @@ const SocialBotTable = ({ posts }) => {
     }
   };
 
-  // Open view modal for a post
   const openPostModal = (post) => {
     setSelectedPost(post);
     setIsModalOpen(true);
   };
-
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedPost(null);
   };
 
-  // Filter posts based on the selected criteria
   const filteredPosts = posts.filter((post) => {
     const matchesPriority = priorityFilter === "all" || post.priority === priorityFilter;
     const matchesChannel = channelFilter === "all" || post.platform === channelFilter;
     return matchesPriority && matchesChannel;
   });
 
-  // Gemini reply generation for a post when Reply is clicked
+  // Reply generation logic unchanged…
   const handleGenerateReplyForPost = async (post) => {
     setReplyLoading(true);
     setReplyError(null);
     setReplyGenerated(null);
     const prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${post.content}"\n\nReply:`;
     const requestBody = {
-      contents: [
-        {
-          parts: [
-            { text: prompt }
-          ]
-        }
-      ]
+      contents: [{ parts: [{ text: prompt }] }]
     };
-
-    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
-
+    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY`;
     try {
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
@@ -119,14 +96,8 @@ const SocialBotTable = ({ posts }) => {
       }
       const data = await response.json();
       let generatedText = "Error: Could not parse reply from API response.";
-      if (
-        data.candidates &&
-        data.candidates[0]?.content?.parts &&
-        data.candidates[0].content.parts[0]?.text
-      ) {
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
         generatedText = data.candidates[0].content.parts[0].text;
-      } else {
-        console.warn("Unexpected API response structure:", data);
       }
       setReplyGenerated(generatedText.trim());
     } catch (error) {
@@ -136,10 +107,8 @@ const SocialBotTable = ({ posts }) => {
     }
   };
 
-  // When the user clicks the Reply button in the table row
   const handleReplyClick = (post) => {
     setReplyPost(post);
-    // Trigger Gemini reply generation using the post content.
     handleGenerateReplyForPost(post);
   };
 
@@ -180,16 +149,14 @@ const SocialBotTable = ({ posts }) => {
         {filteredPosts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 p-4">
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0">
-                <img className="h-10 w-10 rounded-full" src={post.avatar} alt="" />
-              </div>
+              <img className="h-10 w-10 rounded-full flex-shrink-0" src={post.avatar} alt="" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-1">
                     {getPlatformIcon(post.platform)}
                     <p className="text-sm font-medium text-gray-900 truncate">{post.username}</p>
                   </div>
-                  <div>{getPriorityBadge(post.priority)}</div>
+                  {getPriorityBadge(post.priority)}
                 </div>
                 <p className="text-sm text-gray-500">{post.timestamp}</p>
                 {post.group && (
@@ -202,19 +169,17 @@ const SocialBotTable = ({ posts }) => {
                 <div className="mt-3 flex space-x-2">
                   <button
                     onClick={() => openPostModal(post)}
-                    className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                   >
-                    <Eye size={14} className="mr-1" />
-                    View
+                    <Eye size={14} className="mr-1" /> View
                   </button>
                   <button
                     onClick={() => handleReplyClick(post)}
-                    className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium"
                   >
-                    <Reply size={14} className="mr-1" />
-                    Reply
+                    <Reply size={14} className="mr-1" /> Reply
                   </button>
-                  <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500 focus:outline-none">
+                  <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500">
                     <Star size={16} />
                   </button>
                 </div>
@@ -229,12 +194,12 @@ const SocialBotTable = ({ posts }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avatar</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relevance</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avatar</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Group</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Post</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Relevance</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -248,9 +213,7 @@ const SocialBotTable = ({ posts }) => {
                   <div className="text-xs text-gray-500">{post.timestamp}</div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="flex-shrink-0 h-10 w-10">
-                    <img className="h-10 w-10 rounded-full" src={post.avatar} alt="" />
-                  </div>
+                  <img className="h-10 w-10 rounded-full" src={post.avatar} alt="" />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {post.group ? (
@@ -263,26 +226,28 @@ const SocialBotTable = ({ posts }) => {
                   )}
                 </td>
                 <td className="px-4 py-4">
-                  <div className="text-sm text-gray-900 max-w-xs truncate lg:max-w-sm xl:max-w-md">{post.content}</div>
+                  <div className="text-sm text-gray-900 max-w-xs truncate lg:max-w-sm xl:max-w-md">
+                    {post.content}
+                  </div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">{getPriorityBadge(post.priority)}</td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {getPriorityBadge(post.priority)}
+                </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
                     <button
                       onClick={() => openPostModal(post)}
-                      className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 bg-white text-gray-700 rounded text-xs"
                     >
-                      <Eye size={14} className="mr-1" />
-                      View
+                      <Eye size={14} className="mr-1" /> View
                     </button>
                     <button
                       onClick={() => handleReplyClick(post)}
-                      className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs"
                     >
-                      <Reply size={14} className="mr-1" />
-                      Reply
+                      <Reply size={14} className="mr-1" /> Reply
                     </button>
-                    <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500 focus:outline-none">
+                    <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500">
                       <Star size={16} />
                     </button>
                   </div>
@@ -293,87 +258,92 @@ const SocialBotTable = ({ posts }) => {
         </table>
       </div>
 
-      {/* Pagination (Static Example) */}
-      <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:px-6 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+      {/* Pagination */}
+      <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
         <div className="text-sm text-gray-700">
           Showing <span className="font-medium">{filteredPosts.length}</span> of <span className="font-medium">{posts.length}</span> posts
         </div>
-        <div>
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-            <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-              <span className="sr-only">Previous</span>
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </a>
-            <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</a>
-            <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 hover:bg-gray-50">2</a>
-            <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">3</a>
-            <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-              <span className="sr-only">Next</span>
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-              </svg>
-            </a>
-          </nav>
-        </div>
+        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
+            <span className="sr-only">Previous</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+          </a>
+          <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">1</a>
+          <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm text-indigo-600">2</a>
+          <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">3</a>
+          <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
+            <span className="sr-only">Next</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/></svg>
+          </a>
+        </nav>
       </div>
 
       {/* Post View Modal */}
       {isModalOpen && selectedPost && (
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <div className="absolute top-0 right-0 pt-4 pr-4">
-                      <button
-                        type="button"
-                        className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        onClick={closeModal}
-                      >
-                        <span className="sr-only">Close</span>
-                        <X size={20} />
-                      </button>
+          <div className="flex items-center justify-center min-h-screen p-4 text-center">
+            <div className="fixed inset-0 bg-gray-500 opacity-75" />
+            <div className="inline-block bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full">
+              <div className="relative bg-white px-4 pt-5 pb-4 sm:p-6">
+                <button
+                  onClick={closeModal}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                >
+                  <X size={20} />
+                </button>
+                <div className="flex items-center mb-4">
+                  <img className="h-12 w-12 rounded-full mr-4" src={selectedPost.avatar} alt="" />
+                  <div>
+                    <div className="flex items-center">
+                      {getLargePlatformIcon(selectedPost.platform)}
+                      <h3 className="ml-1 text-lg font-medium text-gray-900">
+                        {selectedPost.username}
+                      </h3>
                     </div>
-                    <div className="flex items-center mb-4">
-                      <img className="h-12 w-12 rounded-full mr-4" src={selectedPost.avatar} alt="" />
-                      <div>
-                        <div className="flex items-center">
-                          {getLargePlatformIcon(selectedPost.platform)}
-                          <h3 className="ml-1 text-lg leading-6 font-medium text-gray-900">
-                            {selectedPost.username}
-                          </h3>
-                        </div>
-                        <p className="text-sm text-gray-500">{selectedPost.timestamp}</p>
-                      </div>
-                    </div>
-                    {selectedPost.group && (
-                      <div className="flex items-center mb-3 bg-gray-50 px-3 py-2 rounded-md">
-                        <Users size={16} className="mr-2 text-gray-500" />
-                        <span className="text-sm text-gray-600">{selectedPost.group}</span>
-                      </div>
-                    )}
-                    <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                      <p className="text-sm text-gray-700">{selectedPost.content}</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>{getPriorityBadge(selectedPost.priority)}</div>
-                      <div className="flex space-x-2">
-                        <button className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                          <Reply size={16} className="mr-2" />
-                          Reply Now
-                        </button>
-                        <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                          <Star size={16} className="mr-2" />
-                          Save
-                        </button>
-                      </div>
-                    </div>
+                    <p className="text-sm text-gray-500">{selectedPost.timestamp}</p>
+                  </div>
+                </div>
+
+                {/* Attachment */}
+                {selectedPost.attachment && (
+                  <div className="mb-4">
+                    <img
+                      src={selectedPost.attachment}
+                      alt="Post attachment"
+                      className="w-full rounded-lg object-cover"
+                    />
+                  </div>
+                )}
+
+                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                  <p className="text-sm text-gray-700">{selectedPost.content}</p>
+                </div>
+
+                {/* Metrics */}
+                <div className="flex space-x-6 text-sm text-gray-600 mb-4">
+                  <div className="flex items-center">
+                    <span className="mr-1">❤️</span>
+                    {selectedPost.metrics.likes}
+                  </div>
+                  <div className="flex items-center">
+                    <span className="mr-1">🔁</span>
+                    {selectedPost.metrics.retweets}
+                  </div>
+                  <div className="flex items-center">
+                    <span className="mr-1">💬</span>
+                    {selectedPost.metrics.replies}
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  {getPriorityBadge(selectedPost.priority)}
+                  <div className="flex space-x-2">
+                    <button className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white rounded-md">
+                      <Reply size={16} className="mr-2" /> Reply Now
+                    </button>
+                    <button className="inline-flex items-center px-3 py-2 bg-white text-gray-700 border rounded-md">
+                      <Star size={16} className="mr-2" /> Save
+                    </button>
                   </div>
                 </div>
               </div>

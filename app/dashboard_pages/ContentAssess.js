@@ -25,7 +25,6 @@ const PostExtractor = () => {
   };
 
   // --- Extraction Functions ---
-
   const extractTwitterData = (html) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -279,48 +278,45 @@ const PostExtractor = () => {
   };
 
   // Listen for postMessage from sidepanel wrapper
-// Listen for postMessage from sidepanel wrapper
-useEffect(() => {
-  const handleMessage = (event) => {
-    const msg = event.data;
-    if (msg.type === 'PASTE_HTML') {
-      setRawHTML(msg.payload);
-      setExtractedData(null);
-      setExtractionError("");
-    } else if (msg.type === 'EXTRACTED_DATA') {
-      // clear any prior errors
-      setExtractionError("");
-      // show raw JSON
-      setExtractedData(msg.payload);
+  useEffect(() => {
+    const handleMessage = (event) => {
+      const msg = event.data;
+      if (msg.type === 'PASTE_HTML') {
+        setRawHTML(msg.payload);
+        setExtractedData(null);
+        setExtractionError("");
+      } else if (msg.type === 'EXTRACTED_DATA') {
+        setExtractionError("");
+        setExtractedData(msg.payload);
 
-      // also add to posts table
-      const data = msg.payload;
-      const newPost = {
-        id: Date.now(),  // unique ID
-        username: data.user_handle || data.author || 'unknown',
-        platform: data.postType,
-        avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
-        group: data.subreddit || data.group || null,
-        content:
-          data.tweet_text ||
-          data.content ||
-          data.message_text ||
-          data.message_content ||
-          '',
-        priority: 'medium',
-        timestamp: new Date().toLocaleTimeString(),
-      };
-      setPosts(prev => [...prev, newPost]);
-    } else if (msg.type === 'EXTRACT_ERROR') {
-      setExtractedData(null);
-      setExtractionError(msg.error);
-    }
-  };
+        const data = msg.payload;
+        const newPost = {
+          id: Date.now(),
+          username: data.user_handle || data.author || 'unknown',
+          platform: data.postType,
+          avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
+          group: data.subreddit || data.group || null,
+          content:
+            data.tweet_text ||
+            data.content ||
+            data.message_text ||
+            data.message_content ||
+            '',
+          priority: 'medium',
+          timestamp: new Date().toLocaleTimeString(),
+          attachment: data.attachment_url || null,
+          metrics: data.metrics || { likes: 0, retweets: 0, replies: 0 },
+        };
+        setPosts(prev => [...prev, newPost]);
+      } else if (msg.type === 'EXTRACT_ERROR') {
+        setExtractedData(null);
+        setExtractionError(msg.error);
+      }
+    };
 
-  window.addEventListener('message', handleMessage);
-  return () => window.removeEventListener('message', handleMessage);
-}, []);
-
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -337,11 +333,13 @@ useEffect(() => {
         id: posts.length + 1,
         username: data.user_handle || data.author || "unknown",
         platform: postType,
-        avatar: data.avatar_url || '/api/placeholder/40/40',
-        group: data.group || null,
+        avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
+        group: data.subreddit || data.group || null,
         content: data.tweet_text || data.content || data.message_text || data.message_content,
         priority: "medium",
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString(),
+        attachment: data.attachment_url || null,
+        metrics: data.metrics || { likes: 0, retweets: 0, replies: 0 },
       };
       setPosts(prev => [...prev, newPost]);
     } catch (err) {

@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
 import { Check, Settings, Zap } from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
-const PostExtractor = () => {
+export default function PostExtractor() {
   const [postType, setPostType] = useState("twitter");
   const [rawHTML, setRawHTML] = useState("");
   const [extractedData, setExtractedData] = useState(null);
@@ -15,7 +17,14 @@ const PostExtractor = () => {
     button5: false,
     button6: false,
   });
+
+  // Posts + dedupe
   const [posts, setPosts] = useState([]);
+  const seenKeys = useRef(new Set());
+
+  // Toggles
+  const [hideDuplicates, setHideDuplicates] = useState(false);
+  const [showExtractedJSON, setShowExtractedJSON] = useState(false);
 
   const toggleActive = (buttonId) => {
     setActiveStates(prev => ({
@@ -25,6 +34,7 @@ const PostExtractor = () => {
   };
 
   // --- Extraction Functions ---
+
   const extractTwitterData = (html) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -39,6 +49,7 @@ const PostExtractor = () => {
       retweetCount = 0,
       replyCount = 0;
 
+    // username
     const userNameElem = doc.querySelector('[data-testid="User-Name"]');
     if (userNameElem) {
       userName = userNameElem.textContent.trim();
@@ -51,76 +62,80 @@ const PostExtractor = () => {
         }
       }
     }
+
+    // avatar
     const avatarElem = doc.querySelector('[data-testid^="UserAvatar-Container"] img');
-    if (avatarElem) {
-      avatarUrl = avatarElem.getAttribute("src") || "";
-    }
+    if (avatarElem) avatarUrl = avatarElem.src;
+
+    // tweet text
     const tweetTextElem = doc.querySelector('[data-testid="tweetText"]');
     if (tweetTextElem) {
       tweetText = tweetTextElem.textContent.trim();
     } else {
       const articleElements = doc.querySelectorAll('article div[lang]');
-      if (articleElements.length > 0) {
+      if (articleElements.length) {
         tweetText = Array.from(articleElements)
-          .map((el) => el.textContent.trim())
+          .map(el => el.textContent.trim())
           .join("\n\n");
       }
     }
-    if (!tweetText) tweetText = "No text content found";
+
+    // image
     const imageElem = doc.querySelector('[data-testid="tweetPhoto"] img');
-    if (imageElem) attachmentUrl = imageElem.getAttribute("src") || "";
+    if (imageElem) attachmentUrl = imageElem.src;
+
+    // date
     const timeElem = doc.querySelector("time");
-    if (timeElem && timeElem.getAttribute("datetime")) {
-      date = timeElem.getAttribute("datetime");
-      try {
-        date = new Date(date).toLocaleString();
-      } catch (e) {}
+    if (timeElem && timeElem.dateTime) {
+      date = new Date(timeElem.dateTime).toLocaleString();
     }
+
+    // url
     const tweetLinkElem = doc.querySelector('a[role="link"][href*="/status/"]');
     if (tweetLinkElem) {
       const href = tweetLinkElem.getAttribute("href");
-      if (href) tweetURL = href.startsWith("http") ? href : `https://twitter.com${href}`;
+      tweetURL = href.startsWith("http") ? href : `https://twitter.com${href}`;
     }
+
+    // handle
     const userHandleElem = doc.querySelector('div[data-testid="User-Name"] + div span');
     if (userHandleElem && userHandleElem.textContent.trim().startsWith('@')) {
       userHandle = userHandleElem.textContent.trim();
     } else {
-      const handleElements = Array.from(doc.querySelectorAll('a[href]'));
-      for (const elem of handleElements) {
-        const text = elem.textContent.trim();
-        if (text.startsWith('@') && text.length > 1 && !text.includes("\n")) {
-          userHandle = text;
-          break;
+      Array.from(doc.querySelectorAll('a[href]')).some(elem => {
+        const t = elem.textContent.trim();
+        if (t.startsWith('@') && t.length > 1 && !t.includes("\n")) {
+          userHandle = t;
+          return true;
         }
-      }
+      });
     }
-    const extractMetric = (metricType) => {
-      const metricElem = doc.querySelector(`[data-testid="${metricType.toLowerCase()}"]`);
-      if (metricElem) {
-        const ariaLabel = metricElem.getAttribute("aria-label");
-        if (ariaLabel) {
-          const matches = ariaLabel.match(/([\d,]+)/);
-          if (matches && matches[1]) return parseInt(matches[1].replace(/,/g, ""), 10);
-        }
-        const textSpan = metricElem.querySelector('span[data-testid="app-text-transition-container"] span');
-        if (textSpan && textSpan.textContent) {
-          const text = textSpan.textContent.trim();
-          if (/^\d+$/.test(text)) return parseInt(text, 10);
-          if (text.endsWith("K")) return parseFloat(text) * 1000;
-          if (text.endsWith("M")) return parseFloat(text) * 1000000;
-        }
-        const group = metricElem.closest('div[role="group"]');
-        if (group) {
-          const text = group.textContent || group.innerText || "";
-          const matches = text.match(/([\d,]+)/);
-          if (matches && matches[1]) return parseInt(matches[1].replace(/,/g, ""), 10);
-        }
+
+    // metrics helper
+    const extractMetric = (type) => {
+      const el = doc.querySelector(`[data-testid="${type.toLowerCase()}"]`);
+      if (!el) return 0;
+      const aria = el.getAttribute("aria-label") || "";
+      const m = aria.match(/([\d,]+)/);
+      if (m) return parseInt(m[1].replace(/,/g, ""), 10);
+      const span = el.querySelector('span[data-testid="app-text-transition-container"] span');
+      if (span) {
+        const txt = span.textContent.trim();
+        if (/^\d+$/.test(txt)) return parseInt(txt, 10);
+        if (txt.endsWith("K")) return parseFloat(txt) * 1000;
+        if (txt.endsWith("M")) return parseFloat(txt) * 1000000;
+      }
+      const grp = el.closest('div[role="group"]');
+      if (grp) {
+        const txt = grp.textContent.match(/([\d,]+)/);
+        if (txt) return parseInt(txt[1].replace(/,/g, ""), 10);
       }
       return 0;
     };
-    likeCount = extractMetric("like");
+
+    likeCount    = extractMetric("like");
     retweetCount = extractMetric("retweet");
-    replyCount = extractMetric("reply");
+    replyCount   = extractMetric("reply");
 
     return {
       postType: "twitter",
@@ -145,67 +160,65 @@ const PostExtractor = () => {
       score = "0",
       icon = "",
       content = "";
+
     const article = doc.querySelector("shreddit-post");
     if (article) {
       postTitle = article.getAttribute("post-title") || postTitle;
-      author = article.getAttribute("author") || author;
+      author    = article.getAttribute("author") || author;
       subreddit = article.getAttribute("subreddit-prefixed-name") || subreddit;
       permalink = article.getAttribute("permalink") || permalink;
-      score = article.getAttribute("score") || score;
-      icon = article.getAttribute("icon-url") || article.getAttribute("profile-icon-url") || icon;
-      const contentContainer = article.querySelector('[data-post-click-location="text-body"]');
-      if (contentContainer) {
-        const paragraphs = contentContainer.querySelectorAll("p");
-        if (paragraphs.length > 0) {
-          content = Array.from(paragraphs)
-            .map((p) => p.textContent.trim())
-            .join("\n\n");
+      score     = article.getAttribute("score") || score;
+      icon      = article.getAttribute("icon-url") || article.getAttribute("profile-icon-url") || icon;
+
+      const body = article.querySelector('[data-post-click-location="text-body"]');
+      if (body) {
+        const ps = body.querySelectorAll("p");
+        if (ps.length) {
+          content = Array.from(ps).map(p => p.textContent.trim()).join("\n\n");
         } else {
-          content = contentContainer.textContent.trim();
+          content = body.textContent.trim();
         }
       } else {
-        const legacyPostBody = article.querySelector(".md");
-        if (legacyPostBody) content = legacyPostBody.textContent.trim();
+        const legacy = article.querySelector(".md");
+        if (legacy) content = legacy.textContent.trim();
       }
+
       if (permalink && !permalink.startsWith("http")) {
         permalink = `https://www.reddit.com${permalink}`;
       }
     } else {
-      console.warn("shreddit-post element not found, attempting fallback selectors.");
-      const titleElem =
-        doc.querySelector('[data-adclicklocation="title"] h1') || doc.querySelector("h1[slot='title']");
+      // fallback
+      const titleElem = doc.querySelector('[data-adclicklocation="title"] h1') || doc.querySelector("h1[slot='title']");
       if (titleElem) postTitle = titleElem.textContent.trim();
       const authorLink = doc.querySelector('a[data-testid="post_author_link"]');
       if (authorLink) author = authorLink.textContent.trim();
-      const subredditLink = doc.querySelector('a[data-testid="post_subreddit_link"]');
-      if (subredditLink) subreddit = subredditLink.textContent.trim();
+      const subLink = doc.querySelector('a[data-testid="post_subreddit_link"]');
+      if (subLink) subreddit = subLink.textContent.trim();
       const contentArea = doc.querySelector('[data-click-id="text"]');
       if (contentArea) {
-        const paragraphs = contentArea.querySelectorAll("p");
-        if (paragraphs.length > 0) {
-          content = Array.from(paragraphs)
-            .map((p) => p.textContent.trim())
-            .join("\n\n");
+        const ps = contentArea.querySelectorAll("p");
+        if (ps.length) {
+          content = Array.from(ps).map(p => p.textContent.trim()).join("\n\n");
         } else {
           content = contentArea.textContent.trim();
         }
       }
     }
-    const numericScore = parseInt(score.replace(/,/g, ""), 10);
+
+    const numericScore = parseInt(score.replace(/,/g, ""), 10) || 0;
     return {
       postType: "reddit",
       post_title: postTitle,
       author,
       subreddit,
       permalink,
-      score: isNaN(numericScore) ? 0 : numericScore,
+      score: numericScore,
       icon_url: icon,
       content: content || postTitle,
     };
   };
 
   const extractTelegramData = (html) => {
-    console.warn("Telegram extraction is a placeholder. Adapt selectors based on actual HTML.");
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     let author = "Unknown Author",
@@ -213,29 +226,32 @@ const PostExtractor = () => {
       date = "Unknown Date",
       messageUrl = "URL not found",
       avatarUrl = "";
-    const messageBubble = doc.querySelector(".tgme_widget_message_bubble");
-    const authorElem = messageBubble?.querySelector(".tgme_widget_message_author_name");
-    const textElem = messageBubble?.querySelector(".tgme_widget_message_text");
-    const dateElem = messageBubble?.querySelector(".tgme_widget_message_date time");
-    const linkElem = messageBubble?.querySelector(".tgme_widget_message_date a");
+
+    const bubble = doc.querySelector(".tgme_widget_message_bubble");
+    if (bubble) {
+      const aElem = bubble.querySelector(".tgme_widget_message_author_name");
+      const tElem = bubble.querySelector(".tgme_widget_message_text");
+      const dElem = bubble.querySelector(".tgme_widget_message_date time");
+      const lElem = bubble.querySelector(".tgme_widget_message_date a");
+      if (aElem) author = aElem.textContent.trim();
+      if (tElem) messageText = tElem.innerHTML.trim();
+      if (dElem && dElem.dateTime) date = dElem.dateTime;
+      if (lElem) messageUrl = lElem.href;
+    }
     const avatarElem = doc.querySelector(".tgme_widget_message_user_photo img");
-    if (authorElem) author = authorElem.textContent.trim();
-    if (textElem) messageText = textElem.innerHTML.trim();
-    if (dateElem) date = dateElem.getAttribute("datetime");
-    if (linkElem) messageUrl = linkElem.getAttribute("href");
-    if (avatarElem) avatarUrl = avatarElem.getAttribute("src");
+    if (avatarElem) avatarUrl = avatarElem.src;
+
     return {
       postType: "telegram",
       author_name: author,
       message_text: messageText,
-      date: date,
+      date,
       message_url: messageUrl,
       avatar_url: avatarUrl,
     };
   };
 
   const extractDiscordData = (html) => {
-    console.warn("Discord extraction is a placeholder. Adapt selectors based on actual HTML.");
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     let userName = "Unknown User",
@@ -243,41 +259,40 @@ const PostExtractor = () => {
       messageContent = "No text content found",
       avatarUrl = "",
       messageUrl = "URL not found";
-    const messageCozy = doc.querySelector(".messageCozy_f5869e");
-    const avatarElem = messageCozy?.querySelector(".avatar_f8541f");
-    const usernameElem = messageCozy?.querySelector(".username_d30d99");
-    const timestampElem = messageCozy?.querySelector(".timestamp_c79dd2");
-    const contentElem = messageCozy?.querySelector(".contents_f5869e .markup_a7e664");
-    const messageLinkElem = messageCozy?.querySelector('a[href*="/channels/"]');
-    if (usernameElem) userName = usernameElem.textContent.trim();
-    if (timestampElem) timestamp = timestampElem.textContent.trim();
-    if (contentElem) messageContent = contentElem.textContent.trim();
-    if (avatarElem) avatarUrl = avatarElem.getAttribute("src");
-    if (messageLinkElem) messageUrl = messageLinkElem.getAttribute("href");
+
+    const cozy = doc.querySelector(".messageCozy_f5869e");
+    if (cozy) {
+      const uElem = cozy.querySelector(".username_d30d99");
+      const tElem = cozy.querySelector(".timestamp_c79dd2");
+      const cElem = cozy.querySelector(".contents_f5869e .markup_a7e664");
+      const aElem = cozy.querySelector(".avatar_f8541f img");
+      const lElem = cozy.querySelector('a[href*="/channels/"]');
+      if (uElem) userName = uElem.textContent.trim();
+      if (tElem) timestamp = tElem.textContent.trim();
+      if (cElem) messageContent = cElem.textContent.trim();
+      if (aElem) avatarUrl = aElem.src;
+      if (lElem) messageUrl = lElem.href;
+    }
+
     return {
       postType: "discord",
       user_name: userName,
       message_content: messageContent,
-      timestamp: timestamp,
+      timestamp,
       avatar_url: avatarUrl,
       message_url: messageUrl,
     };
   };
 
   const extractData = (html) => {
-    if (postType === "twitter") {
-      return extractTwitterData(html);
-    } else if (postType === "reddit") {
-      return extractRedditData(html);
-    } else if (postType === "telegram") {
-      return extractTelegramData(html);
-    } else if (postType === "discord") {
-      return extractDiscordData(html);
-    }
+    if (postType === "twitter") return extractTwitterData(html);
+    if (postType === "reddit")  return extractRedditData(html);
+    if (postType === "telegram")return extractTelegramData(html);
+    if (postType === "discord") return extractDiscordData(html);
     throw new Error("Unknown post type: " + postType);
   };
 
-  // Listen for postMessage from sidepanel wrapper
+  // Listen for messages
   useEffect(() => {
     const handleMessage = (event) => {
       const msg = event.data;
@@ -290,24 +305,31 @@ const PostExtractor = () => {
         setExtractedData(msg.payload);
 
         const data = msg.payload;
-        const newPost = {
-          id: Date.now(),
-          username: data.user_handle || data.author || 'unknown',
-          platform: data.postType,
-          avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
-          group: data.subreddit || data.group || null,
-          content:
-            data.tweet_text ||
-            data.content ||
-            data.message_text ||
-            data.message_content ||
-            '',
-          priority: 'medium',
-          timestamp: new Date().toLocaleTimeString(),
-          attachment: data.attachment_url || null,
-          metrics: data.metrics || { likes: 0, retweets: 0, replies: 0 },
-        };
-        setPosts(prev => [...prev, newPost]);
+        const key = data.tweet_url || data.permalink || `${data.postType}-${Date.now()}`;
+        if (!seenKeys.current.has(key)) {
+          seenKeys.current.add(key);
+          setPosts(prev => [
+            ...prev,
+            {
+              key,
+              id: Date.now(),
+              username: data.user_handle || data.author || 'unknown',
+              platform: data.postType,
+              avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
+              group: data.subreddit || data.group || null,
+              content:
+                data.tweet_text ||
+                data.content ||
+                data.message_text ||
+                data.message_content ||
+                '',
+              priority: 'medium',
+              timestamp: new Date().toLocaleTimeString(),
+              attachment: data.attachment_url || null,
+              metrics: data.metrics || { likes: 0, retweets: 0, replies: 0 },
+            }
+          ]);
+        }
       } else if (msg.type === 'EXTRACT_ERROR') {
         setExtractedData(null);
         setExtractionError(msg.error);
@@ -316,7 +338,7 @@ const PostExtractor = () => {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [postType]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -327,34 +349,42 @@ const PostExtractor = () => {
     }
     setExtractionError("");
     setExtractedData(null);
+
     try {
       const data = extractData(rawHTML);
-      const newPost = {
-        id: posts.length + 1,
-        username: data.user_handle || data.author || "unknown",
-        platform: postType,
-        avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
-        group: data.subreddit || data.group || null,
-        content: data.tweet_text || data.content || data.message_text || data.message_content,
-        priority: "medium",
-        timestamp: new Date().toLocaleTimeString(),
-        attachment: data.attachment_url || null,
-        metrics: data.metrics || { likes: 0, retweets: 0, replies: 0 },
-      };
-      setPosts(prev => [...prev, newPost]);
+      const key = data.tweet_url || data.permalink || `${data.postType}-${Date.now()}`;
+      if (!seenKeys.current.has(key)) {
+        seenKeys.current.add(key);
+        setPosts(prev => [
+          ...prev,
+          {
+            key,
+            id: prev.length + 1,
+            username: data.user_handle || data.author || "unknown",
+            platform: postType,
+            avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
+            group: data.subreddit || data.group || null,
+            content: data.tweet_text || data.content || data.message_text || data.message_content,
+            priority: "medium",
+            timestamp: new Date().toLocaleTimeString(),
+            attachment: data.attachment_url || null,
+            metrics: data.metrics || { likes: 0, retweets: 0, replies: 0 },
+          }
+        ]);
+      }
     } catch (err) {
       console.error("Extraction failed:", err);
+      setExtractionError("Extraction failed: " + err.message);
     }
   };
 
   return (
     <div className="w-full max-w-6xl mx-auto my-6 px-4 sm:px-6 md:my-10">
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h1 className="text-xl sm:text-2xl font-bold">
-            Extract & Generate Reply
-          </h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Extract & Generate Reply</h1>
           <div className="flex items-center bg-gray-50 p-2 rounded-full">
             <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
               <Check size={16} className="mr-1 hidden sm:inline" />
@@ -438,23 +468,47 @@ const PostExtractor = () => {
           </div>
         )}
 
-        {/* Extracted Data */}
+        {/* Extracted Data JSON Toggle */}
         {extractedData && (
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">Extracted Data:</h2>
-            <div className="bg-gray-100 p-3 sm:p-4 rounded overflow-x-auto border border-gray-200">
-              <pre className="text-xs sm:text-sm whitespace-pre-wrap break-words">
-                {JSON.stringify(extractedData, null, 2)}
-              </pre>
-            </div>
+            <button
+              onClick={() => setShowExtractedJSON(!showExtractedJSON)}
+              className="mb-2 text-indigo-600 hover:underline text-sm"
+            >
+              {showExtractedJSON ? "Hide" : "Show"} Extracted Data JSON
+            </button>
+            {showExtractedJSON && (
+              <div className="bg-gray-100 p-3 rounded overflow-x-auto">
+                <pre className="text-xs whitespace-pre-wrap">
+                  {JSON.stringify(extractedData, null, 2)}
+                </pre>
+              </div>
+            )}
           </div>
         )}
 
+        {/* Hide Duplicates Toggle */}
+        <label className="flex items-center space-x-2 mb-4">
+          <input
+            type="checkbox"
+            checked={hideDuplicates}
+            onChange={() => setHideDuplicates(!hideDuplicates)}
+            className="form-checkbox"
+          />
+          <span className="text-sm">Hide duplicates</span>
+        </label>
+
         {/* Table */}
-        <SocialBotTable posts={posts} />
+        <SocialBotTable
+          posts={
+            hideDuplicates
+              ? posts.filter((post, idx, arr) =>
+                  arr.findIndex(p => p.key === post.key) === idx
+                )
+              : posts
+          }
+        />
       </div>
     </div>
   );
-};
-
-export default PostExtractor;
+}

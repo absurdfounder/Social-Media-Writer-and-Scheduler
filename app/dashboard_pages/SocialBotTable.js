@@ -225,13 +225,13 @@ export default function SocialBotTable({ posts }) {
                   </button>
                   <button
                     onClick={() => handleQuoteClick(post)}
-                    className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium"
                   >
-                    <Reply size={14} className="mr-1" /> Quote It
+                    <Reply size={14} className="mr-1" /> Quote
                   </button>
                   <button
                     onClick={() => handleRepostClick(post)}
-                    className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium"
                   >
                     <Reply size={14} className="mr-1" /> Repost
                   </button>

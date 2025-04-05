@@ -133,9 +133,9 @@ export default function PostExtractor() {
       return 0;
     };
 
-    likeCount    = extractMetric("like");
+    likeCount = extractMetric("like");
     retweetCount = extractMetric("retweet");
-    replyCount   = extractMetric("reply");
+    replyCount = extractMetric("reply");
 
     return {
       postType: "twitter",
@@ -164,11 +164,11 @@ export default function PostExtractor() {
     const article = doc.querySelector("shreddit-post");
     if (article) {
       postTitle = article.getAttribute("post-title") || postTitle;
-      author    = article.getAttribute("author") || author;
+      author = article.getAttribute("author") || author;
       subreddit = article.getAttribute("subreddit-prefixed-name") || subreddit;
       permalink = article.getAttribute("permalink") || permalink;
-      score     = article.getAttribute("score") || score;
-      icon      = article.getAttribute("icon-url") || article.getAttribute("profile-icon-url") || icon;
+      score = article.getAttribute("score") || score;
+      icon = article.getAttribute("icon-url") || article.getAttribute("profile-icon-url") || icon;
 
       const body = article.querySelector('[data-post-click-location="text-body"]');
       if (body) {
@@ -286,8 +286,8 @@ export default function PostExtractor() {
 
   const extractData = (html) => {
     if (postType === "twitter") return extractTwitterData(html);
-    if (postType === "reddit")  return extractRedditData(html);
-    if (postType === "telegram")return extractTelegramData(html);
+    if (postType === "reddit") return extractRedditData(html);
+    if (postType === "telegram") return extractTelegramData(html);
     if (postType === "discord") return extractDiscordData(html);
     throw new Error("Unknown post type: " + postType);
   };
@@ -399,11 +399,10 @@ export default function PostExtractor() {
         <div className="rounded-lg shadow-md mb-6">
           <button
             onClick={() => toggleActive('button3')}
-            className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-300 ${
-              activeStates.button3
+            className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-300 ${activeStates.button3
                 ? "bg-teal-50 text-teal-600 border border-teal-500"
                 : "bg-teal-600 hover:bg-teal-700 text-white"
-            }`}
+              }`}
           >
             {activeStates.button3 ? (
               <>
@@ -423,45 +422,44 @@ export default function PostExtractor() {
         </div>
 
 
-<div className="hidden">
+        <div className="hidden">
 
-        {/* Channel Selection */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-          <h2 className="text-sm font-medium sm:text-base">Select Channel</h2>
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            {["twitter", "reddit", "telegram", "discord"].map((type) => (
-              <button
-                key={type}
-                onClick={() => setPostType(type)}
-                className={`px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm rounded transition-colors duration-150 ${
-                  postType === type
-                    ? "bg-slate-600 text-white shadow-md"
-                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                }`}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
-            ))}
+          {/* Channel Selection */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <h2 className="text-sm font-medium sm:text-base">Select Channel</h2>
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+              {["twitter", "reddit", "telegram", "discord"].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setPostType(type)}
+                  className={`px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm rounded transition-colors duration-150 ${postType === type
+                      ? "bg-slate-600 text-white shadow-md"
+                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                    }`}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Input Form */}
-        <form onSubmit={handleSubmit} className="mb-6">
-          <textarea
-            value={rawHTML}
-            onChange={(e) => setRawHTML(e.target.value)}
-            placeholder={`Paste raw ${postType} post HTML here...`}
-            rows={6}
-            className="w-full p-3 border border-gray-300 rounded mb-4 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-            aria-label="Raw HTML Input"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-green-600 text-white text-sm sm:text-base rounded hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-          >
-            Extract Data
-          </button>
-        </form>
+          {/* Input Form */}
+          <form onSubmit={handleSubmit} className="mb-6">
+            <textarea
+              value={rawHTML}
+              onChange={(e) => setRawHTML(e.target.value)}
+              placeholder={`Paste raw ${postType} post HTML here...`}
+              rows={6}
+              className="w-full p-3 border border-gray-300 rounded mb-4 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+              aria-label="Raw HTML Input"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 bg-green-600 text-white text-sm sm:text-base rounded hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            >
+              Extract Data
+            </button>
+          </form>
         </div>
 
 
@@ -475,12 +473,27 @@ export default function PostExtractor() {
         {/* Extracted Data JSON Toggle */}
         {extractedData && (
           <div className="mb-6">
-            <button
-              onClick={() => setShowExtractedJSON(!showExtractedJSON)}
-              className="mb-2 text-indigo-600 hover:underline text-sm"
-            >
-              {showExtractedJSON ? "Hide" : "Show"} Extracted Data JSON
-            </button>
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowExtractedJSON(!showExtractedJSON)}
+                className="mb-2 text-indigo-600 hover:underline text-sm"
+              >
+                {showExtractedJSON ? "Hide" : "Show"} Extracted Data JSON
+              </button>
+
+              {/* Hide Duplicates Toggle */}
+              <label className="flex items-center space-x-2 mb-4">
+                <input
+                  type="checkbox"
+                  checked={hideDuplicates}
+                  onChange={() => setHideDuplicates(!hideDuplicates)}
+                  className="form-checkbox"
+                />
+                <span className="text-sm">Hide duplicates</span>
+              </label>
+            </div>
+
+
             {showExtractedJSON && (
               <div className="bg-gray-100 p-3 rounded overflow-x-auto">
                 <pre className="text-xs whitespace-pre-wrap">
@@ -491,24 +504,15 @@ export default function PostExtractor() {
           </div>
         )}
 
-        {/* Hide Duplicates Toggle */}
-        <label className="flex items-center space-x-2 mb-4">
-          <input
-            type="checkbox"
-            checked={hideDuplicates}
-            onChange={() => setHideDuplicates(!hideDuplicates)}
-            className="form-checkbox"
-          />
-          <span className="text-sm">Hide duplicates</span>
-        </label>
+
 
         {/* Table */}
         <SocialBotTable
           posts={
             hideDuplicates
               ? posts.filter((post, idx, arr) =>
-                  arr.findIndex(p => p.key === post.key) === idx
-                )
+                arr.findIndex(p => p.key === post.key) === idx
+              )
               : posts
           }
         />

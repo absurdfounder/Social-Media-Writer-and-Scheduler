@@ -30,20 +30,20 @@ const SocialBotTable = ({ posts }) => {
   const getPlatformIcon = (platform) => {
     switch (platform) {
       case 'twitter': return <Twitter size={16} className="text-blue-400" />;
-      case 'reddit':  return <MessageCircle size={16} className="text-orange-500" />;
-      case 'facebook':return <Facebook size={16} className="text-blue-600" />;
+      case 'reddit': return <MessageCircle size={16} className="text-orange-500" />;
+      case 'facebook': return <Facebook size={16} className="text-blue-600" />;
       case 'discord': return <MessageSquare size={16} className="text-indigo-500" />;
-      default:        return <MessageCircle size={16} className="text-gray-500" />;
+      default: return <MessageCircle size={16} className="text-gray-500" />;
     }
   };
 
   const getLargePlatformIcon = (platform) => {
     switch (platform) {
       case 'twitter': return <Twitter size={20} className="text-blue-400" />;
-      case 'reddit':  return <MessageCircle size={20} className="text-orange-500" />;
-      case 'facebook':return <Facebook size={20} className="text-blue-600" />;
+      case 'reddit': return <MessageCircle size={20} className="text-orange-500" />;
+      case 'facebook': return <Facebook size={20} className="text-blue-600" />;
       case 'discord': return <MessageSquare size={20} className="text-indigo-500" />;
-      default:        return <MessageCircle size={20} className="text-gray-500" />;
+      default: return <MessageCircle size={20} className="text-gray-500" />;
     }
   };
 
@@ -271,7 +271,7 @@ const SocialBotTable = ({ posts }) => {
           <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
             <span className="sr-only">Previous</span>
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd"/>
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
           </a>
           <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">1</a>
@@ -280,7 +280,7 @@ const SocialBotTable = ({ posts }) => {
           <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
             <span className="sr-only">Next</span>
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
             </svg>
           </a>
         </nav>

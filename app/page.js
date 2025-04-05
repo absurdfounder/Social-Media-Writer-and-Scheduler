@@ -344,7 +344,7 @@ export default function Dashboard() {
     { icon: ShieldAlert, label: 'Reddit Post', id: 'RedditPost' },
     { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
     { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
-    { icon: ShieldAlert, label: 'ContentAssess', id: 'TweetExtractor' },
+    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
    /* { icon: Settings2, label: 'Settings', id: 'settings' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
      { icon: Chrome, label: 'Extension', id: 'extension' }, 

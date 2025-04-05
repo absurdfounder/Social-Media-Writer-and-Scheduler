@@ -9,7 +9,7 @@ import {
   MessageCircle,
   Users,
   X,
-} from 'lucide-react';
+} from 'lucide-react';z
 import ReplyModal from './ReplyModal';
 
 const SocialBotTable = ({ posts }) => {
@@ -184,8 +184,12 @@ const SocialBotTable = ({ posts }) => {
                     <Reply size={14} className="mr-1" /> Reply
                   </button>
                   <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500">
-                    <Star size={16} />
+                  <Reply size={14} className="mr-1" /> Quote It
                   </button>
+                  <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500">
+                  <Reply size={14} className="mr-1" /> Repost
+                  </button>
+
                 </div>
               </div>
             </div>

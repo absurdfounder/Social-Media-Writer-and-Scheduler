@@ -9,7 +9,7 @@ import {
   MessageCircle,
   Users,
   X,
-} from 'lucide-react';z
+} from 'lucide-react';
 import ReplyModal from './ReplyModal';
 
 const SocialBotTable = ({ posts }) => {
@@ -169,7 +169,7 @@ const SocialBotTable = ({ posts }) => {
                     <span className="text-xs text-gray-500">{post.group}</span>
                   </div>
                 )}
-                <p className="mt-2 text-sm text-gray-700 line-clamp-2">{post.content}</p>
+                <p className="mt-2 text-sm text-gray-700 text-start line-clamp-2">{post.content}</p>
                 <div className="mt-3 flex space-x-2">
                   <button
                     onClick={() => openPostModal(post)}
@@ -268,7 +268,7 @@ const SocialBotTable = ({ posts }) => {
 
       {/* Pagination */}
       <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
-        <div className="text-sm text-gray-700">
+        <div className="text-sm text-gray-700 text-start">
           Showing <span className="font-medium">{filteredPosts.length}</span> of <span className="font-medium">{posts.length}</span> posts
         </div>
 
@@ -311,7 +311,7 @@ const SocialBotTable = ({ posts }) => {
                 )}
 
                 <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                  <p className="text-sm text-gray-700">{selectedPost.content}</p>
+                  <p className="text-sm text-gray-700 text-start">{selectedPost.content}</p>
                 </div>
 
                 <div className="flex space-x-6 text-sm text-gray-600 mb-4">

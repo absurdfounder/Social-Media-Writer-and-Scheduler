@@ -10,6 +10,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import ReplyModal from './ReplyModal';
 
 const SocialBotTable = ({ posts }) => {
   // Filter states
@@ -74,16 +75,15 @@ const SocialBotTable = ({ posts }) => {
     return matchesPriority && matchesChannel;
   });
 
-  // Reply generation logic unchanged…
   const handleGenerateReplyForPost = async (post) => {
     setReplyLoading(true);
     setReplyError(null);
     setReplyGenerated(null);
+
     const prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${post.content}"\n\nReply:`;
-    const requestBody = {
-      contents: [{ parts: [{ text: prompt }] }]
-    };
-    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY`;
+    const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
+    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
+
     try {
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
@@ -95,13 +95,10 @@ const SocialBotTable = ({ posts }) => {
         throw new Error(errorData.error?.message || "Failed to generate reply");
       }
       const data = await response.json();
-      let generatedText = "Error: Could not parse reply from API response.";
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        generatedText = data.candidates[0].content.parts[0].text;
-      }
-      setReplyGenerated(generatedText.trim());
-    } catch (error) {
-      setReplyError(error.message || "Failed to generate AI reply");
+      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      setReplyGenerated(candidate?.trim() || "No reply generated.");
+    } catch (err) {
+      setReplyError(err.message || "Failed to generate AI reply");
     } finally {
       setReplyLoading(false);
     }
@@ -110,6 +107,13 @@ const SocialBotTable = ({ posts }) => {
   const handleReplyClick = (post) => {
     setReplyPost(post);
     handleGenerateReplyForPost(post);
+  };
+
+  const handleViewReplyNow = () => {
+    if (selectedPost) {
+      handleReplyClick(selectedPost);
+      setIsModalOpen(false);
+    }
   };
 
   return (
@@ -266,14 +270,18 @@ const SocialBotTable = ({ posts }) => {
         <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
           <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
             <span className="sr-only">Previous</span>
-            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
           </a>
           <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">1</a>
           <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm text-indigo-600">2</a>
           <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">3</a>
           <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
             <span className="sr-only">Next</span>
-            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/></svg>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
+            </svg>
           </a>
         </nav>
       </div>
@@ -304,7 +312,6 @@ const SocialBotTable = ({ posts }) => {
                   </div>
                 </div>
 
-                {/* Attachment */}
                 {selectedPost.attachment && (
                   <div className="mb-4">
                     <img
@@ -319,7 +326,6 @@ const SocialBotTable = ({ posts }) => {
                   <p className="text-sm text-gray-700">{selectedPost.content}</p>
                 </div>
 
-                {/* Metrics */}
                 <div className="flex space-x-6 text-sm text-gray-600 mb-4">
                   <div className="flex items-center">
                     <span className="mr-1">❤️</span>
@@ -338,11 +344,16 @@ const SocialBotTable = ({ posts }) => {
                 <div className="flex justify-between items-center">
                   {getPriorityBadge(selectedPost.priority)}
                   <div className="flex space-x-2">
-                    <button className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white rounded-md">
-                      <Reply size={16} className="mr-2" /> Reply Now
+                    <button
+                      onClick={handleViewReplyNow}
+                      className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white rounded-md"
+                    >
+                      <Reply size={16} className="mr-2" />
+                      Reply Now
                     </button>
-                    <button className="inline-flex items-center px-3 py-2 bg-white text-gray-700 border rounded-md">
-                      <Star size={16} className="mr-2" /> Save
+                    <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                      <Star size={16} className="mr-2" />
+                      Save
                     </button>
                   </div>
                 </div>
@@ -353,45 +364,17 @@ const SocialBotTable = ({ posts }) => {
       )}
 
       {/* Reply Modal */}
-      {replyPost && (
-        <div className="fixed inset-0 z-20 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-              <h3 className="text-lg font-bold mb-2">Reply to {replyPost.username}</h3>
-              {replyLoading ? (
-                <p className="text-sm text-gray-600">Generating reply...</p>
-              ) : replyError ? (
-                <p className="text-sm text-red-600">{replyError}</p>
-              ) : replyGenerated ? (
-                <textarea
-                  readOnly
-                  value={replyGenerated}
-                  rows={4}
-                  className="w-full p-3 border border-gray-300 rounded bg-gray-50 font-mono text-xs sm:text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent mb-4"
-                  aria-label="Generated Reply"
-                />
-              ) : null}
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => setReplyPost(null)}
-                  className="px-4 py-2 border rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    // Add your reply submission logic here.
-                    setReplyPost(null);
-                  }}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded"
-                >
-                  Send Reply
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ReplyModal
+        post={replyPost}
+        loading={replyLoading}
+        error={replyError}
+        generated={replyGenerated}
+        onClose={() => setReplyPost(null)}
+        onSend={() => {
+          // your send logic here…
+          setReplyPost(null);
+        }}
+      />
     </div>
   );
 };

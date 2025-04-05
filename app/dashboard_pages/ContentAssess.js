@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Settings, Zap } from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
-
 const PostExtractor = () => {
-  // State for post type and raw HTML input
   const [postType, setPostType] = useState("twitter");
   const [rawHTML, setRawHTML] = useState("");
   const [extractedData, setExtractedData] = useState(null);
   const [extractionError, setExtractionError] = useState("");
-
-  // State for AI reply generation (not used here since reply generation is now in SocialBotTable)
   const [activeStates, setActiveStates] = useState({
     button1: false,
     button2: false,
@@ -19,10 +15,7 @@ const PostExtractor = () => {
     button5: false,
     button6: false,
   });
-
-  const [posts, setPosts] = useState([
-
-  ]);
+  const [posts, setPosts] = useState([]);
 
   const toggleActive = (buttonId) => {
     setActiveStates(prev => ({
@@ -32,27 +25,6 @@ const PostExtractor = () => {
   };
 
   // --- Extraction Functions ---
-  const extractData = (html) => {
-    try {
-      let data;
-      if (postType === "twitter") {
-        data = extractTwitterData(html);
-      } else if (postType === "reddit") {
-        data = extractRedditData(html);
-      } else if (postType === "telegram") {
-        data = extractTelegramData(html);
-      } else if (postType === "discord") {
-        data = extractDiscordData(html);
-      }
-      setExtractedData(data);
-      setExtractionError("");
-      return data;
-    } catch (err) {
-      setExtractionError(err.message);
-      setExtractedData(null);
-      throw err;
-    }
-  };
 
   const extractTwitterData = (html) => {
     const parser = new DOMParser();
@@ -138,7 +110,7 @@ const PostExtractor = () => {
           if (text.endsWith("K")) return parseFloat(text) * 1000;
           if (text.endsWith("M")) return parseFloat(text) * 1000000;
         }
-        const group = metricElem?.closest('div[role="group"]');
+        const group = metricElem.closest('div[role="group"]');
         if (group) {
           const text = group.textContent || group.innerText || "";
           const matches = text.match(/([\d,]+)/);
@@ -293,6 +265,39 @@ const PostExtractor = () => {
     };
   };
 
+  const extractData = (html) => {
+    if (postType === "twitter") {
+      return extractTwitterData(html);
+    } else if (postType === "reddit") {
+      return extractRedditData(html);
+    } else if (postType === "telegram") {
+      return extractTelegramData(html);
+    } else if (postType === "discord") {
+      return extractDiscordData(html);
+    }
+    throw new Error("Unknown post type: " + postType);
+  };
+
+  // Listen for postMessage from sidepanel wrapper
+  useEffect(() => {
+    const handleMessage = (event) => {
+      const msg = event.data;
+      if (msg.type === 'PASTE_HTML') {
+        setRawHTML(msg.payload);
+        setExtractedData(null);
+        setExtractionError("");
+      } else if (msg.type === 'EXTRACTED_DATA') {
+        setExtractionError("");
+        setExtractedData(msg.payload);
+      } else if (msg.type === 'EXTRACT_ERROR') {
+        setExtractedData(null);
+        setExtractionError(msg.error);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!rawHTML.trim()) {
@@ -304,7 +309,6 @@ const PostExtractor = () => {
     setExtractedData(null);
     try {
       const data = extractData(rawHTML);
-      // Append the new post to the posts state
       const newPost = {
         id: posts.length + 1,
         username: data.user_handle || data.author || "unknown",
@@ -324,7 +328,7 @@ const PostExtractor = () => {
   return (
     <div className="w-full max-w-6xl mx-auto my-6 px-4 sm:px-6 md:my-10">
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-        {/* Header Section */}
+        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h1 className="text-xl sm:text-2xl font-bold">
             Extract & Generate Reply
@@ -405,14 +409,14 @@ const PostExtractor = () => {
           </button>
         </form>
 
-        {/* Error Messages */}
+        {/* Error */}
         {extractionError && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded text-sm">
             <strong>Extraction Error:</strong> {extractionError}
           </div>
         )}
 
-        {/* Extracted Data Display */}
+        {/* Extracted Data */}
         {extractedData && (
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-2">Extracted Data:</h2>
@@ -424,7 +428,7 @@ const PostExtractor = () => {
           </div>
         )}
 
-        {/* Social Bot Table Component */}
+        {/* Table */}
         <SocialBotTable posts={posts} />
       </div>
     </div>

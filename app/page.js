@@ -5,7 +5,7 @@ import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
-  DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, LaughIcon, MailIcon,calendar,CalendarRange,ShieldAlert, HandMetal
+  DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, LaughIcon, MailIcon, calendar, CalendarRange, ShieldAlert, HandMetal
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -115,8 +115,8 @@ const BillingModal = ({ isOpen, onClose }) => {
                     ))}
                   </ul>
                   <button className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${plan.popular
-                      ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                     }`}>
                     Get Started
                   </button>
@@ -144,8 +144,8 @@ const FeedbackModal = ({ isOpen, onClose }) => {
         <div className="flex rounded-lg bg-gray-100 p-1">
           <button
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'feedback'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white text-blue-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
               }`}
             onClick={() => setSelectedTab('feedback')}
           >
@@ -153,8 +153,8 @@ const FeedbackModal = ({ isOpen, onClose }) => {
           </button>
           <button
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'call'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white text-blue-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
               }`}
             onClick={() => setSelectedTab('call')}
           >
@@ -345,10 +345,10 @@ export default function Dashboard() {
     { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
     { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
     { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
-   /* { icon: Settings2, label: 'Settings', id: 'settings' },
-    { icon: DollarSign, label: 'Billing', id: 'billing' },
-     { icon: Chrome, label: 'Extension', id: 'extension' }, 
-     { icon: Heart, label: 'Feedback', id: 'feedback' }*/
+    /* { icon: Settings2, label: 'Settings', id: 'settings' },
+     { icon: DollarSign, label: 'Billing', id: 'billing' },
+      { icon: Chrome, label: 'Extension', id: 'extension' }, 
+      { icon: Heart, label: 'Feedback', id: 'feedback' }*/
   ];
 
   // Primary mobile nav items - limited to only the most important ones
@@ -371,7 +371,7 @@ export default function Dashboard() {
       try {
         // Check if getTrainingData exists
         let trainingData = localStorage.getItem('getTrainingData');
-        
+
         if (!trainingData) {
           // If it doesn't exist, create it with an empty object
           localStorage.setItem('getTrainingData', JSON.stringify({}));
@@ -394,7 +394,7 @@ export default function Dashboard() {
 
     initializeLocalStorage();
   }, []);
-  
+
   useEffect(() => {
     const checkLoginState = async () => {
       try {
@@ -462,14 +462,14 @@ export default function Dashboard() {
         return <OutreachAgent />;
       case 'Crypto':
         return <Crypto />;
-        case 'HackerNewsPost':
-          return <HackerNewsPostGenerator />;
-          case 'RedditPost':
-            return <RedditPostGenerator />;   
-        case 'ElevenLabsScriptOptimizer':
-          return <ElevenLabsScriptOptimizer />;
-          case 'TweetExtractor':
-            return <TweetExtractor />;
+      case 'HackerNewsPost':
+        return <HackerNewsPostGenerator />;
+      case 'RedditPost':
+        return <RedditPostGenerator />;
+      case 'ElevenLabsScriptOptimizer':
+        return <ElevenLabsScriptOptimizer />;
+      case 'TweetExtractor':
+        return <TweetExtractor />;
       case 'MemeEditor':
         return <MemeEditor />;
       default:
@@ -480,19 +480,19 @@ export default function Dashboard() {
   // Enhanced Mobile Menu Component
   const MobileMenu = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
-    
+
     // Group items for better organization in the mobile menu
     const menuGroups = [
-      { 
+      {
         category: "Main Tools",
         items: mainNavItems
       },
-      { 
+      {
         category: "Other Tools",
         items: bottomNavItems
       }
     ];
-    
+
     return (
       <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
         <div className="sticky top-0 bg-white border-b z-10">
@@ -503,7 +503,7 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        
+
         <div className="p-4 pb-24">
           {menuGroups.map((group, index) => (
             <div key={index} className="mb-6">
@@ -514,8 +514,8 @@ export default function Dashboard() {
                     key={item.id}
                     onClick={() => handleNavItemClick(item.id)}
                     className={`flex flex-col items-center justify-center p-4 rounded-lg border
-                      ${activeTab === item.id 
-                        ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                      ${activeTab === item.id
+                        ? 'bg-blue-50 text-blue-600 border-blue-200'
                         : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
                   >
                     <item.icon className="h-6 w-6 mb-2" />
@@ -525,7 +525,7 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
-          
+
           {/* User profile section for mobile menu */}
           <div className="mt-8 pt-6 border-t">
             <ApiKeyManager />
@@ -552,9 +552,9 @@ export default function Dashboard() {
       <ToastContainer />
       <div className="flex h-screen overflow-hidden">
         {/* Mobile Menu Component */}
-        <MobileMenu 
-          isOpen={isMobileMenuOpen} 
-          onClose={() => setIsMobileMenuOpen(false)} 
+        <MobileMenu
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
         />
 
         {/* Sidebar */}
@@ -581,9 +581,9 @@ export default function Dashboard() {
           <div className="px-6 mb-6">
             <button
               className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center
-                ${activeTab === 'dashboard' 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+                ${activeTab === 'dashboard'
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
               onClick={() => handleNavItemClick('dashboard')}
             >
               <HandMetal className="mr-2 h-5 w-5" />
@@ -625,8 +625,8 @@ export default function Dashboard() {
           <SubscriptionBanner onUpgrade={() => handleNavItemClick('billing')} />
           <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">
-              {activeTab === 'dashboard' 
-                ? 'Marketing Week' 
+              {activeTab === 'dashboard'
+                ? 'Marketing Week'
                 : [...mainNavItems, ...bottomNavItems].find(item => item.id === activeTab)?.label}
             </h2>
             {renderContent()}

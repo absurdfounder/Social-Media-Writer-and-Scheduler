@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import {
   MessageSquare,
@@ -12,7 +14,7 @@ import {
 } from 'lucide-react';
 import ReplyModal from './ReplyModal';
 
-const SocialBotTable = ({ posts }) => {
+export default function SocialBotTable({ posts }) {
   // Filter states
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState("all");
@@ -27,6 +29,101 @@ const SocialBotTable = ({ posts }) => {
   const [replyGenerated, setReplyGenerated] = useState(null);
   const [replyError, setReplyError] = useState(null);
 
+  // Quote modal
+  const [quotePost, setQuotePost] = useState(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteGenerated, setQuoteGenerated] = useState(null);
+  const [quoteError, setQuoteError] = useState(null);
+
+  // Repost modal
+  const [repostPost, setRepostPost] = useState(null);
+  const [repostLoading, setRepostLoading] = useState(false);
+  const [repostGenerated, setRepostGenerated] = useState(null);
+  const [repostError, setRepostError] = useState(null);
+
+  // Shared AI generator
+  async function generateAIContent(
+    prompt,
+    setLoading,
+    setError,
+    setResult
+  ) {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
+    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_KEY`;
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || 'Generation failed');
+      }
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      setResult(text || 'No content generated.');
+    } catch (err) {
+      setError(err.message || 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Handlers
+  const handleGenerateReplyForPost = (post) => {
+    setReplyPost(post);
+    const prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${post.content}"\n\nReply:`;
+    generateAIContent(prompt, setReplyLoading, setReplyError, setReplyGenerated);
+  };
+
+  const handleReplyClick = (post) => {
+    handleGenerateReplyForPost(post);
+  };
+
+  const handleQuoteClick = (post) => {
+    setQuotePost(post);
+    const prompt =
+      `Write a concise “quote tweet” that offers a learning or new perspective on:\n\n"${post.content}"\n\nQuote Tweet:`;
+    generateAIContent(prompt, setQuoteLoading, setQuoteError, setQuoteGenerated);
+  };
+
+  const handleRepostClick = (post) => {
+    setRepostPost(post);
+    const prompt =
+      `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.content}"\n\nRewritten Tweet:`;
+    generateAIContent(prompt, setRepostLoading, setRepostError, setRepostGenerated);
+  };
+
+  const openPostModal = (post) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
+  };
+
+  const handleViewReplyNow = () => {
+    if (selectedPost) {
+      handleGenerateReplyForPost(selectedPost);
+      closeModal();
+    }
+  };
+
+  // Filtering
+  const filteredPosts = posts.filter((post) => {
+    const matchesPriority = priorityFilter === "all" || post.priority === priorityFilter;
+    const matchesChannel = channelFilter === "all" || post.platform === channelFilter;
+    return matchesPriority && matchesChannel;
+  });
+
+  // Icon helpers
   const getPlatformIcon = (platform) => {
     switch (platform) {
       case 'twitter': return <Twitter size={16} className="text-blue-400" />;
@@ -36,7 +133,6 @@ const SocialBotTable = ({ posts }) => {
       default: return <MessageCircle size={16} className="text-gray-500" />;
     }
   };
-
   const getLargePlatformIcon = (platform) => {
     switch (platform) {
       case 'twitter': return <Twitter size={20} className="text-blue-400" />;
@@ -46,7 +142,6 @@ const SocialBotTable = ({ posts }) => {
       default: return <MessageCircle size={20} className="text-gray-500" />;
     }
   };
-
   const getPriorityBadge = (priority) => {
     switch (priority) {
       case 'high':
@@ -60,64 +155,9 @@ const SocialBotTable = ({ posts }) => {
     }
   };
 
-  const openPostModal = (post) => {
-    setSelectedPost(post);
-    setIsModalOpen(true);
-  };
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedPost(null);
-  };
-
-  const filteredPosts = posts.filter((post) => {
-    const matchesPriority = priorityFilter === "all" || post.priority === priorityFilter;
-    const matchesChannel = channelFilter === "all" || post.platform === channelFilter;
-    return matchesPriority && matchesChannel;
-  });
-
-  const handleGenerateReplyForPost = async (post) => {
-    setReplyLoading(true);
-    setReplyError(null);
-    setReplyGenerated(null);
-
-    const prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${post.content}"\n\nReply:`;
-    const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
-    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
-
-    try {
-      const response = await fetch(API_ENDPOINT, {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Failed to generate reply");
-      }
-      const data = await response.json();
-      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      setReplyGenerated(candidate?.trim() || "No reply generated.");
-    } catch (err) {
-      setReplyError(err.message || "Failed to generate AI reply");
-    } finally {
-      setReplyLoading(false);
-    }
-  };
-
-  const handleReplyClick = (post) => {
-    setReplyPost(post);
-    handleGenerateReplyForPost(post);
-  };
-
-  const handleViewReplyNow = () => {
-    if (selectedPost) {
-      handleReplyClick(selectedPost);
-      setIsModalOpen(false);
-    }
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-6">
+      {/* Header */}
       <div className="p-4 bg-gray-50 border-b border-gray-200">
         <h2 className="text-lg font-medium text-gray-800">Social Posts Requiring Response</h2>
         <p className="text-sm text-gray-500">Posts collected from various platforms by your AI social assistant</p>
@@ -183,13 +223,18 @@ const SocialBotTable = ({ posts }) => {
                   >
                     <Reply size={14} className="mr-1" /> Reply
                   </button>
-                  <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500">
-                  <Reply size={14} className="mr-1" /> Quote It
+                  <button
+                    onClick={() => handleQuoteClick(post)}
+                    className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                  >
+                    <Reply size={14} className="mr-1" /> Quote It
                   </button>
-                  <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500">
-                  <Reply size={14} className="mr-1" /> Repost
+                  <button
+                    onClick={() => handleRepostClick(post)}
+                    className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                  >
+                    <Reply size={14} className="mr-1" /> Repost
                   </button>
-
                 </div>
               </div>
             </div>
@@ -255,8 +300,17 @@ const SocialBotTable = ({ posts }) => {
                     >
                       <Reply size={14} className="mr-1" /> Reply
                     </button>
-                    <button className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500">
-                      <Star size={16} />
+                    <button
+                      onClick={() => handleQuoteClick(post)}
+                      className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                    >
+                      <Reply size={14} className="mr-1" /> Quote It
+                    </button>
+                    <button
+                      onClick={() => handleRepostClick(post)}
+                      className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                    >
+                      <Reply size={14} className="mr-1" /> Repost
                     </button>
                   </div>
                 </td>
@@ -271,7 +325,6 @@ const SocialBotTable = ({ posts }) => {
         <div className="text-sm text-gray-700 text-start">
           Showing <span className="font-medium">{filteredPosts.length}</span> of <span className="font-medium">{posts.length}</span> posts
         </div>
-
       </div>
 
       {/* Post View Modal */}
@@ -363,8 +416,36 @@ const SocialBotTable = ({ posts }) => {
           setReplyPost(null);
         }}
       />
+
+      {/* Quote Modal */}
+      <ReplyModal
+        post={quotePost}
+        loading={quoteLoading}
+        error={quoteError}
+        generated={
+          quoteGenerated
+            ? `${quoteGenerated}\n\n${quotePost?.tweet_url || quotePost?.permalink || ''}`
+            : null
+        }
+        onClose={() => setQuotePost(null)}
+        onSend={() => {
+          // send quoteGenerated + URL to API…
+          setQuotePost(null);
+        }}
+      />
+
+      {/* Repost Modal */}
+      <ReplyModal
+        post={repostPost}
+        loading={repostLoading}
+        error={repostError}
+        generated={repostGenerated}
+        onClose={() => setRepostPost(null)}
+        onSend={() => {
+          // send repostGenerated to API…
+          setRepostPost(null);
+        }}
+      />
     </div>
   );
-};
-
-export default SocialBotTable;
+}

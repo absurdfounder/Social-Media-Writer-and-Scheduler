@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MessageSquare,
   Eye,
@@ -41,13 +41,12 @@ export default function SocialBotTable({ posts }) {
   const [repostGenerated, setRepostGenerated] = useState(null);
   const [repostError, setRepostError] = useState(null);
 
-  // Shared AI generator
-  async function generateAIContent(
-    prompt,
-    setLoading,
-    setError,
-    setResult
-  ) {
+  // Computed posts with relevance scores
+  const [computedPosts, setComputedPosts] = useState([]);
+  const [relevanceLoading, setRelevanceLoading] = useState(false);
+
+  // Shared AI generator for Reply, Quote, Repost, etc.
+  async function generateAIContent(prompt, setLoading, setError, setResult) {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -75,7 +74,75 @@ export default function SocialBotTable({ posts }) {
     }
   }
 
-  // Handlers
+  // Compute relevance for a single post using Gemini API
+  async function generateRelevanceForPost(post, prompt) {
+    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
+    const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || 'Generation failed');
+      }
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      // Parse the output as a number (percentage)
+      const score = parseFloat(text);
+      if (isNaN(score)) {
+        return "N/A";
+      }
+      return `${score}%`;
+    } catch (error) {
+      console.error("Error generating relevance for post", post.id, error);
+      return "Error";
+    }
+  }
+
+  // Compute relevance for all posts when posts change
+  async function computeRelevanceForAllPosts() {
+    setRelevanceLoading(true);
+    try {
+      const results = await Promise.all(
+        posts.map(async (post) => {
+          const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.content}"`;
+          const relevance = await generateRelevanceForPost(post, prompt);
+          return { ...post, relevance };
+        })
+      );
+      // Sort descending by relevance (treat non-numeric values as 0)
+      const sorted = results.sort((a, b) => {
+        const getVal = (item) => {
+          const num = parseFloat(item.relevance);
+          return isNaN(num) ? 0 : num;
+        };
+        return getVal(b) - getVal(a);
+      });
+      setComputedPosts(sorted);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRelevanceLoading(false);
+    }
+  }
+
+  // When posts change, compute relevance automatically
+  useEffect(() => {
+    if (posts && posts.length) {
+      computeRelevanceForAllPosts();
+    }
+  }, [posts]);
+
+  // Delete a tweet from the computed posts list
+  function handleDeleteTweet(id) {
+    const updated = computedPosts.filter(post => post.id !== id);
+    setComputedPosts(updated);
+  }
+
+  // Handlers for Reply, Quote, Repost, and Post View
   const handleGenerateReplyForPost = (post) => {
     setReplyPost(post);
     const prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${post.content}"\n\nReply:`;
@@ -104,6 +171,7 @@ export default function SocialBotTable({ posts }) {
     setSelectedPost(post);
     setIsModalOpen(true);
   };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedPost(null);
@@ -116,8 +184,8 @@ export default function SocialBotTable({ posts }) {
     }
   };
 
-  // Filtering
-  const filteredPosts = posts.filter((post) => {
+  // Apply filters to computed posts
+  const filteredPosts = computedPosts.filter((post) => {
     const matchesPriority = priorityFilter === "all" || post.priority === priorityFilter;
     const matchesChannel = channelFilter === "all" || post.platform === channelFilter;
     return matchesPriority && matchesChannel;
@@ -133,6 +201,7 @@ export default function SocialBotTable({ posts }) {
       default: return <MessageCircle size={16} className="text-gray-500" />;
     }
   };
+
   const getLargePlatformIcon = (platform) => {
     switch (platform) {
       case 'twitter': return <Twitter size={20} className="text-blue-400" />;
@@ -142,17 +211,10 @@ export default function SocialBotTable({ posts }) {
       default: return <MessageCircle size={20} className="text-gray-500" />;
     }
   };
-  const getPriorityBadge = (priority) => {
-    switch (priority) {
-      case 'high':
-        return <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">High</span>;
-      case 'medium':
-        return <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Medium</span>;
-      case 'low':
-        return <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Low</span>;
-      default:
-        return null;
-    }
+
+  // Display computed relevance as a badge
+  const displayRelevance = (relevance) => {
+    return <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">{relevance}</span>;
   };
 
   return (
@@ -161,6 +223,7 @@ export default function SocialBotTable({ posts }) {
       <div className="p-4 bg-gray-50 border-b border-gray-200">
         <h2 className="text-lg font-medium text-gray-800">Social Posts Requiring Response</h2>
         <p className="text-sm text-gray-500">Posts collected from various platforms by your AI social assistant</p>
+        {relevanceLoading && <p className="text-sm text-gray-500">Loading relevance scores...</p>}
       </div>
 
       {/* Filter Controls */}
@@ -200,7 +263,7 @@ export default function SocialBotTable({ posts }) {
                     {getPlatformIcon(post.platform)}
                     <p className="text-sm font-medium text-gray-900 truncate">{post.username}</p>
                   </div>
-                  {getPriorityBadge(post.priority)}
+                  {displayRelevance(post.relevance)}
                 </div>
                 <p className="text-sm text-gray-500">{post.timestamp}</p>
                 {post.group && (
@@ -209,8 +272,8 @@ export default function SocialBotTable({ posts }) {
                     <span className="text-xs text-gray-500">{post.group}</span>
                   </div>
                 )}
-                <p className="mt-2 text-sm text-gray-700 text-start line-clamp-2">{post.content}</p>
-                <div className="mt-3 flex space-x-2">
+                <p className="mt-2 text-sm text-gray-700 text-start">{post.content}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
                   <button
                     onClick={() => openPostModal(post)}
                     className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
@@ -234,6 +297,12 @@ export default function SocialBotTable({ posts }) {
                     className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium"
                   >
                     <Reply size={14} className="mr-1" /> Repost
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTweet(post.id)}
+                    className="inline-flex items-center px-2.5 py-1.5 bg-red-500 text-white rounded shadow-sm text-xs font-medium"
+                  >
+                    <X size={14} className="mr-1" /> Delete
                   </button>
                 </div>
               </div>
@@ -279,12 +348,12 @@ export default function SocialBotTable({ posts }) {
                   )}
                 </td>
                 <td className="px-4 py-4">
-                  <div className="text-sm text-gray-900 max-w-xs truncate lg:max-w-sm xl:max-w-md">
+                  <div className="text-sm text-gray-900 max-w-xs lg:max-w-sm xl:max-w-md">
                     {post.content}
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  {getPriorityBadge(post.priority)}
+                  {displayRelevance(post.relevance)}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
@@ -304,7 +373,7 @@ export default function SocialBotTable({ posts }) {
                       onClick={() => handleQuoteClick(post)}
                       className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
                     >
-                      <Reply size={14} className="mr-1" /> Quote It
+                      <Reply size={14} className="mr-1" /> Quote
                     </button>
                     <button
                       onClick={() => handleRepostClick(post)}
@@ -312,19 +381,18 @@ export default function SocialBotTable({ posts }) {
                     >
                       <Reply size={14} className="mr-1" /> Repost
                     </button>
+                    <button
+                      onClick={() => handleDeleteTweet(post.id)}
+                      className="inline-flex items-center px-2 py-1 bg-red-500 text-white rounded text-xs"
+                    >
+                      <X size={14} className="mr-1" /> Delete
+                    </button>
                   </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
-        <div className="text-sm text-gray-700 text-start">
-          Showing <span className="font-medium">{filteredPosts.length}</span> of <span className="font-medium">{posts.length}</span> posts
-        </div>
       </div>
 
       {/* Post View Modal */}
@@ -383,7 +451,7 @@ export default function SocialBotTable({ posts }) {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  {getPriorityBadge(selectedPost.priority)}
+                  {displayRelevance(selectedPost.relevance)}
                   <div className="flex space-x-2">
                     <button
                       onClick={handleViewReplyNow}

@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.25.0",
+    "@anthropic-ai/sdk": "^0.25.2",
     "@editorjs/editorjs": "^2.30.2",
     "@editorjs/header": "^2.8.7",
     "@editorjs/link": "^2.6.2",

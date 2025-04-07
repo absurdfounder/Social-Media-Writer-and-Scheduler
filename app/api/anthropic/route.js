@@ -1,25 +1,23 @@
 // app/api/anthropic/route.js
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { getAnthropicKey } from '@/app/Utils/getApikey';
 
 export async function POST(request) {
-  const { temperature, max_tokens, messages, system, model } = await request.json();
-
-  // Get API key from request headers
-  const apiKey = request.headers.get('x-api-key');
-
-  if (!apiKey) {
-    console.error('Anthropic API key not provided');
-    return NextResponse.json({ error: 'Anthropic API key not provided' }, { status: 500 });
-  }
-
-  const anthropic = new Anthropic({
-    apiKey: apiKey,
-  });
-
   try {
-    console.log('Received request:', { temperature, max_tokens, system, messages, model });
+    const { temperature, max_tokens, messages, system, model } = await request.json();
+    console.log('Anthropic API route called with model:', model);
+
+    // Use hard-coded API key directly
+    const apiKey = "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";
+
+    const anthropic = new Anthropic({
+      apiKey: apiKey,
+    });
+
+    console.log(
+      'Sending request to Anthropic API with model:',
+      model || 'claude-3-5-sonnet-20241022'
+    );
 
     const response = await anthropic.messages.create({
       model: model || 'claude-3-5-sonnet-20241022',
@@ -29,14 +27,23 @@ export async function POST(request) {
       messages: messages,
     });
 
-    console.log('Anthropic API response:', response);
+    console.log('Received response from Anthropic API:', response);
     return NextResponse.json(response);
   } catch (error) {
     console.error('Anthropic API error:', error);
-    return NextResponse.json({
+    const errorResponse = {
       error: 'An error occurred while processing your request',
       details: error.message,
-      stack: error.stack,
-    }, { status: 500 });
+      type: error.constructor.name,
+    };
+
+    if (error.response) {
+      errorResponse.status = error.response.status;
+      errorResponse.data = error.response.data;
+    }
+
+    return NextResponse.json(errorResponse, {
+      status: error.response?.status || 500,
+    });
   }
 }

@@ -50,23 +50,22 @@ export default function SocialBotTable({ posts }) {
     setLoading(true);
     setError(null);
     setResult(null);
-
-    const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
-    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
-
     try {
-      const res = await fetch(API_ENDPOINT, {
+      const res = await fetch('/api/gen', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({ prompt }),
       });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error?.message || 'Generation failed');
-      }
       const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      setResult(text || 'No content generated.');
+      if (!res.ok) {
+        throw new Error(data.error || 'Generation failed');
+      }
+      // Extract the generated text from the response's content array.
+      const generatedText =
+        data.content && data.content.length > 0
+          ? data.content[0].text
+          : 'No content generated.';
+      setResult(generatedText);
     } catch (err) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -74,7 +73,7 @@ export default function SocialBotTable({ posts }) {
     }
   }
 
-  // Compute relevance for a single post using Gemini API
+  // Compute relevance for a single post using Gemini API (kept unchanged)
   async function generateRelevanceForPost(post, prompt) {
     const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
     const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
@@ -90,7 +89,6 @@ export default function SocialBotTable({ posts }) {
       }
       const data = await res.json();
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      // Parse the output as a number (percentage)
       const score = parseFloat(text);
       if (isNaN(score)) {
         return "N/A";
@@ -108,12 +106,11 @@ export default function SocialBotTable({ posts }) {
     try {
       const results = await Promise.all(
         posts.map(async (post) => {
-          const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.content}"`;
+          const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
           const relevance = await generateRelevanceForPost(post, prompt);
           return { ...post, relevance };
         })
       );
-      // Sort descending by relevance (treat non-numeric values as 0)
       const sorted = results.sort((a, b) => {
         const getVal = (item) => {
           const num = parseFloat(item.relevance);
@@ -143,9 +140,14 @@ export default function SocialBotTable({ posts }) {
   }
 
   // Handlers for Reply, Quote, Repost, and Post View
+
   const handleGenerateReplyForPost = (post) => {
     setReplyPost(post);
-    const prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${post.content}"\n\nReply:`;
+    let prompt = `Generate a concise and relevant social media style reply (max 2 sentences) to the following post content:\n\n"${post.tweet_text || post.content}"`;
+    if (post.attachment_url || post.attachment) {
+      prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
+    }
+    prompt += `\n\nReply:`;
     generateAIContent(prompt, setReplyLoading, setReplyError, setReplyGenerated);
   };
 
@@ -155,15 +157,21 @@ export default function SocialBotTable({ posts }) {
 
   const handleQuoteClick = (post) => {
     setQuotePost(post);
-    const prompt =
-      `Write a concise “quote tweet” that offers a learning or new perspective on:\n\n"${post.content}"\n\nQuote Tweet:`;
+    let prompt = `Write a concise “quote tweet” that offers a learning or new perspective on:\n\n"${post.tweet_text || post.content}"`;
+    if (post.attachment_url || post.attachment) {
+      prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
+    }
+    prompt += `\n\nQuote Tweet:`;
     generateAIContent(prompt, setQuoteLoading, setQuoteError, setQuoteGenerated);
   };
 
   const handleRepostClick = (post) => {
     setRepostPost(post);
-    const prompt =
-      `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.content}"\n\nRewritten Tweet:`;
+    let prompt = `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.tweet_text || post.content}"`;
+    if (post.attachment_url || post.attachment) {
+      prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
+    }
+    prompt += `\n\nRewritten Tweet:`;
     generateAIContent(prompt, setRepostLoading, setRepostError, setRepostGenerated);
   };
 
@@ -187,7 +195,7 @@ export default function SocialBotTable({ posts }) {
   // Apply filters to computed posts
   const filteredPosts = computedPosts.filter((post) => {
     const matchesPriority = priorityFilter === "all" || post.priority === priorityFilter;
-    const matchesChannel = channelFilter === "all" || post.platform === channelFilter;
+    const matchesChannel = channelFilter === "all" || post.postType === channelFilter;
     return matchesPriority && matchesChannel;
   });
 
@@ -256,23 +264,23 @@ export default function SocialBotTable({ posts }) {
         {filteredPosts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 p-4">
             <div className="flex items-start space-x-3">
-              <img className="h-10 w-10 rounded-full flex-shrink-0" src={post.avatar} alt="" />
+              <img className="h-10 w-10 rounded-full flex-shrink-0" src={post.avatar_url || post.avatar} alt="" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-1">
-                    {getPlatformIcon(post.platform)}
-                    <p className="text-sm font-medium text-gray-900 truncate">{post.username}</p>
+                    {getPlatformIcon(post.postType)}
+                    <p className="text-sm font-medium text-gray-900 truncate">{post.user_name}</p>
                   </div>
                   {displayRelevance(post.relevance)}
                 </div>
-                <p className="text-sm text-gray-500">{post.timestamp}</p>
+                <p className="text-sm text-gray-500">{post.date}</p>
                 {post.group && (
                   <div className="flex items-center mt-1">
                     <Users size={14} className="mr-1 text-gray-400" />
                     <span className="text-xs text-gray-500">{post.group}</span>
                   </div>
                 )}
-                <p className="mt-2 text-sm text-gray-700 text-start">{post.content}</p>
+                <p className="mt-2 text-sm text-gray-700 text-start">{post.tweet_text || post.content}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button
                     onClick={() => openPostModal(post)}
@@ -329,13 +337,13 @@ export default function SocialBotTable({ posts }) {
               <tr key={post.id} className="hover:bg-gray-50">
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="flex items-center space-x-1">
-                    {getPlatformIcon(post.platform)}
-                    <span className="text-sm font-medium text-gray-900">{post.username}</span>
+                    {getPlatformIcon(post.postType)}
+                    <span className="text-sm font-medium text-gray-900">{post.user_name}</span>
                   </div>
-                  <div className="text-xs text-gray-500">{post.timestamp}</div>
+                  <div className="text-xs text-gray-500">{post.date}</div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <img className="h-10 w-10 rounded-full" src={post.avatar} alt="" />
+                  <img className="h-10 w-10 rounded-full" src={post.avatar_url || post.avatar} alt="" />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {post.group ? (
@@ -349,7 +357,7 @@ export default function SocialBotTable({ posts }) {
                 </td>
                 <td className="px-4 py-4">
                   <div className="text-sm text-gray-900 max-w-xs lg:max-w-sm xl:max-w-md">
-                    {post.content}
+                    {post.tweet_text || post.content}
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
@@ -409,22 +417,22 @@ export default function SocialBotTable({ posts }) {
                   <X size={20} />
                 </button>
                 <div className="flex items-center mb-4">
-                  <img className="h-12 w-12 rounded-full mr-4" src={selectedPost.avatar} alt="" />
+                  <img className="h-12 w-12 rounded-full mr-4" src={selectedPost.avatar_url || selectedPost.avatar} alt="" />
                   <div>
                     <div className="flex items-center">
-                      {getLargePlatformIcon(selectedPost.platform)}
+                      {getLargePlatformIcon(selectedPost.postType)}
                       <h3 className="ml-1 text-lg font-medium text-gray-900">
-                        {selectedPost.username}
+                        {selectedPost.user_name}
                       </h3>
                     </div>
-                    <p className="text-sm text-gray-500">{selectedPost.timestamp}</p>
+                    <p className="text-sm text-gray-500">{selectedPost.date}</p>
                   </div>
                 </div>
 
-                {selectedPost.attachment && (
+                {(selectedPost.attachment_url || selectedPost.attachment) && (
                   <div className="mb-4">
                     <img
-                      src={selectedPost.attachment}
+                      src={selectedPost.attachment_url || selectedPost.attachment}
                       alt="Post attachment"
                       className="w-full rounded-lg object-cover"
                     />
@@ -432,21 +440,21 @@ export default function SocialBotTable({ posts }) {
                 )}
 
                 <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                  <p className="text-sm text-gray-700 text-start">{selectedPost.content}</p>
+                  <p className="text-sm text-gray-700 text-start">{selectedPost.tweet_text || selectedPost.content}</p>
                 </div>
 
                 <div className="flex space-x-6 text-sm text-gray-600 mb-4">
                   <div className="flex items-center">
                     <span className="mr-1">❤️</span>
-                    {selectedPost.metrics.likes}
+                    {selectedPost.metrics?.likes}
                   </div>
                   <div className="flex items-center">
                     <span className="mr-1">🔁</span>
-                    {selectedPost.metrics.retweets}
+                    {selectedPost.metrics?.retweets}
                   </div>
                   <div className="flex items-center">
                     <span className="mr-1">💬</span>
-                    {selectedPost.metrics.replies}
+                    {selectedPost.metrics?.replies}
                   </div>
                 </div>
 
@@ -480,7 +488,6 @@ export default function SocialBotTable({ posts }) {
         generated={replyGenerated}
         onClose={() => setReplyPost(null)}
         onSend={() => {
-          // your send logic here…
           setReplyPost(null);
         }}
       />
@@ -497,7 +504,6 @@ export default function SocialBotTable({ posts }) {
         }
         onClose={() => setQuotePost(null)}
         onSend={() => {
-          // send quoteGenerated + URL to API…
           setQuotePost(null);
         }}
       />
@@ -510,7 +516,6 @@ export default function SocialBotTable({ posts }) {
         generated={repostGenerated}
         onClose={() => setRepostPost(null)}
         onSend={() => {
-          // send repostGenerated to API…
           setRepostPost(null);
         }}
       />

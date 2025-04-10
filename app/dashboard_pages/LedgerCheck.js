@@ -34,7 +34,7 @@ const LedgerCheckDashboard = () => {
                 id="party-select"
                 value={selectedParty}
                 onChange={(e) => setSelectedParty(e.target.value)}
-                className="w-full p-2 bg-white dark:bg-gray-500 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 bg-white dark:bg-gray-500 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option>(B) B-198(CB)</option>
                 <option>Acme Corp</option>
@@ -45,7 +45,7 @@ const LedgerCheckDashboard = () => {
           </div>
           <button
             onClick={handleRunQuery}
-            className="w-full md:w-auto bg-blue-500 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
+            className="w-full md:w-auto bg-green-500 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
           >
             <Search className="mr-2" size={18} />
             Run Query for Party
@@ -59,7 +59,7 @@ const LedgerCheckDashboard = () => {
           <div className="bg-white dark:bg-gray-500 p-4 rounded-md shadow">
             <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Credit Days</div>
             <div className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-              <Calendar className="mr-2 text-blue-500" size={20} />
+              <Calendar className="mr-2 text-green-500" size={20} />
               15
             </div>
           </div>

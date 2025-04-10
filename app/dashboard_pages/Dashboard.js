@@ -103,7 +103,7 @@ const ContributionGraph = ({ data }) => {
       </div>
       
       {/* Added quote section */}
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
+      <div className="mt-4 p-3 bg-green-50 border border-green-100 rounded-md">
         <p className="text-sm text-gray-700 italic">{randomQuote.quote}</p>
         <p className="text-xs text-gray-500 mt-1 text-right">— {randomQuote.author}</p>
       </div>
@@ -164,7 +164,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
         <h3 className="text-xl font-bold">Marketing Milestones</h3>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 text-sm flex items-center"
+          className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 text-sm flex items-center"
         >
           <PlusCircle size={16} className="mr-1" /> Add Milestone
         </button>
@@ -178,7 +178,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
               <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Milestone title"
                 value={newMilestone.title}
                 onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
@@ -188,7 +188,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
               <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
               <input
                 type="date"
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                 value={newMilestone.date}
                 onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
               />
@@ -198,7 +198,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Describe your milestone"
               rows="2"
               value={newMilestone.description}
@@ -209,7 +209,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Impact</label>
             <textarea
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="What impact did this milestone have?"
               rows="2"
               value={newMilestone.impact}
@@ -226,7 +226,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
             </button>
             <button
               onClick={handleSubmit}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
             >
               Save Milestone
             </button>
@@ -244,7 +244,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
           <div className="space-y-6">
             {milestones.map((milestone, index) => (
               <div key={milestone.id} className="relative pl-10">
-                <div className="absolute left-2 top-1.5 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                <div className="absolute left-2 top-1.5 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
                   <Award size={12} className="text-white" />
                 </div>
                 <div className="bg-white p-4 rounded-lg border shadow-sm">
@@ -449,7 +449,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
         <div className="flex mb-2">
           <input
             type="text"
-            className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Add a new marketing task..."
             value={newTaskText}
             onChange={(e) => setNewTaskText(e.target.value)}
@@ -457,7 +457,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
           />
           <button
             onClick={handleAddTask}
-            className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
+            className="bg-green-500 text-white p-2 rounded-r-md hover:bg-green-600"
           >
             <PlusCircle size={20} />
           </button>
@@ -470,7 +470,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
               onClick={() => setSelectedCategory(category.toLowerCase())}
               className={`px-3 py-1 text-xs rounded-full ${
                 selectedCategory === category.toLowerCase()
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-green-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
@@ -522,7 +522,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
                       <div className="flex items-center">
                         <button
                           onClick={() => handleProofClick(task.id)}
-                          className="ml-2 text-blue-500 hover:text-blue-700"
+                          className="ml-2 text-green-500 hover:text-green-700"
                           title="Attach proof"
                         >
                           <Paperclip size={16} />
@@ -554,7 +554,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
                                     href={proof.url} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline truncate"
+                                    className="text-green-500 hover:underline truncate"
                                   >
                                     {proof.name}
                                   </a>
@@ -582,14 +582,14 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
                               <input
                                 type="text"
                                 placeholder="Add notes about this task..."
-                                className="flex-1 p-2 text-sm border rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="flex-1 p-2 text-sm border rounded-l focus:outline-none focus:ring-1 focus:ring-green-500"
                                 value={noteText}
                                 onChange={(e) => setNoteText(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleAddNotes(task.id)}
                               />
                               <button
                                 onClick={() => handleAddNotes(task.id)}
-                                className="bg-blue-500 text-white p-2 rounded-r hover:bg-blue-600"
+                                className="bg-green-500 text-white p-2 rounded-r hover:bg-green-600"
                               >
                                 <Send size={14} />
                               </button>
@@ -839,7 +839,7 @@ const handleTaskToggle = async (taskId) => {
           onClick={onClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg transition-all duration-200 hover:scale-105"
+          className="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white rounded-full w-14 h-14 shadow-lg transition-all duration-200 hover:scale-105"
         >
           <MessageCircle size={24} />
         </button>
@@ -900,7 +900,7 @@ const handleTaskToggle = async (taskId) => {
                 <div 
                   className={`max-w-xs px-4 py-2 rounded-lg ${
                     message.type === 'user' 
-                      ? 'bg-blue-500 text-white rounded-br-none' 
+                      ? 'bg-green-500 text-white rounded-br-none' 
                       : 'bg-gray-100 text-gray-800 rounded-bl-none'
                   }`}
                 >
@@ -916,14 +916,14 @@ const handleTaskToggle = async (taskId) => {
               <input
                 type="text"
                 placeholder="Ask about marketing strategies..."
-                className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
               <button
                 onClick={handleSendMessage}
-                className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
+                className="bg-green-500 text-white p-2 rounded-r-md hover:bg-green-600"
               >
                 <Send size={20} />
               </button>
@@ -937,7 +937,7 @@ const handleTaskToggle = async (taskId) => {
   return (
     <div className="bg-gray-100 min-h-screen p-4">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-2xl text-center mb-4 text-blue-800">
+        <h2 className="text-2xl text-center mb-4 text-green-800">
           Marketing Dashboard {currentProfile ? `for Profile: ${currentProfile.name}` : ''}
         </h2>
         
@@ -953,7 +953,7 @@ const handleTaskToggle = async (taskId) => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
             <div 
-              className="bg-blue-500 h-2.5 rounded-full" 
+              className="bg-green-500 h-2.5 rounded-full" 
               style={{ width: `${completionRate}%` }}
             ></div>
           </div>

@@ -599,7 +599,7 @@ export default function App() {
       case "Supply":
         return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium">Supply</span>;
       case "Withdraw":
-        return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs font-medium">Withdraw</span>;
+        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium">Withdraw</span>;
       case "Borrow":
         return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md text-xs font-medium">Borrow</span>;
       case "Repay":
@@ -635,11 +635,11 @@ export default function App() {
           placeholder="Enter Wallet Address" 
           value={wallet} 
           onChange={(e) => setWallet(e.target.value)} 
-          className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <button 
           onClick={fetchCTokens} 
-          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
         >
           Fetch cTokens
         </button>
@@ -709,7 +709,7 @@ export default function App() {
                             href={`https://etherscan.io/tx/${tx.hash}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline text-sm"
+                            className="text-green-600 hover:underline text-sm"
                           >
                             {tx.hash.substring(0, 6)}...{tx.hash.substring(tx.hash.length - 4)}
                           </a>
@@ -760,7 +760,7 @@ export default function App() {
                   <button 
                     onClick={loadMoreTransactions} 
                     disabled={isLoadingTx}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
                   >
                     {isLoadingTx ? 'Loading...' : 'Load More Transactions'}
                   </button>

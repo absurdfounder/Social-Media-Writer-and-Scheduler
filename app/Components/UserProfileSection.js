@@ -235,7 +235,7 @@ export const Login = () => {
         case 'lifetime':
           return 'bg-gray-500 text-white';
         case 'monthly':
-          return 'bg-blue-500 text-white';
+          return 'bg-green-500 text-white';
         default:
           return '';
       }

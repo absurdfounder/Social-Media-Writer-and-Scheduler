@@ -191,14 +191,14 @@ export const ProfileManager = ({ onProfileSelect }) => {
     <div className="mb-6">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2 p-2 px-6 bg-gray-50 border rounded-md">
-          <span className="items-center text-blue-600 flex gap-2">
+          <span className="items-center text-green-600 flex gap-2">
           <User className="h-4 w-4" />
             {profiles.find(p => p.id === currentProfileId)?.name || 'Select Profile'}
           </span>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="items-center flex gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
+          className="items-center flex gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200"
         >
           <UserPen className="h-4 w-4" /> Manage Profiles
         </button>
@@ -232,7 +232,7 @@ export const ProfileManager = ({ onProfileSelect }) => {
                     <div className="space-x-2">
                       <button
                         onClick={() => handleSwitchProfile(profile.id)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition duration-200"
                       >
                         Select
                       </button>
@@ -268,11 +268,11 @@ export const ProfileManager = ({ onProfileSelect }) => {
                     value={newProfileName}
                     onChange={(e) => setNewProfileName(e.target.value)}
                     placeholder="Enter profile name"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                   <button
                     onClick={editingProfile ? handleEditProfile : handleCreateProfile}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-200"
                   >
                     {editingProfile ? 'Save' : 'Create'}
                   </button>

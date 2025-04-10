@@ -202,9 +202,9 @@ export default function SocialBotTable({ posts }) {
   // Icon helpers
   const getPlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter': return <Twitter size={16} className="text-blue-400" />;
+      case 'twitter': return <Twitter size={16} className="text-green-400" />;
       case 'reddit': return <MessageCircle size={16} className="text-orange-500" />;
-      case 'facebook': return <Facebook size={16} className="text-blue-600" />;
+      case 'facebook': return <Facebook size={16} className="text-green-600" />;
       case 'discord': return <MessageSquare size={16} className="text-indigo-500" />;
       default: return <MessageCircle size={16} className="text-gray-500" />;
     }
@@ -212,9 +212,9 @@ export default function SocialBotTable({ posts }) {
 
   const getLargePlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter': return <Twitter size={20} className="text-blue-400" />;
+      case 'twitter': return <Twitter size={20} className="text-green-400" />;
       case 'reddit': return <MessageCircle size={20} className="text-orange-500" />;
-      case 'facebook': return <Facebook size={20} className="text-blue-600" />;
+      case 'facebook': return <Facebook size={20} className="text-green-600" />;
       case 'discord': return <MessageSquare size={20} className="text-indigo-500" />;
       default: return <MessageCircle size={20} className="text-gray-500" />;
     }

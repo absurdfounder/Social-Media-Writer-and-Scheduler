@@ -243,7 +243,7 @@ const ApiKeyManager = () => {
               <button
                   onClick={handleSaveKeys}
                   disabled={loading}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-green-300"
                 >
                   {loading ? 'Saving...' : 'Update Keys'}
                 </button>

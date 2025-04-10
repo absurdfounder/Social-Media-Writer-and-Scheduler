@@ -79,7 +79,7 @@ const BillingModal = ({ isOpen, onClose }) => {
 
           <div className="p-6">
             <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
+              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-green-700">
                 Choose Your Perfect Plan
               </h3>
               <p className="text-gray-600 mt-2">Unlock all features with our premium plans</p>
@@ -87,9 +87,9 @@ const BillingModal = ({ isOpen, onClose }) => {
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl m-auto">
               {plans.map((plan) => (
-                <div key={plan.name} className={`relative rounded-lg border p-6 ${plan.popular ? 'border-2 border-blue-500' : ''}`}>
+                <div key={plan.name} className={`relative rounded-lg border p-6 ${plan.popular ? 'border-2 border-green-500' : ''}`}>
                   {plan.popular && (
-                    <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
+                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
                       Popular
                     </div>
                   )}
@@ -109,13 +109,13 @@ const BillingModal = ({ isOpen, onClose }) => {
                   <ul className="space-y-3 mb-6">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2">
-                        <Check className="h-5 w-5 text-blue-500" />
+                        <Check className="h-5 w-5 text-green-500" />
                         <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
                   <button className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${plan.popular
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    ? 'bg-green-500 hover:bg-green-600 text-white'
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                     }`}>
                     Get Started
@@ -144,7 +144,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
         <div className="flex rounded-lg bg-gray-100 p-1">
           <button
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'feedback'
-              ? 'bg-white text-blue-600 shadow-sm'
+              ? 'bg-white text-green-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
               }`}
             onClick={() => setSelectedTab('feedback')}
@@ -153,7 +153,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
           </button>
           <button
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'call'
-              ? 'bg-white text-blue-600 shadow-sm'
+              ? 'bg-white text-green-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
               }`}
             onClick={() => setSelectedTab('call')}
@@ -177,8 +177,8 @@ const FeedbackModal = ({ isOpen, onClose }) => {
         ) : (
           <div className="space-y-6 p-4">
             <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100">
-                <calendar className="h-8 w-8 text-blue-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100">
+                <calendar className="h-8 w-8 text-green-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Schedule a 1-on-1 Call</h3>
@@ -207,7 +207,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
             </div>
             <button
               onClick={handleScheduleCall}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
+              className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition-colors"
             >
               Schedule Your Call
             </button>
@@ -277,11 +277,11 @@ const SubscriptionBanner = ({ onUpgrade }) => {
   }
 
   return (
-    <div className="text-sm text-blue-800 rounded-md border border-blue-300 p-2 flex justify-between bg-blue-50 text-center items-center max-w-7xl m-auto">
+    <div className="text-sm text-green-800 rounded-md border border-green-300 p-2 flex justify-between bg-green-50 text-center items-center max-w-7xl m-auto">
       <p>Trial period: <b>{trialStatus.daysLeft}</b> days remaining</p>
       <button
         onClick={onUpgrade}
-        className="ml-2 hover:text-blue-900 transition-colors font-bold bg-blue-200 p-2 rounded-md"
+        className="ml-2 hover:text-green-900 transition-colors font-bold bg-green-200 p-2 rounded-md"
       >
         Upgrade now
       </button>
@@ -293,7 +293,7 @@ const SubscriptionBanner = ({ onUpgrade }) => {
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 
-      ${active ? 'bg-blue-100 text-blue-500' : 'text-gray-500 hover:bg-gray-100'}`}
+      ${active ? 'bg-green-100 text-green-500' : 'text-gray-500 hover:bg-gray-100'}`}
     onClick={onClick}
   >
     <Icon className="mr-3 h-5 w-5" />
@@ -304,7 +304,7 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
 const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex flex-col items-center justify-center p-2 
-      ${active ? 'text-blue-500' : 'text-gray-500'}`}
+      ${active ? 'text-green-500' : 'text-gray-500'}`}
     onClick={onClick}
   >
     <Icon size={20} />
@@ -515,7 +515,7 @@ export default function Dashboard() {
                     onClick={() => handleNavItemClick(item.id)}
                     className={`flex flex-col items-center justify-center p-4 rounded-lg border
                       ${activeTab === item.id
-                        ? 'bg-blue-50 text-blue-600 border-blue-200'
+                        ? 'bg-green-50 text-green-600 border-green-200'
                         : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
                   >
                     <item.icon className="h-6 w-6 mb-2" />
@@ -540,7 +540,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your workspace...</p>
         </div>
       </div>
@@ -582,8 +582,8 @@ export default function Dashboard() {
             <button
               className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center
                 ${activeTab === 'dashboard'
-                  ? 'bg-blue-500 text-white hover:bg-blue-600'
-                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+                  ? 'bg-green-500 text-white hover:bg-green-600'
+                  : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
               onClick={() => handleNavItemClick('dashboard')}
             >
               <HandMetal className="mr-2 h-5 w-5" />

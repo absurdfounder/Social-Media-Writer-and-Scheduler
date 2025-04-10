@@ -107,13 +107,13 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-gradient-to-br from-blue-100 via-white to-indigo-100 text-gray-800 rounded-xl shadow-lg w-full max-w-6xl my-4 pb-6"
+            className="bg-gradient-to-br from-green-100 via-white to-indigo-100 text-gray-800 rounded-xl shadow-lg w-full max-w-6xl my-4 pb-6"
             onClick={handleContentClick}
           >
             <div className="px-3 sm:px-6 py-2 text-center space-y-4">
-              <div className="flex justify-between items-center mb-4 sm:mb-8 pt-4">
+              <div className="flex justify-between items-center mb-4 sm:mb-8 pt-6 mt-8">
                 <div className="flex items-center space-x-2 w-full">
-                  <img src="/logo.png" alt="Big Mouth AI" className="w-fit h-10 sm:h-16 m-auto" />
+                  <img src="/logo.png" alt="Big Mouth AI" className="h-18 w-fit m-auto" />
                 </div>
                 {user && (
                   <button
@@ -132,12 +132,12 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     style={{ lineHeight: "1.3" }}
                   >
                     <span>
-                      Get <b className="text-blue-500">more customers</b> from
+                      Get <b className="text-green-500">more customers</b> from
                     </span>
                     <br />
                   </h2>
                   <div className="flex flex-wrap justify-center gap-2 md:gap-4 mt-4">
-                    <span className="font-bold text-blue-400 bg-blue-100 border-blue-400 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
+                    <span className="font-bold text-gray-800 bg-gray-100 border-gray-400 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/X_logo.jpg/768px-X_logo.jpg"
                         alt="X logo"
@@ -145,6 +145,15 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       />
                       X
                     </span>
+                    <span className="font-bold text-blue-800 bg-blue-50 border-blue-400 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/960px-LinkedIn_logo_initials.png"
+                        alt="LinkedIn logo"
+                        className="w-5 h-5 sm:w-8 sm:h-8 rounded-lg mr-1 sm:mr-2"
+                      />
+                      LinkedIn
+                    </span>
+
                     <span className="font-bold text-pink-500 bg-pink-100 border-pink-500 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/1200px-Instagram_icon.png"
@@ -171,7 +180,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     </span>
                   </div>
                   <h2 className="mt-4 text-center text-slate-700 max-w-2xl mx-auto text-xl sm:text-2xl md:text-4xl mb-3 sm:mb-6 px-2">
-                    using <b className="text-blue-500">AI trained</b> on <b className="text-blue-500">your brand</b>.
+                    using <b className="text-green-500">AI trained</b> on <b className="text-green-500">your brand</b>.
                   </h2>
                 </section>
 
@@ -235,33 +244,33 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
             </div>
 
             <div className="px-3 sm:px-6 max-w-6xl mx-auto mt-8 sm:mt-16">
-              <h3 className="my-3 font-medium text-2xl sm:text-4xl text-center"><strong>BUT</strong>... Creating Viral Content Is <span className="pt-1 text-blue-600 border-b-2 border-blue-500 font-semibold">Hard</span></h3>
+              <h3 className="my-3 font-medium text-2xl sm:text-4xl text-center"><strong>BUT</strong>... Creating Viral Content Is <span className="pt-1 text-green-600 border-b-2 border-green-500 font-semibold">Hard</span></h3>
               <div className="max-w-xl mx-auto mt-6 sm:mt-10 space-y-3 leading-6 text-gray-800 text-sm sm:text-base md:text-xl">
                 <ul className="space-y-6 sm:space-y-8">
                   <li className="flex items-start justify-start leading-normal text-left sm:leading-7 md:leading-10 relative">
-                    <span className="relative top-1 inline-flex flex-shrink-0 text-blue-700 items-center justify-center size-7 sm:size-9 mr-2 sm:mr-3 text-[14px] sm:text-[16px] bg-blue-50 border-2 border-blue-500/50 rounded-full">
+                    <span className="relative top-1 inline-flex flex-shrink-0 text-green-700 items-center justify-center size-7 sm:size-9 mr-2 sm:mr-3 text-[14px] sm:text-[16px] bg-green-50 border-2 border-green-500/50 rounded-full">
                       <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                     </span>
                     <span className="text-sm sm:text-base">
-                      Creating consistent, high-quality content across multiple platforms takes hours each day. Most creators spend <span className="border-b-4 border-blue-200 pb-0.5">20+ hours per week</span> just on content creation. Our AI helps you create a weeks worth of content in minutes.
+                      Creating consistent, high-quality content across multiple platforms takes hours each day. Most creators spend <span className="border-b-4 border-green-200 pb-0.5">20+ hours per week</span> just on content creation. Our AI helps you create a weeks worth of content in minutes.
                     </span>
                   </li>
 
                   <li className="flex items-start justify-start leading-normal text-left sm:leading-7 md:leading-10 relative">
-                    <span className="relative top-0.5 inline-flex flex-shrink-0 text-blue-700 items-center justify-center size-7 sm:size-9 mr-2 sm:mr-3 text-[14px] sm:text-[16px] bg-blue-50 border-2 border-blue-500/50 rounded-full">
+                    <span className="relative top-0.5 inline-flex flex-shrink-0 text-green-700 items-center justify-center size-7 sm:size-9 mr-2 sm:mr-3 text-[14px] sm:text-[16px] bg-green-50 border-2 border-green-500/50 rounded-full">
                       <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                     </span>
                     <span className="text-sm sm:text-base">
-                      It is challenging to maintain your authentic voice while scaling content. Most AI tools produce <span className="border-b-4 border-blue-200 pb-0.5">generic, robotic content</span>. Our AI learns your unique style and voice to create content that truly sounds like you.
+                      It is challenging to maintain your authentic voice while scaling content. Most AI tools produce <span className="border-b-4 border-green-200 pb-0.5">generic, robotic content</span>. Our AI learns your unique style and voice to create content that truly sounds like you.
                     </span>
                   </li>
 
                   <li className="flex items-start justify-start leading-normal text-left sm:leading-7 md:leading-10 relative">
-                    <span className="relative top-0.5 inline-flex flex-shrink-0 text-blue-700 items-center justify-center size-7 sm:size-9 mr-2 sm:mr-3 text-[14px] sm:text-[16px] bg-blue-50 border-2 border-blue-500/50 rounded-full">
+                    <span className="relative top-0.5 inline-flex flex-shrink-0 text-green-700 items-center justify-center size-7 sm:size-9 mr-2 sm:mr-3 text-[14px] sm:text-[16px] bg-green-50 border-2 border-green-500/50 rounded-full">
                       <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                     </span>
                     <span className="text-sm sm:text-base">
-                      Keeping up with trends and maintaining engagement is <span className="border-b-4 border-blue-200 pb-0.5">exhausting and time-consuming</span>. Our AI analyzes trending content in your niche and helps you create posts that resonate with your audience.
+                      Keeping up with trends and maintaining engagement is <span className="border-b-4 border-green-200 pb-0.5">exhausting and time-consuming</span>. Our AI analyzes trending content in your niche and helps you create posts that resonate with your audience.
                     </span>
                   </li>
 
@@ -271,11 +280,11 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                         Let
                         <span className="inline-flex">
                           <span className="font-semibold text-gray-800 flex justify-center items-center logo mx-2">
-                            Big Mouth <span className="text-blue-500"> AI</span>
+                            Big Mouth <span className="text-green-500"> AI</span>
                           </span>
                         </span>
                         do the <br className="sm:hidden" />
-                        <span className="text-blue-500">work for you</span>
+                        <span className="text-green-500">work for you</span>
                       </strong>
                       .
                     </span>
@@ -291,7 +300,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Write posts on X & BlueSky <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">in your authentic voice</span>
+                          Write posts on X & BlueSky <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-green-200">in your authentic voice</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Stop spending hours brainstorming. Our AI learns your unique writing style, tone, and expertise to generate posts that sound exactly like you. Keep your content consistent while saving hours every week.
@@ -308,7 +317,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-blue-200">
+                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-green-200">
                       <div className="w-full">
                         <img alt="AI Writing Assistant" loading="lazy" width="80" height="100" decoding="async" data-nimg="1" className="w-full rounded" src="/assets/ai-writing.png" />
                       </div>
@@ -319,7 +328,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Create viral TikTok & IG videos that <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">captures attention</span>
+                          Create viral TikTok & IG videos that <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-green-200">captures attention</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Transform your expertise into engaging short-form videos. Our AI analyzes trending content in your niche and helps you create scripts that hook viewers in the first 3 seconds and keep them watching till the end.
@@ -336,7 +345,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-blue-200">
+                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-green-200">
                       <div className="w-full">
                         <img alt="Video Content Creation" loading="lazy" width="80" height="100" decoding="async" data-nimg="1" className="w-full rounded" src="/assets/video-content.png" />
                       </div>
@@ -347,7 +356,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Turn Reddit discussions into <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">traffic & leads.</span>
+                          Turn Reddit discussions into <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-green-200">traffic & leads.</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Never run out of content ideas. Our AI helps you discover trending discussions in your niche and create valuable responses that establish your expertise. Turn real user questions into content that resonates.
@@ -364,7 +373,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-blue-200">
+                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-green-200">
                       <div className="w-full">
                         <img alt="Content Discovery" loading="lazy" width="80" height="100" decoding="async" data-nimg="1" className="w-full rounded" src="/assets/content-discovery.png" />
                       </div>
@@ -375,7 +384,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Build your content strategy like a <span className="font-source-serif-4 font-normal text-blue-600 border-b-4 border-blue-200">pro creator</span>
+                          Build your content strategy like a <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-green-200">pro creator</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Get a birds-eye view of your content strategy. Our AI helps you plan, schedule, and optimize content across all platforms while maintaining your unique voice and expertise in every post.
@@ -392,7 +401,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-blue-200">
+                    <div className="flex justify-center sm:justify-start mt-2 sm:mt-6 md:w-1/2 w-full rounded bg-green-200">
                       <div className="w-full">
                         <img alt="Content Strategy" loading="lazy" width="80" height="100" decoding="async" data-nimg="1" className="w-full rounded" src="/assets/content-strategy.png" />
                       </div>
@@ -402,7 +411,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   <section>
                     <div className="p-2 sm:p-6">
                       <div className="text-center mb-4 sm:mb-8">
-                        <h3 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
+                        <h3 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-green-700">
                           Choose Your Growth Plan
                         </h3>
                         <p className="text-sm sm:text-base text-gray-600 mt-2">Start creating viral content today</p>
@@ -413,10 +422,10 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                           <div
                             key={plan.name}
                             className={`relative rounded-lg border p-4 sm:p-6 transition-all hover:shadow-lg bg-white
-                                 ${plan.popular ? 'border-2 border-blue-500' : ''}`}
+                                 ${plan.popular ? 'border-2 border-green-500' : ''}`}
                           >
                             {plan.popular && (
-                              <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+                              <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-1 bg-gradient-to-r from-green-500 to-green-700 text-white px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
                                 <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
                                 <span className="text-xs sm:text-sm font-medium">Most Popular</span>
                               </div>
@@ -425,7 +434,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                             <div className="mb-3 sm:mb-4">
                               <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-1 sm:gap-2">
                                 {plan.name}
-                                <Infinity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
+                                <Infinity className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                               </h3>
                               <p className="text-xs sm:text-sm text-gray-500">{plan.description}</p>
                             </div>
@@ -438,8 +447,8 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                             <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                               {plan.features.map((feature) => (
                                 <li key={feature} className="flex items-center gap-1 sm:gap-2">
-                                  <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <Check className="h-2 w-2 sm:h-3 sm:w-3 text-blue-600" />
+                                  <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-green-100 flex items-center justify-center">
+                                    <Check className="h-2 w-2 sm:h-3 sm:w-3 text-green-600" />
                                   </div>
                                   <span className="text-xs sm:text-sm">{feature}</span>
                                 </li>
@@ -449,8 +458,8 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                             <button
                               className={`w-full py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg text-sm sm:text-base font-medium transition-colors
                                   ${plan.popular
-                                  ? 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white'
-                                  : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
+                                  ? 'bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white'
+                                  : 'bg-green-100 hover:bg-green-200 text-green-700'}`}
                             >
                               Get Started
                             </button>

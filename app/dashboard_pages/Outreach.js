@@ -138,7 +138,7 @@ const OutreachAgent = () => {
     switch (apiKeyStatus) {
       case 'validating':
         return (
-          <div className="flex items-center gap-2 text-blue-500 text-xs sm:text-sm">
+          <div className="flex items-center gap-2 text-green-500 text-xs sm:text-sm">
             <Loader size={20} className="animate-spin" />
             Please wait validating API key...
           </div>
@@ -433,7 +433,7 @@ const generateMessage = async () => {
         <div className='bg-white rounded-md p-2 sm:p-4'>
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
             <div className='grid gap-2'>
-              <h1 className="text-lg sm:text-xl font-bold text-blue-500 mb-2 sm:mb-0">Outreach Message Generator</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-green-500 mb-2 sm:mb-0">Outreach Message Generator</h1>
               {getStatusMessage()}
             </div>
           </div>
@@ -445,7 +445,7 @@ const generateMessage = async () => {
               <button
                 onClick={() => setPlatform('twitter')}
                 className={`flex items-center px-4 py-2 rounded-md ${
-                  platform === 'twitter' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
+                  platform === 'twitter' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 <AtSign size={16} className="mr-2" /> Twitter/X
@@ -453,7 +453,7 @@ const generateMessage = async () => {
               <button
                 onClick={() => setPlatform('linkedin')}
                 className={`flex items-center px-4 py-2 rounded-md ${
-                  platform === 'linkedin' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
+                  platform === 'linkedin' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 <Linkedin size={16} className="mr-2" /> LinkedIn
@@ -461,7 +461,7 @@ const generateMessage = async () => {
               <button
                 onClick={() => setPlatform('email')}
                 className={`flex items-center px-4 py-2 rounded-md ${
-                  platform === 'email' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
+                  platform === 'email' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 <Mail size={16} className="mr-2" /> Email
@@ -536,7 +536,7 @@ const generateMessage = async () => {
               <User size={16} className="mr-2" /> Recipient Context
             </label>
             <textarea
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-green-50"
               value={userContext}
               onChange={(e) => setUserContext(e.target.value)}
               placeholder="Paste information about the recipient here (profile bio, recent posts, articles, etc.)"
@@ -577,7 +577,7 @@ const generateMessage = async () => {
                       id="includeNotes"
                       checked={includeNotesInGeneration}
                       onChange={(e) => setIncludeNotesInGeneration(e.target.checked)}
-                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                     />
                     <label htmlFor="includeNotes" className="text-sm text-gray-700">
                       Use notes as additional instructions for message generation
@@ -603,7 +603,7 @@ const generateMessage = async () => {
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
             <button
               onClick={() => setIsTrainingPopupOpen(true)}
-              className="flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
+              className="flex items-center gap-2 bg-green-100 text-green-600 px-4 py-2 rounded-md"
             >
               <Database size={16} /> Select Profile
             </button>
@@ -618,7 +618,7 @@ const generateMessage = async () => {
             <div className="flex justify-end">
               {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
                 <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2"
+                  className="bg-green-500 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2"
                   onClick={generateMessage}
                   disabled={isGenerating || apiKeyStatus === 'validating' || !userContext.trim()}
                 >
@@ -669,11 +669,11 @@ const generateMessage = async () => {
                           }}
                           className={`p-3 rounded-md cursor-pointer flex items-center ${
                             selectedProfile === profile.id 
-                              ? 'bg-blue-100 border border-blue-300' 
+                              ? 'bg-green-100 border border-green-300' 
                               : 'bg-gray-50 hover:bg-gray-100'
                           }`}
                         >
-                          <User size={18} className="mr-2 text-blue-500" />
+                          <User size={18} className="mr-2 text-green-500" />
                           <div>
                             <div className="font-medium">{profile.name}</div>
                             {profile.description && (
@@ -689,7 +689,7 @@ const generateMessage = async () => {
                 <div className="flex justify-end">
                   <button
                     onClick={() => setIsTrainingPopupOpen(false)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    className="bg-green-500 text-white px-4 py-2 rounded-md"
                   >
                     Close
                   </button>
@@ -710,7 +710,7 @@ const generateMessage = async () => {
                 </div>
                 <button
                   onClick={copyToClipboard}
-                  className="text-gray-500 hover:text-blue-500"
+                  className="text-gray-500 hover:text-green-500"
                   title="Copy to clipboard"
                 >
                   {copied ? <Check size={16} /> : <Copy size={16} />}

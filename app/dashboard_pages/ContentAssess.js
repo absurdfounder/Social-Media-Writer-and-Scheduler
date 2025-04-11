@@ -1,7 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Check, Settings, Zap } from 'lucide-react';
+import { 
+  Check, 
+  Settings, 
+  Twitter, 
+  MessageCircle, 
+  Send, 
+  Discord, 
+  Filter, 
+  EyeOff, 
+  Code, 
+  Trash2, 
+  Layers 
+} from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
 export default function PostExtractor() {
@@ -381,19 +393,87 @@ export default function PostExtractor() {
     }
   };
 
+  // Get the icon based on platform type
+  const getPlatformIcon = (type) => {
+    switch(type) {
+      case "twitter": return <Twitter size={18} />;
+      case "reddit": return <MessageCircle size={18} />;
+      case "telegram": return <Send size={18} />;
+      case "discord": return <Discord size={18} />;
+      default: return <MessageCircle size={18} />;
+    }
+  };
+
+  const clearAllPosts = () => {
+    setPosts([]);
+    seenKeys.current.clear();
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto my-6 px-4 sm:px-6 md:my-10">
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <div className="flex items-center bg-gray-50 p-2 rounded-full">
-            <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
-              <Check size={16} className="mr-1 hidden sm:inline" />
-              <span className="truncate">Connected</span>
-            </span>
-            <button className="p-1 sm:p-2 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
-              <Settings size={16} className="text-slate-700" />
+          <div className="flex items-center">
+            <h2 className="text-xl font-bold text-gray-800 mr-4">Social Post Extractor</h2>
+            <div className="flex items-center bg-gray-50 p-2 rounded-full">
+              <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
+                <Check size={16} className="mr-1 hidden sm:inline" />
+                <span className="truncate">Connected</span>
+              </span>
+              <button 
+                className="p-1 sm:p-2 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                title="Settings"
+              >
+                <Settings size={16} className="text-slate-700" />
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex space-x-2">
+            <button
+              onClick={() => toggleActive('button3')}
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                activeStates.button3 
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <div className="flex items-center">
+                <Layers size={16} className="mr-2" />
+                Track Posts
+              </div>
             </button>
+            
+            <button
+              onClick={clearAllPosts}
+              className="px-3 py-2 rounded-md text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              <div className="flex items-center">
+                <Trash2 size={16} className="mr-2" />
+                Clear All
+              </div>
+            </button>
+          </div>
+        </div>
+        
+        {/* Platform Selection */}
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
+            {["twitter", "reddit", "telegram", "discord"].map((platform) => (
+              <button
+                key={platform}
+                onClick={() => setPostType(platform)}
+                className={`px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors ${
+                  postType === platform
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {getPlatformIcon(platform)}
+                <span className="ml-2 capitalize">{platform}</span>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -404,47 +484,88 @@ export default function PostExtractor() {
           </div>
         )}
 
+        {/* HTML Input Area */}
+        <div className="mb-6">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div>
+              <label htmlFor="rawHTML" className="block text-sm font-medium text-gray-700 mb-1">
+                Paste Post HTML
+              </label>
+              <textarea
+                id="rawHTML"
+                value={rawHTML}
+                onChange={(e) => setRawHTML(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                rows="4"
+                placeholder={`Paste ${postType} post HTML here...`}
+              />
+            </div>
+            <div>
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+              >
+                Extract Data
+              </button>
+            </div>
+          </form>
+        </div>
+
         {/* Extracted Data JSON Toggle */}
-        {extractedData && (
-          <div className="mb-6">
-            <div className="flex justify-between">
+        <div className="mb-6">
+          <div className="flex justify-between items-center">
+            {extractedData && (
               <button
                 onClick={() => setShowExtractedJSON(!showExtractedJSON)}
-                className="mb-2 text-indigo-600 hover:underline text-sm"
+                className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
               >
-                {showExtractedJSON ? "Hide" : "Show"} Extracted Data JSON
+                <Code size={16} className="mr-1" />
+                {showExtractedJSON ? "Hide" : "Show"} Extracted JSON
               </button>
-              <label className="flex items-center space-x-2 mb-4">
-                <input
-                  type="checkbox"
-                  checked={hideDuplicates}
-                  onChange={() => setHideDuplicates(!hideDuplicates)}
-                  className="form-checkbox"
-                />
-                <span className="text-sm">Hide duplicates</span>
-              </label>
-            </div>
-            {showExtractedJSON && (
-              <div className="bg-gray-100 p-3 rounded overflow-x-auto">
-                <pre className="text-xs whitespace-pre-wrap">
-                  {JSON.stringify(extractedData, null, 2)}
-                </pre>
-              </div>
             )}
+            
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={hideDuplicates}
+                onChange={() => setHideDuplicates(!hideDuplicates)}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <span className="text-sm flex items-center">
+                <EyeOff size={14} className="mr-1" />
+                Hide duplicates
+              </span>
+            </label>
           </div>
-        )}
+          
+          {showExtractedJSON && extractedData && (
+            <div className="mt-3 bg-gray-100 p-3 rounded overflow-x-auto border border-gray-200">
+              <pre className="text-xs whitespace-pre-wrap">
+                {JSON.stringify(extractedData, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
 
         {/* Table */}
-        <div className="overflow-auto max-h-[60vh] border">
-          <SocialBotTable
-            posts={
-              hideDuplicates
-                ? posts.filter((post, idx, arr) =>
-                    arr.findIndex(p => p.key === post.key) === idx
-                  )
-                : posts
-            }
-          />
+        <div className="overflow-auto border rounded-lg shadow-sm">
+          <div className="flex justify-between items-center p-3 bg-gray-50 border-b">
+            <h3 className="font-medium text-gray-700 flex items-center">
+              <Filter size={16} className="mr-2" />
+              Extracted Posts ({posts.length})
+            </h3>
+          </div>
+          <div className="max-h-[60vh] overflow-auto">
+            <SocialBotTable
+              posts={
+                hideDuplicates
+                  ? posts.filter((post, idx, arr) =>
+                      arr.findIndex(p => p.key === post.key) === idx
+                    )
+                  : posts
+              }
+            />
+          </div>
         </div>
       </div>
     </div>

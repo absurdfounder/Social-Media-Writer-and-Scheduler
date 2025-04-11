@@ -104,7 +104,7 @@ const EmbedContent = ({ url }) => {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-500 hover:text-green-700 break-all"
+              className="text-slate-500 hover:text-slate-700 break-all"
             >
               {url}
             </a>
@@ -233,10 +233,10 @@ const TagSummary = ({ tags, selectedTags, onTagClick }) => {
             onClick={() => onTagClick(tag)}
             className={`px-3 py-1 rounded-full text-sm flex items-center transition-colors
               ${selectedTags.includes(tag) 
-                ? 'bg-green-500 text-white' 
-                : 'bg-green-100 text-green-800 hover:bg-green-200'}`}
+                ? 'bg-green-600 text-white' 
+                : 'bg-slate-300 text-slate-800 hover:bg-slate-200'}`}
           >
-            {tag} <span className={`ml-2 ${selectedTags.includes(tag) ? 'bg-green-400' : 'bg-green-200'} rounded-full px-2`}>{count}</span>
+            {tag} <span className={`ml-2 ${selectedTags.includes(tag) ? 'bg-slate-400' : 'bg-slate-200'} rounded-full px-2`}>{count}</span>
           </button>
         ))}
       </div>
@@ -268,16 +268,16 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
   return (
     <div className="flex flex-wrap gap-2 mt-2 items-center">
       {tags.map((tag, index) => (
-        <span key={index} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center">
+        <span key={index} className="px-2 py-1 bg-slate-300 text-slate-800 rounded-full text-sm flex items-center">
           {editingIndex === index ? (
             <>
               <input
                 type="text"
                 value={editingTag}
                 onChange={(e) => setEditingTag(e.target.value)}
-                className="px-1 py-0 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-green-300"
+                className="px-1 py-0 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-slate-300"
               />
-              <button onClick={() => handleEditTag(index)} className="ml-1 text-green-500">
+              <button onClick={() => handleEditTag(index)} className="ml-1 text-slate-500">
                 <Check size={12} />
               </button>
               <button onClick={() => setEditingIndex(null)} className="ml-1 text-red-500">
@@ -287,7 +287,7 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
           ) : (
             <>
               {tag}
-              <button onClick={() => { setEditingIndex(index); setEditingTag(tag); }} className="ml-1 text-green-500">
+              <button onClick={() => { setEditingIndex(index); setEditingTag(tag); }} className="ml-1 text-slate-500">
                 <Pencil size={12} />
               </button>
               <button onClick={() => onDeleteTag(index)} className="ml-1 text-red-500">
@@ -303,12 +303,12 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
             type="text"
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
-            className="px-2 py-1 text-sm border rounded-l-full focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="px-2 py-1 text-sm border rounded-l-full focus:outline-none focus:ring-2 focus:ring-slate-300"
             placeholder="New tag"
           />
           <button
             onClick={handleAddTag}
-            className="px-2 py-1 bg-green-500 text-white rounded-r-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="px-2 py-1 bg-green-600 text-white rounded-r-full hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-300"
           >
             <Check size={16} />
           </button>
@@ -316,7 +316,7 @@ const TagList = ({ tags, onAddTag, onEditTag, onDeleteTag }) => {
       ) : (
         <button
           onClick={() => setIsAdding(true)}
-          className="p-1 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300"
+          className="p-1 bg-green-600 text-white rounded-full hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-300"
         >
           <Plus size={16} />
         </button>
@@ -356,7 +356,7 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
           />
           <div className="flex justify-end mt-2 space-x-2">
             <button
-              className="p-1 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300"
+              className="p-1 rounded-full bg-green-600 text-white hover:bg-slate-600 transition-colors duration-300"
               onClick={handleSave}
             >
               <Check size={16} />
@@ -373,7 +373,7 @@ const PostItNote = ({ note, onEdit, onSave, onCancel }) => {
         <div>
           <p className="text-gray-800 font-handwriting">{note || "No note added yet."}</p>
           <button
-            className="mt-2 p-1 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300"
+            className="mt-2 p-1 rounded-full bg-green-600 text-white hover:bg-slate-600 transition-colors duration-300"
             onClick={() => setIsEditing(true)}
           >
             <Pencil size={16} />
@@ -412,12 +412,12 @@ const AddContentForm = ({ onAdd }) => {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Enter URL to embed (Twitter, Instagram, YouTube, Vimeo, Images, etc.)"
-          className="flex-grow px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-300"
+          className="flex-grow px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
           disabled={isLoading}
         />
         <button
           type="submit"
-          className={`px-4 py-2 bg-green-500 text-white rounded-r-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 ${
+          className={`px-4 py-2 bg-green-600 text-white rounded-r-lg hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-300 ${
             isLoading ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           disabled={isLoading}
@@ -685,7 +685,7 @@ const ContentGrid = () => {
         
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-500"></div>
           </div>
         ) : (
           <Droppable droppableId="content-list">

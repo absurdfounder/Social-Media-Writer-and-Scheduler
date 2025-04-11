@@ -54,7 +54,7 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-green-500 hover:underline',
+          class: 'text-slate-500 hover:underline',
         },
       }),
       Image.configure({
@@ -137,7 +137,7 @@ const LinkPreview = ({ url }) => {
       <div className="p-2">
         <h3 className="font-bold">{preview.title}</h3>
         <p className="text-sm text-gray-500">{preview.description}</p>
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:underline text-sm">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:underline text-sm">
           {url}
         </a>
       </div>
@@ -366,7 +366,7 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     switch (apiKeyStatus) {
       case 'validating':
         return (
-          <div className="flex items-center gap-2 text-green-500 text-xs sm:text-sm">
+          <div className="flex items-center gap-2 text-slate-500 text-xs sm:text-sm">
             <Loader size={20} className="animate-spin" />
             Please wait validating API key...
           </div>
@@ -974,7 +974,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
         <div className='bg-white rounded-md p-2 sm:p-4'>
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4'>
             <div className='grid gap-2'>
-              <h1 className="text-lg sm:text-xl font-bold text-green-500 mb-2 sm:mb-0">What is this update about?</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-slate-500 mb-2 sm:mb-0">What is this update about?</h1>
               {!apikeyAdded ? (
                 <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'>
                   <InfoIcon size={20} />
@@ -989,33 +989,33 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                   setMode('share');
                   playSound(toggleSound);
                 }}
-                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${mode === 'share'
-                  ? 'text-white bg-green-500'
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 ${mode === 'share'
+                  ? 'text-white bg-green-600'
                   : 'text-gray-500 hover:text-gray-500'
                   }`}
                 aria-pressed={mode === 'share'}
               >
                 <span className="relative z-10">Share</span>
-                {mode === 'share' && <span className="absolute inset-0 rounded-full bg-green-500 animate-fadeIn" />}
+                {mode === 'share' && <span className="absolute inset-0 rounded-full bg-green-600 animate-fadeIn" />}
               </button>
               <button
                 onClick={() => {
                   setMode('reply');
                   playSound(toggleSound);
                 }}
-                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${mode === 'reply'
-                  ? 'text-white bg-green-500'
+                className={`relative px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 ${mode === 'reply'
+                  ? 'text-white bg-green-600'
                   : 'text-gray-500 hover:text-gray-500'
                   }`}
                 aria-pressed={mode === 'reply'}
               >
                 <span className="relative z-10">Reply</span>
-                {mode === 'reply' && <span className="absolute inset-0 rounded-full bg-green-500 animate-fadeIn" />}
+                {mode === 'reply' && <span className="absolute inset-0 rounded-full bg-green-600 animate-fadeIn" />}
               </button>
             </div>
           </div>
           <textarea
-            className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-green-50 text-green-900 text-sm sm:text-base'
+            className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-slate-50 text-slate-900 text-sm sm:text-base'
             value={overallPrompt}
             onChange={(e) => setOverallPrompt(e.target.value)}
             placeholder={mode === 'share' ? "I need to share an update with the community.." : "I want to reply to..."}
@@ -1107,7 +1107,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
             <div className="flex items-center gap-2">
 
               <button
-                className='flex gap-2 bg-green-100 text-green-600 p-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm'
+                className='flex gap-2 bg-slate-100 text-slate-600 p-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm'
                 onClick={() => setIsTrainingPopupOpen(true)}
               >
                 Training Data
@@ -1115,7 +1115,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
 
               {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
                 <button
-                  className="bg-green-500 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-green-900 text-xs sm:text-sm"
+                  className="bg-green-600 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-slate-900 text-xs sm:text-sm"
                   onClick={generateAIThread}
                   disabled={isGenerating || apiKeyStatus === 'validating'}
                 >
@@ -1163,11 +1163,11 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                             setIsTrainingPopupOpen(false);
                           }}
                           className={`p-3 rounded-md cursor-pointer flex items-center ${selectedProfile === profile.id
-                              ? 'bg-green-100 border border-green-300'
+                              ? 'bg-slate-100 border border-slate-300'
                               : 'bg-gray-50 hover:bg-gray-100'
                             }`}
                         >
-                          <User size={18} className="mr-2 text-green-500" />
+                          <User size={18} className="mr-2 text-slate-500" />
                           <div className="flex-1">
                             <div className="font-medium">{profile.name || "Unnamed Profile"}</div>
                             {profile.description && (
@@ -1181,7 +1181,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                     <div className="text-center p-4 bg-gray-100 rounded-md">
                       <p className="text-gray-500">No profiles found. Please create a profile first.</p>
                       <button
-                        className="mt-2 text-sm text-green-500 hover:underline"
+                        className="mt-2 text-sm text-slate-500 hover:underline"
                         onClick={() => {
                           // You can add navigation to profile manager here
                           setIsTrainingPopupOpen(false);
@@ -1210,7 +1210,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                   )}
                   <button
                     onClick={() => setIsTrainingPopupOpen(false)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-md"
+                    className="bg-green-600 text-white px-4 py-2 rounded-md"
                   >
                     Close
                   </button>
@@ -1221,11 +1221,11 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
 
         </div>
       </div>
-      <div className='bg-green-200 p-2 sm:p-4 rounded-md'>
+      <div className='bg-slate-200 p-2 sm:p-4 rounded-md'>
         <div className="max-w-full sm:max-w-xl mx-auto border shadow-lg rounded-lg mb-4 sm:mb-8 bg-white">
           {tweets.map((tweet, index) => (
             <div key={tweet.key} className="relative border-b border-gray-200 last:border-b-0">
-              <div className="absolute left-0 top-0 -ml-4 sm:-ml-6 mt-2 text-xs font-bold text-green-500">
+              <div className="absolute left-0 top-0 -ml-4 sm:-ml-6 mt-2 text-xs font-bold text-slate-500">
                 {index + 1}
               </div>
               <div className="p-2 sm:p-4">
@@ -1266,7 +1266,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
           <div className="p-2 sm:p-4">
             <button
               onClick={addNewTweet}
-              className="flex items-center text-green-500 hover:text-green-500 text-xs sm:text-sm gap-4"
+              className="flex items-center text-slate-500 hover:text-slate-500 text-xs sm:text-sm gap-4"
             >
               <PlusCircle size={14} className="mr-1" />
               Add another tweet

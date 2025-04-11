@@ -38,7 +38,7 @@ const CollectionReport = () => {
 
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-2">
-          <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500 transition-colors duration-200">
+          <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-600 transition-colors duration-200">
             <Download className="w-4 h-4 inline mr-2" />
             Export
           </button>
@@ -51,7 +51,7 @@ const CollectionReport = () => {
           <input
             type="text"
             placeholder="Search parties..."
-            className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-500 dark:text-white"
+            className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 dark:bg-gray-500 dark:text-white"
           />
           <svg className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -61,12 +61,12 @@ const CollectionReport = () => {
 
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-green-100 dark:bg-green-900">
+          <thead className="bg-slate-100 dark:bg-slate-900">
             <tr>
               {['Credit Days', 'Party Name', 'Due', 'OverDue', 'Total'].map((header, index) => (
                 <th 
                   key={index}
-                  className="px-4 py-3 text-xs font-medium text-green-800 dark:text-green-200 uppercase tracking-wider cursor-pointer"
+                  className="px-4 py-3 text-xs font-medium text-slate-800 dark:text-slate-200 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort(header.toLowerCase())}
                 >
                   <div className="flex items-center">
@@ -79,12 +79,12 @@ const CollectionReport = () => {
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-500">
             {collectionData.map((row, index) => (
-              <tr key={row.id} className={index % 2 === 0 ? 'bg-green-50 dark:bg-green-900/10' : ''}>
+              <tr key={row.id} className={index % 2 === 0 ? 'bg-slate-50 dark:bg-slate-900/10' : ''}>
                 <td className="px-4 py-3 text-sm">{row.creditDays}</td>
                 <td className="px-4 py-3 text-sm font-medium">{row.partyName}</td>
                 <td className="px-4 py-3 text-sm">₹{row.due.toFixed(2)}</td>
                 <td className="px-4 py-3 text-sm text-red-500 dark:text-red-400">₹{row.overDue.toFixed(2)}</td>
-                <td className={`px-4 py-3 text-sm font-medium ${row.total > 0 ? 'text-green-500 dark:text-green-400' : ''}`}>
+                <td className={`px-4 py-3 text-sm font-medium ${row.total > 0 ? 'text-slate-500 dark:text-slate-400' : ''}`}>
                   ₹{row.total.toFixed(2)}
                 </td>
               </tr>

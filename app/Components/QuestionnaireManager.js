@@ -163,7 +163,7 @@ export const QuestionnaireManager = ({ currentProfile }) => {
             value={value}
             onChange={handleChange}
             placeholder="Enter your answer here"
-            className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 ease-in-out"
+            className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition duration-200 ease-in-out"
             rows={4}
           />
           <div className="absolute bottom-2 right-2 text-sm text-gray-500">
@@ -180,7 +180,7 @@ export const QuestionnaireManager = ({ currentProfile }) => {
           value={value}
           onChange={handleChange}
           placeholder="Enter your answer here"
-          className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 ease-in-out"
+          className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition duration-200 ease-in-out"
         />
         <div className="absolute bottom-2 right-2 text-sm text-gray-500">
           {value.length}/{limit}
@@ -210,11 +210,11 @@ export const QuestionnaireManager = ({ currentProfile }) => {
         </button>
         <button
           onClick={handleSaveAndNext}
-          className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200 ease-in-out flex items-center"
+          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-slate-600 transition duration-200 ease-in-out flex items-center"
         >
           {currentQuestion === questions.length - 1 ? 'Finish' : 'Save & Next'}
           {saved && (
-            <svg className="w-5 h-5 ml-2 text-green-300" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 ml-2 text-slate-300" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
               <path d="M5 13l4 4L19 7"></path>
             </svg>
           )}
@@ -247,7 +247,7 @@ export const QuestionnaireManager = ({ currentProfile }) => {
   if (isLoading) {
     return (
       <div className="text-center p-8">
-        <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+        <div className="w-8 h-8 border-2 border-slate-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
         <p className="text-lg text-gray-500">Loading questionnaire data...</p>
       </div>
     );
@@ -256,20 +256,20 @@ export const QuestionnaireManager = ({ currentProfile }) => {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="mb-6">
-        <h2 className="text-2xl text-center mb-4 text-green-800">
+        <h2 className="text-2xl text-center mb-4 text-slate-800">
           Training Data for Profile: {currentProfile.name}
         </h2>
         
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setDisplayMode('card')}
-            className={`items-center flex gap-2 px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
+            className={`items-center flex gap-2 px-4 py-2 mr-2 rounded-lg ${displayMode === 'card' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
           >
             <WalletCards className="h-4 w-4" /> Card View
           </button>
           <button
             onClick={() => setDisplayMode('list')}
-            className={`items-center flex gap-2 px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
+            className={`items-center flex gap-2 px-4 py-2 rounded-lg ${displayMode === 'list' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'} transition duration-200`}
           >
             <ListCheckIcon className="h-4 w-4" /> List View
           </button>
@@ -278,7 +278,7 @@ export const QuestionnaireManager = ({ currentProfile }) => {
         {displayMode === 'card' && (
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
-              className="bg-green-500 h-2 rounded-full transition-all duration-500 ease-out"
+              className="bg-green-600 h-2 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             ></div>
           </div>

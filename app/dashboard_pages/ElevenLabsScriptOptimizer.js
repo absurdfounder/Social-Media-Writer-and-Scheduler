@@ -151,19 +151,19 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
         <div className="border-b border-gray-200">
           <nav className="flex">
             <button 
-              className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'input' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'input' ? 'border-slate-500 text-slate-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTab('input')}
             >
               Input Script
             </button>
             <button 
-              className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'output' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'output' ? 'border-slate-500 text-slate-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTab('output')}
             >
               Optimized Output
             </button>
             <button 
-              className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'settings' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              className={`px-4 py-3 text-sm font-medium border-b-2 ${activeTab === 'settings' ? 'border-slate-500 text-slate-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTab('settings')}
             >
               Settings
@@ -186,7 +186,7 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
             <div className="space-y-4">
               <textarea 
                 placeholder="Paste your script here..." 
-                className="w-full h-64 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base"
+                className="w-full h-64 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-base"
                 value={inputScript}
                 onChange={(e) => setInputScript(e.target.value)}
               />
@@ -195,8 +195,8 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                 disabled={isLoading || !inputScript.trim() || !apiKeyValid} 
                 className={`w-full py-2 px-4 rounded-md text-white font-medium ${
                   isLoading || !inputScript.trim() || !apiKeyValid 
-                    ? 'bg-green-300 cursor-not-allowed' 
-                    : 'bg-green-600 hover:bg-green-700'
+                    ? 'bg-slate-300 cursor-not-allowed' 
+                    : 'bg-slate-600 hover:bg-slate-700'
                 } flex items-center justify-center`}
               >
                 {isLoading && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
@@ -210,12 +210,12 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
             <div className="space-y-4">
               {outputScript ? (
                 <>
-                  <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
+                  <div className="bg-slate-50 border-l-4 border-slate-400 p-4 rounded-md">
                     <div className="flex">
-                      <AlertCircle className="h-5 w-5 text-green-600" />
+                      <AlertCircle className="h-5 w-5 text-slate-600" />
                       <div className="ml-3">
-                        <h3 className="text-sm font-medium text-green-800">Optimization Complete</h3>
-                        <p className="text-sm text-green-700 mt-1">
+                        <h3 className="text-sm font-medium text-slate-800">Optimization Complete</h3>
+                        <p className="text-sm text-slate-700 mt-1">
                           Your script has been optimized with SSML tags for ElevenLabs.
                         </p>
                       </div>
@@ -224,12 +224,12 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                   
                   <div className="relative">
                     <textarea 
-                      className="w-full h-64 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-mono"
+                      className="w-full h-64 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-base font-mono"
                       value={outputScript}
                       readOnly
                     />
                     <button 
-                      className="absolute top-2 right-2 px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm flex items-center"
+                      className="absolute top-2 right-2 px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm flex items-center"
                       onClick={copyToClipboard}
                     >
                       {isCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
@@ -259,7 +259,7 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                       checked={includeEmphasis}
                       onChange={() => setIncludeEmphasis(!includeEmphasis)}
                     />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-600"></div>
                     <span className="ms-3">Keyword Emphasis</span>
                   </label>
                 </div>
@@ -272,7 +272,7 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                       checked={includePauses}
                       onChange={() => setIncludePauses(!includePauses)}
                     />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-600"></div>
                     <span className="ms-3">Strategic Pauses</span>
                   </label>
                 </div>
@@ -285,7 +285,7 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                       checked={includePronunciation}
                       onChange={() => setIncludePronunciation(!includePronunciation)}
                     />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-600"></div>
                     <span className="ms-3">Pronunciation Guidance</span>
                   </label>
                 </div>
@@ -298,7 +298,7 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                       checked={attentionDeficit}
                       onChange={() => setAttentionDeficit(!attentionDeficit)}
                     />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-600"></div>
                     <span className="ms-3">Attention Deficit Optimization</span>
                   </label>
                 </div>
@@ -316,7 +316,7 @@ Return ONLY the optimized script with appropriate SSML tags, with no explanation
                         value={style}
                         checked={selectedVoiceStyle === style}
                         onChange={() => setSelectedVoiceStyle(style)}
-                        className="mt-1 h-4 w-4 border-gray-300 text-green-600 focus:ring-green-500"
+                        className="mt-1 h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-500"
                       />
                       <div>
                         <label htmlFor={style} className="font-medium capitalize text-gray-700">{style}</label>

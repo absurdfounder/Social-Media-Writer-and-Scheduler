@@ -14,7 +14,7 @@ import { getOpenAIKey } from '../Utils/getApikey';
 
 const Tab = ({ label, active, onClick, icon: Icon }) => (
   <button
-    className={`px-2 sm:px-4 py-2 ${active ? 'bg-green-200 text-green-800' : 'bg-gray-50 text-gray-500 hover:bg-gray-300'
+    className={`px-2 sm:px-4 py-2 ${active ? 'bg-slate-200 text-slate-800' : 'bg-gray-50 text-gray-500 hover:bg-gray-300'
       } rounded-t-lg transition-colors duration-200 flex items-center text-xs sm:text-sm`}
     onClick={onClick}
   >
@@ -48,7 +48,7 @@ const LinkPreview = ({ url }) => {
       <div className="p-2">
         <h3 className="font-bold">{preview.title}</h3>
         <p className="text-sm text-gray-500">{preview.description}</p>
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:underline text-sm">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:underline text-sm">
           {url}
         </a>
       </div>
@@ -1359,7 +1359,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
         <h3 className="text-lg font-semibold">Fresh Post Ideas AI</h3>
         <div className="flex items-center">
           {isGeneratingIdeas && (
-            <RefreshCcw className="w-4 h-4 animate-spin text-green-500 mr-2" />
+            <RefreshCcw className="w-4 h-4 animate-spin text-slate-500 mr-2" />
           )}
           <span className="text-sm text-gray-500">
             {isGeneratingIdeas ? 'Generating ideas...' : `${postIdeas.length} ideas generated`}
@@ -1369,13 +1369,13 @@ Focus on finding genuine opportunities to add value while promoting the product/
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {postIdeas.map((idea, index) => (
-          <div key={index} className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+          <div key={index} className="bg-white rounded-lg shadow p-4 border-l-4 border-slate-500">
             <div className="flex items-start justify-between mb-2">
-              <h4 className="font-semibold text-green-600 flex-grow">{idea.title}</h4>
+              <h4 className="font-semibold text-slate-600 flex-grow">{idea.title}</h4>
             </div>
             <p className="text-sm text-gray-600 mt-2">{idea.description}</p>
             <div className="flex items-center justify-end mt-4">
-              <button className="text-xs text-green-500 hover:text-green-600 flex items-center">
+              <button className="text-xs text-slate-500 hover:text-slate-600 flex items-center">
                 <PenTool className="w-3 h-3 mr-1" />
                 Use Template
               </button>
@@ -1390,15 +1390,15 @@ Focus on finding genuine opportunities to add value while promoting the product/
     <div>
       <h3 className="text-lg font-semibold mb-4">Discussion</h3>
       {commentSuggestions[selectedPost?.id] && (
-        <div className="bg-gradient-to-r from-green-50 to-white border-l-4 border-green-500 p-4 rounded-lg mb-6">
+        <div className="bg-gradient-to-r from-slate-50 to-white border-l-4 border-slate-500 p-4 rounded-lg mb-6">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="font-semibold text-green-600">Suggested Response</h4>
+            <h4 className="font-semibold text-slate-600">Suggested Response</h4>
             <div className="flex space-x-2">
-              <button className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded flex items-center">
+              <button className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded flex items-center">
                 <PenTool className="w-3 h-3 mr-1" />
                 Edit
               </button>
-              <button className="text-xs bg-green-500 text-white px-2 py-1 rounded flex items-center">
+              <button className="text-xs bg-green-600 text-white px-2 py-1 rounded flex items-center">
                 <Check className="w-3 h-3 mr-1" />
                 Use This
               </button>
@@ -1446,7 +1446,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
   if (loading && communities.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <RefreshCcw className="w-8 h-8 animate-spin text-green-500" />
+        <RefreshCcw className="w-8 h-8 animate-spin text-slate-500" />
       </div>
     );
   }
@@ -1483,7 +1483,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                 placeholder="Search subreddits..."
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full px-3 sm:px-4 py-2 pl-8 sm:pl-10 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                className="w-full px-3 sm:px-4 py-2 pl-8 sm:pl-10 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-500 text-sm"
               />
               <Search className="w-4 h-4 sm:w-5 sm:h-5 absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
@@ -1523,10 +1523,10 @@ Focus on finding genuine opportunities to add value while promoting the product/
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500">
                         {community.subscribersCount.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-slate-500">
                         +{community.growthPerWeek.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-500">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-slate-500">
                         +{community.growthPerMonth.toLocaleString()}
                       </td>
                     </tr>
@@ -1554,7 +1554,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
 
                   <button
                     onClick={() => setShowGroupPopup(true)}
-                    className="px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                    className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 flex items-center text-xs sm:text-sm"
                   >
                     <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Create Group
@@ -1572,7 +1572,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                   >
                     <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center justify-between">
                       <span>{group.name}</span>
-                      <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-500 mb-2">
                       {group.subreddits.length} subreddit{group.subreddits.length !== 1 ? 's' : ''}
@@ -1621,7 +1621,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                           href={`https://reddit.com/r/${subreddit.name}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs sm:text-sm hover:bg-green-200 transition-colors duration-200 flex items-center"
+                          className="px-2 sm:px-3 py-1 bg-slate-100 text-slate-800 rounded-full text-xs sm:text-sm hover:bg-slate-200 transition-colors duration-200 flex items-center"
                         >
                           r/{subreddit.name}
                           <ExternalLink className="w-3 h-3 ml-1 inline-block" />
@@ -1642,7 +1642,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                     key={badge.label}
                     onClick={() => setActiveFilter(badge.label === 'All' ? 'all' : badge.label)}
                     className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center ${activeFilter === (badge.label === 'All' ? 'all' : badge.label)
-                      ? 'bg-green-200 text-green-800'
+                      ? 'bg-slate-200 text-slate-800'
                       : 'bg-white border text-gray-500'
                       }`}
                   >
@@ -1674,7 +1674,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                           fetchSubredditPosts(selectedSubreddit?.name);
                         }}
                         disabled={loading}
-                        className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center"
+                        className="px-3 py-2 bg-green-600 text-white rounded hover:bg-slate-600 flex items-center"
                       >
                         <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                       </button>
@@ -1726,7 +1726,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
 
               {isAnalyzing && (
                 <div className="text-center p-4">
-                  <RefreshCcw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-green-500 mx-auto" />
+                  <RefreshCcw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-slate-500 mx-auto" />
                   <p className="mt-2 text-gray-500 text-sm sm:text-base">Fetching and Analyzing posts...</p>
                 </div>
               )}
@@ -1750,7 +1750,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                             <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
                               <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
                               <span>
-                                <b className='text-green-300'>Relevance Score : <span className='text-green-600'>{post.relevancyScore || 0}</span>/100</b>
+                                <b className='text-slate-300'>Relevance Score : <span className='text-slate-600'>{post.relevancyScore || 0}</span>/100</b>
                                 &nbsp; {post.created}
                               </span>
                             </div>
@@ -1764,15 +1764,15 @@ Focus on finding genuine opportunities to add value while promoting the product/
                               </p>
                             )}
                             {post.relevancyExplanation && (
-                              <div className="mb-2 bg-green-50 p-4 rounded-md border border-green-200 shadow-lg">
-                                <b className='text-green-500 font-bold'>Why Relevant: </b>
+                              <div className="mb-2 bg-slate-50 p-4 rounded-md border border-slate-200 shadow-lg">
+                                <b className='text-slate-500 font-bold'>Why Relevant: </b>
                                 <span className="text-xs sm:text-sm text-gray-500">{post.relevancyExplanation}</span>
                               </div>
                             )}
                             {post.categories && (
                               <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
                                 {post.categories.map((category, index) => (
-                                  <span key={index} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                                  <span key={index} className="px-2 py-1 bg-slate-100 text-slate-800 rounded-full text-xs">
                                     {category}
                                   </span>
                                 ))}
@@ -1805,7 +1805,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                 <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                   <button
                     onClick={() => setSelectedPost(null)}
-                    className="mb-4 text-green-500 hover:text-green-500 flex items-center text-sm sm:text-base"
+                    className="mb-4 text-slate-500 hover:text-slate-500 flex items-center text-sm sm:text-base"
                   >
                     <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Back to posts
@@ -1831,7 +1831,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                       href={selectedPost.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                      className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 flex items-center text-xs sm:text-sm"
                     >
                       View on Reddit
                       <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
@@ -1860,7 +1860,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
               <h3 className="font-semibold mb-2">My Keywords</h3>
               <div className="flex flex-wrap gap-2 mb-2">
                 {keywords.map((keyword, index) => (
-                  <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
+                  <span key={index} className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full text-sm flex items-center">
                     {keyword}
                     <button
                       onClick={() => {
@@ -1868,7 +1868,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                         setKeywords(newKeywords);
                         localStorage.setItem('redditKeywords', JSON.stringify(newKeywords));
                       }}
-                      className="ml-2 text-green-600 hover:text-green-800"
+                      className="ml-2 text-slate-600 hover:text-slate-800"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -1892,7 +1892,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                       setKeywordsInput('');
                     }
                   }}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-slate-600"
                 >
                   Add
                 </button>
@@ -1903,7 +1903,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
               <h3 className="font-semibold mb-2">Competitor Keywords</h3>
               <div className="flex flex-wrap gap-2 mb-2">
                 {competitorKeywords.map((keyword, index) => (
-                  <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
+                  <span key={index} className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full text-sm flex items-center">
                     {keyword}
                     <button
                       onClick={() => {
@@ -1911,7 +1911,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                         setCompetitorKeywords(newKeywords);
                         localStorage.setItem('redditCompetitorKeywords', JSON.stringify(newKeywords));
                       }}
-                      className="ml-2 text-green-600 hover:text-green-800"
+                      className="ml-2 text-slate-600 hover:text-slate-800"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -1935,7 +1935,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                       setCompetitorKeywordsInput('');
                     }
                   }}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-slate-600"
                 >
                   Add
                 </button>
@@ -1945,7 +1945,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
             <div className="flex justify-end">
               <button
                 onClick={() => setShowKeywordsModal(false)}
-                className="px-4 py-2 bg-slate-800 text-white rounded hover:bg-green-600 w-full"
+                className="px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-600 w-full"
               >
                 Done
               </button>
@@ -1968,7 +1968,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
               placeholder="Group name"
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
-              className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 mb-4 text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-500 mb-4 text-sm sm:text-base"
             />
             <div className="mb-4 relative">
               <input
@@ -1976,7 +1976,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                 placeholder="Search subreddits..."
                 value={groupSearchTerm}
                 onChange={(e) => setGroupSearchTerm(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 pl-8 sm:pl-10 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 pl-8 sm:pl-10 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-500 text-sm sm:text-base"
               />
               <Search className="w-4 h-4 sm:w-5 sm:h-5 absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
@@ -2007,7 +2007,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                             type="checkbox"
                             checked={selectedSubredditsForGroup.some(s => s.id === community.id)}
                             onChange={() => handleSubredditSelection(community)}
-                            className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-green-500"
+                            className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-slate-500"
                           />
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
@@ -2031,7 +2031,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
               </button>
               <button
                 onClick={handleCreateGroup}
-                className="px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-500 transition-colors duration-200 flex items-center text-xs sm:text-sm"
+                className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 flex items-center text-xs sm:text-sm"
               >
                 <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Save Group

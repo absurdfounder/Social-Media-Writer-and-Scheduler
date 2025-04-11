@@ -102,7 +102,7 @@ const HackerNewsPostGenerator = () => {
         <div className="space-y-4">
           <textarea
             placeholder="Describe your project, the problem it solves, and what makes it special..."
-            className="w-full p-4 border rounded-lg h-64 focus:ring-2 focus:ring-green-500 text-gray-700"
+            className="w-full p-4 border rounded-lg h-64 focus:ring-2 focus:ring-slate-500 text-gray-700"
             value={post}
             onChange={(e) => setPost(e.target.value)}
           />
@@ -113,7 +113,7 @@ const HackerNewsPostGenerator = () => {
             className={`w-full text-white p-3 rounded-lg transition ${
               isLoading || !apiKeyValid 
                 ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-green-500 hover:bg-green-600'
+                : 'bg-green-600 hover:bg-slate-600'
             }`}
           >
             {isLoading ? 'Generating...' : 'Generate Post'}

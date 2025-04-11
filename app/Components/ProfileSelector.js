@@ -48,8 +48,8 @@ const ProfileSelector = ({ onProfileSelect }) => {
               onClick={() => handleProfileSelect(profile)}
               className={`p-4 rounded-lg border transition-all ${
                 selectedProfile?.name === profile.name
-                  ? 'border-green-500 bg-green-50'
-                  : 'border-gray-200 hover:border-green-300'
+                  ? 'border-slate-500 bg-slate-50'
+                  : 'border-gray-200 hover:border-slate-300'
               }`}
             >
               <h3 className="font-semibold">{profile.name}</h3>

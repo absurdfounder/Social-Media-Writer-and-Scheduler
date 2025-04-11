@@ -241,7 +241,7 @@ export default function SocialBotTable({ posts }) {
   // Display computed relevance as a badge
   const displayRelevance = (relevance) => {
     const relevanceNum = parseFloat(relevance);
-    let bgColor = "bg-green-100 text-green-800";
+    let bgColor = "bg-slate-100 text-slate-800";
     
     if (isNaN(relevanceNum)) {
       bgColor = "bg-gray-100 text-gray-800";
@@ -338,7 +338,7 @@ export default function SocialBotTable({ posts }) {
                   </button>
                   <button
                     onClick={() => handleQuoteClick(post)}
-                    className="inline-flex items-center px-2.5 py-1.5 bg-green-600 text-white rounded shadow-sm text-xs font-medium hover:bg-green-700"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-slate-600 text-white rounded shadow-sm text-xs font-medium hover:bg-slate-700"
                   >
                     <Share2 size={14} className="mr-1" /> Quote
                   </button>
@@ -422,7 +422,7 @@ export default function SocialBotTable({ posts }) {
                     </button>
                     <button
                       onClick={() => handleQuoteClick(post)}
-                      className="inline-flex items-center px-2.5 py-1.5 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                      className="inline-flex items-center px-2.5 py-1.5 bg-slate-600 text-white rounded text-xs hover:bg-slate-700"
                     >
                       <Share2 size={14} className="mr-1" /> Quote
                     </button>
@@ -493,7 +493,7 @@ export default function SocialBotTable({ posts }) {
                     {selectedPost.metrics?.likes || 0}
                   </div>
                   <div className="flex items-center">
-                    <Repeat size={16} className="mr-1 text-green-500" />
+                    <Repeat size={16} className="mr-1 text-slate-500" />
                     {selectedPost.metrics?.retweets || 0}
                   </div>
                   <div className="flex items-center">

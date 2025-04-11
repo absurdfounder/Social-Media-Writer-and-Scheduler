@@ -232,7 +232,7 @@ export const Login = () => {
         case 'lifetime':
           return 'bg-purple-500';
         case 'monthly':
-          return 'bg-green-500';
+          return 'bg-green-600';
         default:
           return 'bg-gray-500';
       }
@@ -279,7 +279,7 @@ export const Login = () => {
                   className="w-8 h-8 rounded-full"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white">
                   {user.displayName?.charAt(0) || user.email?.charAt(0)}
                 </div>
               )}
@@ -316,7 +316,7 @@ export const Login = () => {
       <button
         onClick={user ? handleLogout : handleGoogleLogin}
         disabled={loading}
-        className={`min-w-64 h-16 bg-green-600 text-xl font-bold text-white rounded-full py-4 px-4 flex items-center justify-center space-x-2 mb-4 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed ${user ? 'hover:bg-green-800' : 'hover:bg-green-600'
+        className={`min-w-64 h-16 bg-slate-600 text-xl font-bold text-white rounded-full py-4 px-4 flex items-center justify-center space-x-2 mb-4 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed ${user ? 'hover:bg-slate-800' : 'hover:bg-slate-600'
           }`}
       >
         {renderButtonContent()}

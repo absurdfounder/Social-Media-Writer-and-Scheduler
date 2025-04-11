@@ -226,7 +226,7 @@ function TrainingDataManager() {
         {/* Toggle buttons */}
         <div className="flex mb-4 gap-2">
           <button
-            className={`p-2 rounded w-full ${showImageLibrary ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
+            className={`p-2 rounded w-full ${showImageLibrary ? 'bg-green-600 text-white' : 'bg-gray-100'}`}
             onClick={() => {
               setShowImageLibrary(true);
               setShowMemeLibrary(false);
@@ -235,7 +235,7 @@ function TrainingDataManager() {
             Images
           </button>
           <button
-            className={`p-2 rounded w-full ${showMemeLibrary ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
+            className={`p-2 rounded w-full ${showMemeLibrary ? 'bg-green-600 text-white' : 'bg-gray-100'}`}
             onClick={() => {
               setShowImageLibrary(false);
               setShowMemeLibrary(true);
@@ -317,7 +317,7 @@ function TrainingDataManager() {
         {/* Toolbar */}
         <div className="mb-4 p-2 bg-white rounded-lg shadow flex items-center gap-2">
           <button
-            className={`p-2 rounded ${selectedTool === 'select' ? 'bg-green-500 text-white' : 'hover:bg-gray-100'}`}
+            className={`p-2 rounded ${selectedTool === 'select' ? 'bg-green-600 text-white' : 'hover:bg-gray-100'}`}
             onClick={() => setSelectedTool('select')}
           >
             <Move size={20} />

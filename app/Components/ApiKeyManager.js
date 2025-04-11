@@ -186,7 +186,7 @@ const ApiKeyManager = () => {
                       onClick={() => handleCopyKey(openAIKey, 'openai')}
                       className="p-1 text-gray-500 hover:text-gray-700"
                     >
-                      {openAICopied ? <CheckCheck size={16} className="text-green-500" /> : <Copy size={16} />}
+                      {openAICopied ? <CheckCheck size={16} className="text-slate-500" /> : <Copy size={16} />}
                     </button>
                     <button
                       onClick={() => setShowOpenAIKey(!showOpenAIKey)}
@@ -219,7 +219,7 @@ const ApiKeyManager = () => {
                       onClick={() => handleCopyKey(anthropicKey, 'anthropic')}
                       className="p-1 text-gray-500 hover:text-gray-700"
                     >
-                      {anthropicCopied ? <CheckCheck size={16} className="text-green-500" /> : <Copy size={16} />}
+                      {anthropicCopied ? <CheckCheck size={16} className="text-slate-500" /> : <Copy size={16} />}
                     </button>
                     <button
                       onClick={() => setShowAnthropicKey(!showAnthropicKey)}
@@ -243,7 +243,7 @@ const ApiKeyManager = () => {
               <button
                   onClick={handleSaveKeys}
                   disabled={loading}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-green-300"
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-slate-600 disabled:bg-slate-300"
                 >
                   {loading ? 'Saving...' : 'Update Keys'}
                 </button>

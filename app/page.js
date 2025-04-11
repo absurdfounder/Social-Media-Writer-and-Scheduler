@@ -5,7 +5,8 @@ import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
-  DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, LaughIcon, MailIcon, calendar, CalendarRange, ShieldAlert, HandMetal
+  DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, LaughIcon, MailIcon, Calendar, CalendarRange, ShieldAlert, HandMetal,
+  Ellipsis
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -79,7 +80,7 @@ const BillingModal = ({ isOpen, onClose }) => {
 
           <div className="p-6">
             <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-green-700">
+              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-500 to-slate-700">
                 Choose Your Perfect Plan
               </h3>
               <p className="text-gray-600 mt-2">Unlock all features with our premium plans</p>
@@ -87,9 +88,9 @@ const BillingModal = ({ isOpen, onClose }) => {
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl m-auto">
               {plans.map((plan) => (
-                <div key={plan.name} className={`relative rounded-lg border p-6 ${plan.popular ? 'border-2 border-green-500' : ''}`}>
+                <div key={plan.name} className={`relative rounded-lg border p-6 ${plan.popular ? 'border-2 border-slate-500' : ''}`}>
                   {plan.popular && (
-                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
+                    <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm">
                       Popular
                     </div>
                   )}
@@ -109,13 +110,13 @@ const BillingModal = ({ isOpen, onClose }) => {
                   <ul className="space-y-3 mb-6">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2">
-                        <Check className="h-5 w-5 text-green-500" />
+                        <Check className="h-5 w-5 text-slate-500" />
                         <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
                   <button className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${plan.popular
-                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                    ? 'bg-green-600 hover:bg-slate-600 text-white'
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                     }`}>
                     Get Started
@@ -144,7 +145,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
         <div className="flex rounded-lg bg-gray-100 p-1">
           <button
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'feedback'
-              ? 'bg-white text-green-600 shadow-sm'
+              ? 'bg-white text-slate-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
               }`}
             onClick={() => setSelectedTab('feedback')}
@@ -153,7 +154,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
           </button>
           <button
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'call'
-              ? 'bg-white text-green-600 shadow-sm'
+              ? 'bg-white text-slate-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
               }`}
             onClick={() => setSelectedTab('call')}
@@ -177,8 +178,8 @@ const FeedbackModal = ({ isOpen, onClose }) => {
         ) : (
           <div className="space-y-6 p-4">
             <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100">
-                <calendar className="h-8 w-8 text-green-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100">
+                <Calendar className="h-8 w-8 text-slate-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Schedule a 1-on-1 Call</h3>
@@ -192,22 +193,22 @@ const FeedbackModal = ({ isOpen, onClose }) => {
               <h4 className="text-sm font-medium text-gray-900">What to expect:</h4>
               <ul className="mt-2 space-y-2">
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-slate-500 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-gray-600">30-minute personalized discussion</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-slate-500 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-gray-600">Direct access to me.</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-slate-500 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-gray-600">Opportunity to influence our roadmap</span>
                 </li>
               </ul>
             </div>
             <button
               onClick={handleScheduleCall}
-              className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition-colors"
+              className="w-full bg-green-600 hover:bg-slate-600 text-white py-3 rounded-lg transition-colors"
             >
               Schedule Your Call
             </button>
@@ -215,6 +216,58 @@ const FeedbackModal = ({ isOpen, onClose }) => {
         )}
       </div>
     </Modal>
+  );
+};
+
+// More Options Modal Component
+const MoreOptionsModal = ({ isOpen, onClose, onSelectOption }) => {
+  if (!isOpen) return null;
+
+  // Items to show in More Options
+  const moreOptions = [
+    { icon: Book, label: 'How to Use', id: 'how-to-use' },
+    { icon: ShieldAlert, label: 'Reddit Post', id: 'RedditPost' },
+    { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
+    { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
+    { icon: Settings2, label: 'API Keys', id: 'api-keys' },
+    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
+    { icon: Heart, label: 'Feedback', id: 'feedback' },
+    { icon: DollarSign, label: 'Billing', id: 'billing' },
+    { icon: Chrome, label: 'Extension', id: 'extension' },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="relative w-full max-w-lg bg-white rounded-lg shadow-xl">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="text-xl font-bold">More Tools</h2>
+            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="p-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {moreOptions.map((option) => (
+                <button
+                  key={option.id}
+                  className="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                  onClick={() => {
+                    onSelectOption(option.id);
+                    onClose();
+                  }}
+                >
+                  <option.icon className="h-8 w-8 text-slate-500 mb-2" />
+                  <span className="text-sm text-center">{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -277,11 +330,11 @@ const SubscriptionBanner = ({ onUpgrade }) => {
   }
 
   return (
-    <div className="text-sm text-green-800 rounded-md border border-green-300 p-2 flex justify-between bg-green-50 text-center items-center max-w-7xl m-auto">
+    <div className="text-sm text-slate-800 rounded-md border border-slate-300 p-2 flex justify-between bg-slate-50 text-center items-center max-w-7xl m-auto">
       <p>Trial period: <b>{trialStatus.daysLeft}</b> days remaining</p>
       <button
         onClick={onUpgrade}
-        className="ml-2 hover:text-green-900 transition-colors font-bold bg-green-200 p-2 rounded-md"
+        className="ml-2 hover:text-slate-900 transition-colors font-bold bg-slate-200 p-2 rounded-md"
       >
         Upgrade now
       </button>
@@ -293,7 +346,7 @@ const SubscriptionBanner = ({ onUpgrade }) => {
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 
-      ${active ? 'bg-green-100 text-green-500' : 'text-gray-500 hover:bg-gray-100'}`}
+      ${active ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
     onClick={onClick}
   >
     <Icon className="mr-3 h-5 w-5" />
@@ -301,10 +354,23 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
   </button>
 );
 
+const NavItemWithBadge = ({ icon: Icon, label, active, onClick, isNew }) => (
+  <button
+    className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 
+      ${active ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
+    onClick={onClick}
+  >
+    <Icon className="mr-3 h-5 w-5" />
+    <span className="font-medium">{label}</span>
+
+  </button>
+);
+
+
 const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex flex-col items-center justify-center p-2 
-      ${active ? 'text-green-500' : 'text-gray-500'}`}
+      ${active ? 'text-slate-500' : 'text-gray-500'}`}
     onClick={onClick}
   >
     <Icon size={20} />
@@ -324,31 +390,33 @@ export default function Dashboard() {
   const [isBillingOpen, setIsBillingOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isHowToUseOpen, setIsHowToUseOpen] = useState(false);
+  const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false);
+  const [showApiKeyManager, setShowApiKeyManager] = useState(false);
 
-  // Navigation items configuration
+  // Navigation items configuration - Restructured for better organization
   const mainNavItems = [
-    // Marketing Week removed from here and handled separately
+    { icon: HandMetal, label: 'Marketing Week', id: 'dashboard', featured: true },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
     { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
-    { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor' },
+    { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor', isNew: true },
     { icon: CalendarRange, label: 'Scheduler', id: 'planner' },
   ];
 
-  const bottomNavItems = [
+  // More options are now moved to a modal/menu
+  const moreOptionsItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
-    //{ icon: ShieldAlert, label: 'C-Internal', id: 'Crypto' },
     { icon: ShieldAlert, label: 'Reddit Post', id: 'RedditPost' },
     { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
     { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
+    { icon: Settings2, label: 'API Keys', id: 'api-keys' },
     { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
-    /* { icon: Settings2, label: 'Settings', id: 'settings' },
-     { icon: DollarSign, label: 'Billing', id: 'billing' },
-      { icon: Chrome, label: 'Extension', id: 'extension' }, 
-      { icon: Heart, label: 'Feedback', id: 'feedback' }*/
+    { icon: Heart, label: 'Feedback', id: 'feedback' },
+    { icon: DollarSign, label: 'Billing', id: 'billing' },
+    { icon: Chrome, label: 'Extension', id: 'extension' },
   ];
 
   // Primary mobile nav items - limited to only the most important ones
@@ -356,13 +424,7 @@ export default function Dashboard() {
     { icon: HandMetal, label: 'Marketing', id: 'dashboard' },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
-    { icon: Brain, label: 'Preach', id: 'ledger-db' },
-  ];
-
-  // Medium screen mobile items - add one more option
-  const mediumScreenItems = [
-    ...primaryMobileNavItems,
-    { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
+    { icon: Ellipsis, label: 'More', id: 'more-options' },
   ];
 
   useEffect(() => {
@@ -420,6 +482,9 @@ export default function Dashboard() {
 
   const handleNavItemClick = (id) => {
     switch (id) {
+      case 'more-options':
+        setIsMoreOptionsOpen(true);
+        break;
       case 'settings':
         setIsSettingsOpen(true);
         break;
@@ -431,6 +496,9 @@ export default function Dashboard() {
         break;
       case 'how-to-use':
         setIsHowToUseOpen(true);
+        break;
+      case 'api-keys':
+        setShowApiKeyManager(true);
         break;
       case 'extension':
         window.open('https://chrome.google.com/webstore/category/extensions', '_blank');
@@ -488,8 +556,8 @@ export default function Dashboard() {
         items: mainNavItems
       },
       {
-        category: "Other Tools",
-        items: bottomNavItems
+        category: "More Tools",
+        items: moreOptionsItems
       }
     ];
 
@@ -515,11 +583,16 @@ export default function Dashboard() {
                     onClick={() => handleNavItemClick(item.id)}
                     className={`flex flex-col items-center justify-center p-4 rounded-lg border
                       ${activeTab === item.id
-                        ? 'bg-green-50 text-green-600 border-green-200'
+                        ? 'bg-slate-50 text-slate-600 border-slate-200'
                         : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
                   >
                     <item.icon className="h-6 w-6 mb-2" />
                     <span className="text-sm text-center">{item.label}</span>
+                    {item.isNew && (
+                      <span className="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full mt-1">
+                        New
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -528,7 +601,6 @@ export default function Dashboard() {
 
           {/* User profile section for mobile menu */}
           <div className="mt-8 pt-6 border-t">
-            <ApiKeyManager />
             <UserProfileSection />
           </div>
         </div>
@@ -540,7 +612,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-slate-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your workspace...</p>
         </div>
       </div>
@@ -577,47 +649,71 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Marketing Week Button (special treatment) */}
-          <div className="px-6 mb-6">
+          {/* Main navigation */}
+          <nav className="mt-2 px-6 space-y-2 flex-grow overflow-y-auto scrollbar-thin flex flex-col">
+            {/* Featured Marketing Week Button */}
             <button
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center mb-4
                 ${activeTab === 'dashboard'
-                  ? 'bg-green-500 text-white hover:bg-green-600'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
+                  ? 'bg-green-600 text-white hover:bg-slate-600'
+                  : 'bg-green-600 text-white hover:bg-green-800'}`}
               onClick={() => handleNavItemClick('dashboard')}
             >
               <HandMetal className="mr-2 h-5 w-5" />
               <span>Marketing Week</span>
             </button>
-          </div>
 
-          {/* Main navigation */}
-          <nav className="mt-2 px-6 space-y-1 flex-grow">
-            {mainNavItems.map((item) => (
-              <NavItem
-                key={item.id}
-                icon={item.icon}
-                label={item.label}
-                active={activeTab === item.id}
-                onClick={() => handleNavItemClick(item.id)}
-              />
-            ))}
+            {/* Main Navigation Sections */}
+            <div className="flex flex-col flex-grow">
+              {/* Primary Tools Section */}
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2">
+                  Primary Tools
+                </h3>
+                {mainNavItems.filter(item => !item.featured).slice(0, 6).map((item) => (
+                  <NavItemWithBadge
+                    key={item.id}
+                    icon={item.icon}
+                    label={item.label}
+                    active={activeTab === item.id}
+                    onClick={() => handleNavItemClick(item.id)}
+                    isNew={item.isNew}
+                  />
+                ))}
+              </div>
+
+              {/* Secondary Tools Section */}
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2">
+                  More Tools
+                </h3>
+                {mainNavItems.filter(item => !item.featured).slice(6).map((item) => (
+                  <NavItemWithBadge
+                    key={item.id}
+                    icon={item.icon}
+                    label={item.label}
+                    active={activeTab === item.id}
+                    onClick={() => handleNavItemClick(item.id)}
+                    isNew={item.isNew}
+                  />
+                ))}
+              </div>
+
+              {/* More Options Button */}
+              <button
+                className="w-full py-2 px-6 rounded-lg font-medium transition-colors flex items-center justify-start 
+                  bg-gray-100 text-gray-700 hover:bg-gray-200 mb-6"
+                onClick={() => setIsMoreOptionsOpen(true)}
+              >
+                <span>More Tools</span>
+              </button>
+            </div>
+
+            {/* User Section */}
+            <div className="mt-auto">
+              <UserProfileSection />
+            </div>
           </nav>
-
-          {/* Bottom navigation */}
-          <div className="px-6 space-y-1 mb-8">
-            <ApiKeyManager />
-            {bottomNavItems.map((item) => (
-              <NavItem
-                key={item.id}
-                icon={item.icon}
-                label={item.label}
-                active={activeTab === item.id}
-                onClick={() => handleNavItemClick(item.id)}
-              />
-            ))}
-            <UserProfileSection />
-          </div>
         </aside>
 
         {/* Main content */}
@@ -627,51 +723,28 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold mb-6">
               {activeTab === 'dashboard'
                 ? 'Marketing Week'
-                : [...mainNavItems, ...bottomNavItems].find(item => item.id === activeTab)?.label}
+                : [...mainNavItems, ...moreOptionsItems].find(item => item.id === activeTab)?.label}
             </h2>
             {renderContent()}
           </div>
         </main>
       </div>
 
-      {/* Mobile navigation - Limited to few options with responsive variants */}
+      {/* Mobile navigation - Limited to few options + "More" */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
-        {/* Smallest screens - Only show 4 main items + menu */}
-        <div className="grid grid-cols-5 sm:hidden p-4">
+        <div className="grid grid-cols-4 p-4">
           {primaryMobileNavItems.map((item) => (
             <MobileNavItem
               key={item.id}
               icon={item.icon}
               label={item.label}
-              active={activeTab === item.id}
-              onClick={() => handleNavItemClick(item.id)}
+              active={activeTab === item.id || (item.id === 'more-options' && isMoreOptionsOpen)}
+              onClick={() => item.id === 'more-options' 
+                ? setIsMoreOptionsOpen(true) 
+                : handleNavItemClick(item.id)
+              }
             />
           ))}
-          <MobileNavItem
-            icon={Menu}
-            label="More"
-            active={false}
-            onClick={() => setIsMobileMenuOpen(true)}
-          />
-        </div>
-
-        {/* Medium mobile screens - Show 5 items + menu */}
-        <div className="hidden sm:grid sm:grid-cols-6 md:hidden p-4">
-          {mediumScreenItems.map((item) => (
-            <MobileNavItem
-              key={item.id}
-              icon={item.icon}
-              label={item.label}
-              active={activeTab === item.id}
-              onClick={() => handleNavItemClick(item.id)}
-            />
-          ))}
-          <MobileNavItem
-            icon={Menu}
-            label="More"
-            active={false}
-            onClick={() => setIsMobileMenuOpen(true)}
-          />
         </div>
       </nav>
 
@@ -679,6 +752,24 @@ export default function Dashboard() {
       <OnBoardingPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
       <BillingModal isOpen={isBillingOpen} onClose={() => setIsBillingOpen(false)} />
       <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
+      
+      {/* More Options Modal */}
+      <MoreOptionsModal 
+        isOpen={isMoreOptionsOpen} 
+        onClose={() => setIsMoreOptionsOpen(false)}
+        onSelectOption={handleNavItemClick}
+      />
+
+      {/* API Key Manager Modal */}
+      <Modal 
+        isOpen={showApiKeyManager} 
+        onClose={() => setShowApiKeyManager(false)} 
+        title="API Key Manager"
+      >
+        <div className="p-4">
+          <ApiKeyManager />
+        </div>
+      </Modal>
 
       {/* How to Use Modal */}
       <Modal isOpen={isHowToUseOpen} onClose={() => setIsHowToUseOpen(false)} title="How to Use">

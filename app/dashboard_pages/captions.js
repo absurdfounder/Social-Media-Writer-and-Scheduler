@@ -97,10 +97,10 @@ export default function AudioTranscriber() {
     <div className="p-4 max-w-md mx-auto">
       <h1 className="text-xl font-bold mb-4">Speech-to-Text AI</h1>
       <input type="file" accept="audio/*" onChange={handleFileChange} className="w-full border p-2 rounded" />
-      <button className="mt-2 w-full bg-green-500 text-white p-2 rounded" onClick={handleUpload} disabled={loading}>
+      <button className="mt-2 w-full bg-green-600 text-white p-2 rounded" onClick={handleUpload} disabled={loading}>
         {loading ? "Transcribing..." : "Upload & Transcribe"}
       </button>
-      <button className="mt-2 w-full bg-green-500 text-white p-2 rounded" onClick={handleYoutubeUrlAdd}>Add YouTube URL</button>
+      <button className="mt-2 w-full bg-green-600 text-white p-2 rounded" onClick={handleYoutubeUrlAdd}>Add YouTube URL</button>
       <button className="mt-2 w-full bg-gray-500 text-white p-2 rounded" onClick={downloadCSV}>Download CSV</button>
       {audioUrl && (
         <div className="mt-4">

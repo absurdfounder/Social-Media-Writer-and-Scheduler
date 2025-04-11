@@ -311,7 +311,7 @@ const INITIAL_SCENE = {
 
 // Toggle Switch Component
 const Toggle = ({ enabled, onToggle, size = 'default' }) => {
-  const baseStyles = "relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2";
+  const baseStyles = "relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2";
   const sizeStyles = size === 'small' ? 'h-5 w-9' : 'h-6 w-11';
   const thumbSizeStyles = size === 'small' ? 'h-4 w-4' : 'h-5 w-5';
   const translateStyles = size === 'small' ? 'translate-x-4' : 'translate-x-5';
@@ -319,7 +319,7 @@ const Toggle = ({ enabled, onToggle, size = 'default' }) => {
   return (
     <button
       type="button"
-      className={`${baseStyles} ${sizeStyles} ${enabled ? 'bg-green-500' : 'bg-gray-200'}`}
+      className={`${baseStyles} ${sizeStyles} ${enabled ? 'bg-green-600' : 'bg-gray-200'}`}
       onClick={onToggle}
     >
       <span className="sr-only">Toggle</span>
@@ -336,7 +336,7 @@ const FrameToggle = ({ isAvatar, onToggle, className = "" }) => {
   return (
     <div className={`relative inline-flex items-center rounded-full p-1 bg-gray-100 ${className}`}>
       <button
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${!isAvatar ? 'bg-green-500 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${!isAvatar ? 'bg-green-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
           }`}
         onClick={() => onToggle(false)}
       >
@@ -344,7 +344,7 @@ const FrameToggle = ({ isAvatar, onToggle, className = "" }) => {
         <span className="text-sm font-medium">Visual</span>
       </button>
       <button
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${isAvatar ? 'bg-green-500 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${isAvatar ? 'bg-green-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
           }`}
         onClick={() => onToggle(true)}
       >
@@ -376,7 +376,7 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Camera size={18} className="text-green-500" />
+                <Camera size={18} className="text-slate-500" />
                 <h4 className="font-medium">{TOOL_SETTINGS.AI_VISUALS.name}</h4>
               </div>
               <p className="text-sm text-gray-500">{TOOL_SETTINGS.AI_VISUALS.description}</p>
@@ -395,7 +395,7 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <UserCircle2 size={18} className="text-green-500" />
+                  <UserCircle2 size={18} className="text-slate-500" />
                   <h4 className="font-medium">{TOOL_SETTINGS.AVATAR.name}</h4>
                 </div>
                 <p className="text-sm text-gray-500">{TOOL_SETTINGS.AVATAR.description}</p>
@@ -414,7 +414,7 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
                 <select
                   value={defaultAvatarType}
                   onChange={(e) => setDefaultAvatarType(e.target.value)}
-                  className="w-full p-2 text-sm border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full p-2 text-sm border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-slate-500"
                 >
                   {Object.values(TOOL_SETTINGS.AVATAR.types).map((type) => (
                     <option key={type.name} value={type.name}>
@@ -430,7 +430,7 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Mic size={18} className="text-green-500" />
+                <Mic size={18} className="text-slate-500" />
                 <h4 className="font-medium">{TOOL_SETTINGS.AI_AUDIO.name}</h4>
               </div>
               <p className="text-sm text-gray-500">{TOOL_SETTINGS.AI_AUDIO.description}</p>
@@ -448,7 +448,7 @@ const SettingsDialog = ({ show, onClose, toolSettings, setToolSettings, playSoun
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Volume2 size={18} className="text-green-500" />
+                <Volume2 size={18} className="text-slate-500" />
                 <h4 className="font-medium">{TOOL_SETTINGS.ELEVEN_LABS.name}</h4>
               </div>
               <p className="text-sm text-gray-500">{TOOL_SETTINGS.ELEVEN_LABS.description}</p>
@@ -472,7 +472,7 @@ const ElevenLabsVoiceSettings = ({ voiceSettings, updateVoiceSettings }) => {
   return (
     <div className="border rounded-lg p-4 bg-gray-50">
       <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
-        <Volume2 size={16} className="text-green-500" />
+        <Volume2 size={16} className="text-slate-500" />
         ElevenLabs Voice Settings
       </h4>
 
@@ -483,7 +483,7 @@ const ElevenLabsVoiceSettings = ({ voiceSettings, updateVoiceSettings }) => {
           <select
             value={voiceSettings.voiceId}
             onChange={(e) => updateVoiceSettings('voiceId', e.target.value)}
-            className="w-full p-2 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full p-2 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-slate-500"
           >
             {ELEVEN_LABS_VOICES.map((voice) => (
               <option key={voice.id} value={voice.id}>
@@ -509,7 +509,7 @@ const ElevenLabsVoiceSettings = ({ voiceSettings, updateVoiceSettings }) => {
                 updateVoiceSettings('similarity', preset.settings.similarity);
               }
             }}
-            className="w-full p-2 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full p-2 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-slate-500"
           >
             {VOICE_STYLES.map((style) => (
               <option key={style.id} value={style.id}>
@@ -546,7 +546,7 @@ const ElevenLabsVoiceSettings = ({ voiceSettings, updateVoiceSettings }) => {
           <details className="group">
             <summary className="flex items-center justify-between cursor-pointer list-none text-xs font-medium text-gray-700">
               <span>Advanced Controls</span>
-              <span className="text-green-500 group-open:rotate-180 transition-transform">▼</span>
+              <span className="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
             </summary>
             <div className="mt-3 space-y-3">
               {/* Stability Slider */}
@@ -1026,7 +1026,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 if (isAuthChecking) {
   return (
     <div className="min-h-[200px] flex items-center justify-center">
-      <div className="flex items-center gap-2 text-green-500">
+      <div className="flex items-center gap-2 text-slate-500">
         <Loader className="animate-spin" size={20} />
         <span>Checking authentication...</span>
       </div>
@@ -1059,10 +1059,10 @@ if (!isAuthenticated) {
       {/* Main Header */}
       <div className="p-2 md:p-4 border-b border-gray-200">
         <div className="flex justify-between items-center flex-wrap gap-2">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Create Your <span className='text-green-600'>TikTok / IG Video</span> Script</h1>
+          <h1 className="text-lg md:text-xl font-bold text-gray-900">Create Your <span className='text-slate-600'>TikTok / IG Video</span> Script</h1>
           <button
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
+            className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors text-sm"
           >
             <Settings size={16} />
             <span className="hidden sm:inline">Settings</span>
@@ -1085,7 +1085,7 @@ if (!isAuthenticated) {
               <select
                 value={videoStyle}
                 onChange={(e) => setVideoStyle(e.target.value)}
-                className="w-full p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
               >
                 {Object.entries(VIDEO_STYLES).map(([key, style]) => (
                   <option key={key} value={style.value}>
@@ -1103,7 +1103,7 @@ if (!isAuthenticated) {
               <select
                 value={screenSize}
                 onChange={(e) => setScreenSize(e.target.value)}
-                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
               >
                 {Object.entries(SCREEN_SIZES).map(([key, value]) => (
                   <option key={key} value={key}>
@@ -1121,7 +1121,7 @@ if (!isAuthenticated) {
               <select
                 value={videoType}
                 onChange={(e) => setVideoType(e.target.value)}
-                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
               >
                 <option value="short">Short (30s)</option>
                 <option value="standard">Standard (1-2min)</option>
@@ -1137,7 +1137,7 @@ if (!isAuthenticated) {
               <select
                 value={contentMood}
                 onChange={(e) => setContentMood(e.target.value)}
-                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="p-2 rounded-md bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
               >
                 <option value="engaging">Engaging</option>
                 <option value="professional">Professional</option>
@@ -1152,7 +1152,7 @@ if (!isAuthenticated) {
           {/* Main Prompt Input */}
           <div className="space-y-2">
             <textarea
-              className="w-full p-3 md:p-4 rounded-md bg-green-50 text-green-900 text-sm min-h-[80px] md:min-h-[120px] focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-3 md:p-4 rounded-md bg-slate-50 text-slate-900 text-sm min-h-[80px] md:min-h-[120px] focus:outline-none focus:ring-2 focus:ring-slate-500"
               value={overallPrompt}
               onChange={(e) => setOverallPrompt(e.target.value)}
               placeholder="Describe your video concept. What is the main message or story?"
@@ -1173,16 +1173,16 @@ if (!isAuthenticated) {
                   setIncludeProduct(!includeProduct);
                   playSound(toggleSound);
                 }}
-                className="flex items-center text-gray-600 hover:text-green-500 text-xs md:text-sm gap-1 md:gap-2 w-full sm:w-auto justify-center sm:justify-start"
+                className="flex items-center text-gray-600 hover:text-slate-500 text-xs md:text-sm gap-1 md:gap-2 w-full sm:w-auto justify-center sm:justify-start"
               >
                 {includeProduct ? (
-                  <CircleCheckBig size={isMobileView ? 16 : 20} className="text-green-500" />
+                  <CircleCheckBig size={isMobileView ? 16 : 20} className="text-slate-500" />
                 ) : (
                   <Circle size={isMobileView ? 16 : 20} />
                 )}
 
                 <span className="flex items-center gap-1 text-slate-500 flex-wrap">
-                  Include my <span className='flex gap-1 sm:gap-2 text-green-500'>
+                  Include my <span className='flex gap-1 sm:gap-2 text-slate-500'>
                     <Blocks size={isMobileView ? 14 : 16} />product
                   </span>
                 </span>
@@ -1198,7 +1198,7 @@ if (!isAuthenticated) {
                 className={`flex items-center gap-1 md:gap-2 px-4 md:px-6 py-1.5 md:py-2 rounded-md text-sm transition-colors w-full sm:w-auto justify-center
                 ${isGenerating ?
                     'bg-gray-100 text-gray-400 cursor-not-allowed' :
-                    'bg-green-500 text-white hover:bg-green-600'}`}
+                    'bg-green-600 text-white hover:bg-slate-600'}`}
                 onClick={generateVideoScript}
                 disabled={isGenerating}
               >
@@ -1216,7 +1216,7 @@ if (!isAuthenticated) {
 
       {/* Generated Script Display */}
       {scenes.length > 0 && (
-        <div className="bg-green-200 p-2 md:p-4 rounded-md">
+        <div className="bg-slate-200 p-2 md:p-4 rounded-md">
           <div className="mx-auto">
             {/* Scene Timeline */}
             <div className="mb-4 md:mb-6">
@@ -1245,7 +1245,7 @@ if (!isAuthenticated) {
                       key={scene.key}
                       onClick={() => setCurrentScene(index)}
                       className={`flex-shrink-0 w-48 md:w-64 bg-white rounded-lg shadow-sm cursor-pointer transition-all snap-start
-                        ${currentScene === index ? 'ring-2 ring-green-500' : 'hover:shadow-md'}`}
+                        ${currentScene === index ? 'ring-2 ring-slate-500' : 'hover:shadow-md'}`}
                     >
                       {/* Preview */}
                       <div className={`w-full overflow-hidden relative rounded-t-lg ${screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
@@ -1280,14 +1280,14 @@ if (!isAuthenticated) {
                   {/* Add Scene Button */}
                   <button
                     onClick={addNewScene}
-                    className={`flex-shrink-0 w-48 md:w-64 rounded-lg border-2 border-dashed border-green-300 
-                      hover:border-green-400 hover:bg-green-50/50 transition-colors snap-start
+                    className={`flex-shrink-0 w-48 md:w-64 rounded-lg border-2 border-dashed border-slate-300 
+                      hover:border-slate-400 hover:bg-slate-50/50 transition-colors snap-start
                       flex items-center justify-center
                       ${screenSize === 'VERTICAL' ? 'aspect-[9/16]' :
                         screenSize === 'SQUARE' ? 'aspect-square' :
                           screenSize === 'WIDE' ? 'aspect-[21/9]' : 'aspect-video'}`}
                   >
-                    <div className="flex flex-col items-center text-green-500">
+                    <div className="flex flex-col items-center text-slate-500">
                       <PlusCircle className="w-5 h-5 md:w-6 md:h-6 mb-1" />
                       <span className="text-xs md:text-sm font-medium">Add Scene</span>
                     </div>
@@ -1346,7 +1346,7 @@ if (!isAuthenticated) {
                           newScenes[currentScene].duration = e.target.value;
                           setScenes(newScenes);
                         }}
-                        className="w-16 md:w-20 p-1 border rounded text-center focus:outline-none focus:ring-2 focus:ring-green-500 text-xs md:text-sm"
+                        className="w-16 md:w-20 p-1 border rounded text-center focus:outline-none focus:ring-2 focus:ring-slate-500 text-xs md:text-sm"
                         min="1"
                       />
                       <span className="text-xs md:text-sm text-gray-600">s</span>
@@ -1374,7 +1374,7 @@ if (!isAuthenticated) {
                     <textarea
                       value={getCurrentScene().content}
                       onChange={(e) => updateSceneContent(getCurrentScene().id, e.target.value)}
-                      className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
                       rows={isMobileView ? 2 : 3}
                       placeholder="Describe what happens in this scene..."
                     />
@@ -1401,7 +1401,7 @@ if (!isAuthenticated) {
                             'runwayPrompt' : 'avatarPrompt',
                           e.target.value
                         )}
-                        className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
                         rows={isMobileView ? 4 : 6}
                         placeholder={getPromptPlaceholder(
                           getCurrentScene().frameType,
@@ -1423,7 +1423,7 @@ if (!isAuthenticated) {
                         <textarea
                           value={getCurrentScene().aiPrompts.voicePrompt}
                           onChange={(e) => updateAIPrompt(getCurrentScene().id, 'voicePrompt', e.target.value)}
-                          className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
                           rows={isMobileView ? 4 : 6}
                           placeholder="Describe voice tone, pacing, and emotional delivery..."
                         />
@@ -1435,16 +1435,16 @@ if (!isAuthenticated) {
                       <div className="border rounded-lg p-3 md:p-4 bg-gray-50 space-y-3 md:space-y-4">
                         <div className="flex justify-between items-center">
                           <h4 className="text-xs md:text-sm font-medium text-gray-900 flex items-center gap-1 md:gap-2">
-                            <Volume2 size={isMobileView ? 14 : 16} className="text-green-500" />
+                            <Volume2 size={isMobileView ? 14 : 16} className="text-slate-500" />
                             ElevenLabs Voice Script
                           </h4>
-                          <div className="text-xs text-green-500">Premium Voice</div>
+                          <div className="text-xs text-slate-500">Premium Voice</div>
                         </div>
 
                         <textarea
                           value={getCurrentScene().aiPrompts.voicePrompt}
                           onChange={(e) => updateAIPrompt(getCurrentScene().id, 'voicePrompt', e.target.value)}
-                          className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 md:p-3 border rounded-md text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
                           rows={isMobileView ? 3 : 4}
                           placeholder="Enter the exact script for the AI to speak..."
                         />
@@ -1456,7 +1456,7 @@ if (!isAuthenticated) {
                             <select
                               value={getCurrentScene().elevenLabsSettings.voiceId}
                               onChange={(e) => updateVoiceSettings(getCurrentScene().id, 'voiceId', e.target.value)}
-                              className="w-full p-1.5 md:p-2 text-xs md:text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                              className="w-full p-1.5 md:p-2 text-xs md:text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-slate-500"
                             >
                               {ELEVEN_LABS_VOICES.map((voice) => (
                                 <option key={voice.id} value={voice.id}>
@@ -1483,7 +1483,7 @@ if (!isAuthenticated) {
                                   updateVoiceSettings(getCurrentScene().id, 'similarity', preset.settings.similarity);
                                 }
                               }}
-                              className="w-full p-1.5 md:p-2 text-xs md:text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                              className="w-full p-1.5 md:p-2 text-xs md:text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-slate-500"
                             >
                               {VOICE_STYLES.map((style) => (
                                 <option key={style.id} value={style.id}>
@@ -1521,7 +1521,7 @@ if (!isAuthenticated) {
                           <details className="group">
                             <summary className="flex items-center justify-between cursor-pointer list-none text-xs font-medium text-gray-700">
                               <span>Advanced Voice Controls</span>
-                              <span className="text-green-500 group-open:rotate-180 transition-transform">▼</span>
+                              <span className="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
                             </summary>
                             <div className="mt-2 md:mt-3 space-y-2 md:space-y-3">
                               {/* Stability Slider */}

@@ -230,7 +230,6 @@ const MoreOptionsModal = ({ isOpen, onClose, onSelectOption }) => {
     { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
     { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
     { icon: Settings2, label: 'API Keys', id: 'api-keys' },
-    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
     { icon: Heart, label: 'Feedback', id: 'feedback' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
     { icon: Chrome, label: 'Extension', id: 'extension' },
@@ -400,6 +399,7 @@ export default function Dashboard() {
     { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
+    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor', isNew: true },
@@ -413,7 +413,6 @@ export default function Dashboard() {
     { icon: ShieldAlert, label: 'HackerNews Post', id: 'HackerNewsPost' },
     { icon: ShieldAlert, label: 'Eleven Labs Script', id: 'ElevenLabsScriptOptimizer' },
     { icon: Settings2, label: 'API Keys', id: 'api-keys' },
-    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
     { icon: Heart, label: 'Feedback', id: 'feedback' },
     { icon: DollarSign, label: 'Billing', id: 'billing' },
     { icon: Chrome, label: 'Extension', id: 'extension' },
@@ -423,7 +422,8 @@ export default function Dashboard() {
   const primaryMobileNavItems = [
     { icon: HandMetal, label: 'Marketing', id: 'dashboard' },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
-    { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
+    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
+
     { icon: Ellipsis, label: 'More', id: 'more-options' },
   ];
 

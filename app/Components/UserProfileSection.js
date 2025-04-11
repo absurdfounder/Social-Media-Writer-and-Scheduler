@@ -233,16 +233,16 @@ export const Login = () => {
     const getBadgeColor = () => {
       switch (subscription.planName) {
         case 'lifetime':
-          return 'bg-gray-500 text-white';
+          return 'text-green-800';
         case 'monthly':
-          return 'bg-green-600 text-white';
+          return 'bg-green-700';
         default:
           return '';
       }
     };
 
     return (
-      <div className={`${getBadgeColor()} rounded-full text-xs opacity-50 font-medium flex space-x-1 py-1 px-2`}>
+      <div className={`${getBadgeColor()} rounded-full text-xs font-medium flex space-x-1`}>
         <span>
           {subscription.planName === 'lifetime' ? '∞' : '★'}
         </span>
@@ -279,14 +279,14 @@ export const Login = () => {
                 <img
                   src={user.photoURL}
                   alt="Profile"
-                  className="w-10 h-10 rounded-full m-auto"
+                  className="w-12 h-12 rounded-full m-auto p-1 border shadow-xl"
                 />
               ) : (
                 <div className="w-8 h-8 grid rounded-full bg-orange-500 flex items-center justify-center text-white">
                   {user.displayName?.charAt(0) || user.email?.charAt(0)}
                 </div>
               )}
-              <div className='grid gap-1'>
+              <div className='grid'>
                 <span className="truncate max-w-[150px] text-start font-bold">{user.displayName || user.email}</span>
                 {renderSubscriptionBadge()}
               </div>

@@ -433,8 +433,8 @@ export default function PostExtractor() {
                 key={platform}
                 onClick={() => setPostType(platform)}
                 className={`px-3 py-2 rounded-md flex items-center ${postType === platform
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
               >
                 {getPlatformIcon(platform)}

@@ -397,11 +397,11 @@ export default function Dashboard() {
   // Navigation items configuration - Restructured for better organization
   const mainNavItems = [
     { icon: HandMetal, label: 'Marketing Week', id: 'dashboard', featured: true },
+    { icon: Atom, label: 'Big Mouth AI', id: 'TweetExtractor' },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
     { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
-    { icon: Atom, label: 'Big Mouth AI', id: 'TweetExtractor' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor', isNew: true },

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Check, Settings, Zap, RefreshCw, Eye, EyeOff, Twitter, Reddit, MessageCircle, Share2, Filter } from 'lucide-react';
+import { Check, Settings, Zap, RefreshCw, Eye, EyeOff, Twitter, MessageCircle, Share2, Filter } from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
 export default function PostExtractor() {
@@ -385,7 +385,7 @@ export default function PostExtractor() {
   const getPlatformIcon = (platform) => {
     switch(platform) {
       case "twitter": return <Twitter size={18} />;
-      case "reddit": return <Reddit size={18} />;
+      case "reddit": return <MessageCircle size={18} />;
       case "telegram": return <MessageCircle size={18} />;
       case "discord": return <Share2 size={18} />;
       default: return null;
@@ -398,7 +398,6 @@ export default function PostExtractor() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div className="flex items-center">
-            <h2 className="text-xl font-semibold text-gray-800 mr-4">Social Bot Extractor</h2>
             <div className="flex items-center bg-gray-50 p-2 rounded-full">
               <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
                 <Check size={16} className="mr-1 hidden sm:inline" />
@@ -460,7 +459,7 @@ export default function PostExtractor() {
         )}
 
         {/* Manual Extract Form */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="hidden mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <h3 className="text-md font-medium text-gray-700 mb-3">Manual Extraction</h3>
           <form onSubmit={handleSubmit} className="space-y-3">
             <textarea
@@ -515,7 +514,7 @@ export default function PostExtractor() {
 
         {/* Posts Header */}
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-lg font-medium text-gray-800">Extracted Posts ({posts.length})</h3>
+          <h3 className="text-lg font-medium text-gray-800">Posts ({posts.length})</h3>
           {posts.length > 0 && (
             <span className="text-sm text-gray-500">
               {hideDuplicates ? 'Showing unique posts only' : 'Showing all posts'}
@@ -537,7 +536,7 @@ export default function PostExtractor() {
             />
           ) : (
             <div className="py-12 text-center text-gray-500">
-              <p>No posts extracted yet. Paste HTML or start tracking to extract posts.</p>
+              <p>No posts tracked yet.</p>
             </div>
           )}
         </div>

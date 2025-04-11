@@ -6,7 +6,9 @@ import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
   DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, LaughIcon, MailIcon, Calendar, CalendarRange, ShieldAlert, HandMetal,
-  Ellipsis
+  Ellipsis,
+  Eye,
+  Atom
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -399,7 +401,7 @@ export default function Dashboard() {
     { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
     { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
-    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
+    { icon: Atom, label: 'Big Mouth AI', id: 'TweetExtractor' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
     { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor', isNew: true },
@@ -422,7 +424,7 @@ export default function Dashboard() {
   const primaryMobileNavItems = [
     { icon: HandMetal, label: 'Marketing', id: 'dashboard' },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
-    { icon: ShieldAlert, label: 'Big Mouth AI', id: 'TweetExtractor' },
+    { icon: Atom, label: 'Big Mouth AI', id: 'TweetExtractor' },
 
     { icon: Ellipsis, label: 'More', id: 'more-options' },
   ];
@@ -633,11 +635,11 @@ export default function Dashboard() {
         <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white transform 
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
-          <div className="p-8 flex justify-between items-center">
+          <div className="p-4 my-3 flex justify-between items-center">
             <Image
               src={logoSrc}
               alt="Logo"
-              width={200}
+              width={250}
               height={50}
               onError={() => setLogoSrc('/logo.png')}
             />

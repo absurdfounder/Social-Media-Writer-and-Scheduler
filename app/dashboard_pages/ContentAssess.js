@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Check, Settings, Zap, RefreshCw, Eye, EyeOff, Twitter, MessageCircle, Share2, Filter } from 'lucide-react';
+import { Check, Settings, Zap, RefreshCw, Eye, EyeOff, Twitter, Linkedin, MessageCircle, Share2, Filter, Send } from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
 export default function PostExtractor() {
@@ -289,6 +289,7 @@ export default function PostExtractor() {
 
   const extractData = (html) => {
     if (postType === "twitter") return extractTwitterData(html);
+    if (postType === "linkedin") return extractLinkedinData(html);
     if (postType === "reddit") return extractRedditData(html);
     if (postType === "telegram") return extractTelegramData(html);
     if (postType === "discord") return extractDiscordData(html);
@@ -385,8 +386,9 @@ export default function PostExtractor() {
   const getPlatformIcon = (platform) => {
     switch (platform) {
       case "twitter": return <Twitter size={18} />;
+      case "linkedin": return <Linkedin size={18} />;
       case "reddit": return <MessageCircle size={18} />;
-      case "telegram": return <MessageCircle size={18} />;
+      case "telegram": return <Send size={18} />;
       case "discord": return <Share2 size={18} />;
       default: return null;
     }
@@ -402,7 +404,7 @@ export default function PostExtractor() {
           <div className="flex space-x-2 justify-between w-full">
             <div className="flex items-center">
               <div className="flex items-center bg-gray-100 p-2 rounded-full border">
-                <span className="px-2 sm:px-3 py-1 rounded-full border text-xs sm:text-sm font-medium mr-2 bg-slate-100 text-slate-800 flex items-center">
+                <span className="px-2 sm:px-3 py-1 rounded-full border text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
                   <Check size={16} className="mr-1 hidden sm:inline" />
                   <span className="truncate">Connected</span>
                 </span>
@@ -428,7 +430,7 @@ export default function PostExtractor() {
         {/* Platform Selector */}
         <div className="mb-6">
           <div className="flex flex-wrap gap-2">
-            {["twitter", "reddit", "telegram", "discord"].map((platform) => (
+            {["twitter", "linkedin", "reddit", "telegram", "discord"].map((platform) => (
               <button
                 key={platform}
                 onClick={() => setPostType(platform)}

@@ -22,10 +22,10 @@ const ContributionGraph = ({ data }) => {
   const today = new Date();
   const startDate = new Date(today);
   startDate.setDate(startDate.getDate() - 364); // Get data for past year
-  
+
   const days = [];
   let currentDate = new Date(startDate);
-  
+
   // Generate array of dates for the past year
   while (currentDate <= today) {
     const dateString = currentDate.toISOString().split('T')[0];
@@ -35,13 +35,13 @@ const ContributionGraph = ({ data }) => {
     });
     currentDate.setDate(currentDate.getDate() + 1);
   }
-  
+
   // Group by week for rendering
   const weeks = [];
   for (let i = 0; i < days.length; i += 7) {
     weeks.push(days.slice(i, i + 7));
   }
-  
+
   // Get color based on activity count
   const getColor = (count) => {
     if (count === 0) return 'bg-gray-100';
@@ -59,9 +59,9 @@ const ContributionGraph = ({ data }) => {
     { quote: "Consistency in marketing beats intensity. Our slow but steady approach outperformed all our competitors.", author: "David Park, Founder of SteadyGrowth" },
     { quote: "When we started collecting proof of our marketing work, we could finally see what was working and what wasn't.", author: "Emma Williams, Founder of DataDriven" }
   ];
-  
+
   const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-  
+
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -70,7 +70,7 @@ const ContributionGraph = ({ data }) => {
           Total Activities: {Object.values(data).reduce((sum, count) => sum + count, 0)}
         </div>
       </div>
-      
+
       <div className="overflow-x-auto">
         <div className="flex space-x-1">
           {weeks.map((week, weekIndex) => (
@@ -86,7 +86,7 @@ const ContributionGraph = ({ data }) => {
           ))}
         </div>
       </div>
-      
+
       <div className="flex justify-between mt-2 text-xs text-gray-500 my-2 pt-2">
         <div className="text-sm font-medium">Learn how we count contributions</div>
         <div className="flex items-center">
@@ -101,7 +101,7 @@ const ContributionGraph = ({ data }) => {
           <span>More</span>
         </div>
       </div>
-      
+
       {/* Added quote section */}
       <div className="mt-4 p-3 bg-slate-50 border border-slate-100 rounded-md">
         <p className="text-sm text-gray-700 italic">{randomQuote.quote}</p>
@@ -120,10 +120,10 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
     description: '',
     impact: ''
   });
-  
+
   const auth = getAuth();
   const db = getFirestore();
-  
+
   const handleSubmit = async () => {
     if (newMilestone.title.trim() && newMilestone.description.trim()) {
       try {
@@ -134,15 +134,15 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
           profileId: currentProfile?.id,
           userId: auth.currentUser?.uid
         };
-        
+
         // Save to Firestore
         if (auth.currentUser && currentProfile) {
           const milestonesRef = collection(db, 'marketing_milestones');
           await addDoc(milestonesRef, milestoneToAdd);
-          
+
           toast.success('Milestone saved successfully!');
         }
-        
+
         onAddMilestone(milestoneToAdd);
         setNewMilestone({
           title: '',
@@ -157,7 +157,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
       }
     }
   };
-  
+
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
@@ -169,7 +169,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
           <PlusCircle size={16} className="mr-1" /> Add Milestone
         </button>
       </div>
-      
+
       {showForm && (
         <div className="mb-6 p-4 border rounded-lg bg-gray-50">
           <h4 className="font-medium mb-3">New Milestone</h4>
@@ -181,7 +181,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-slate-500"
                 placeholder="Milestone title"
                 value={newMilestone.title}
-                onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
+                onChange={(e) => setNewMilestone({ ...newMilestone, title: e.target.value })}
               />
             </div>
             <div>
@@ -190,11 +190,11 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
                 type="date"
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-slate-500"
                 value={newMilestone.date}
-                onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
+                onChange={(e) => setNewMilestone({ ...newMilestone, date: e.target.value })}
               />
             </div>
           </div>
-          
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
@@ -202,10 +202,10 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
               placeholder="Describe your milestone"
               rows="2"
               value={newMilestone.description}
-              onChange={(e) => setNewMilestone({...newMilestone, description: e.target.value})}
+              onChange={(e) => setNewMilestone({ ...newMilestone, description: e.target.value })}
             ></textarea>
           </div>
-          
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Impact</label>
             <textarea
@@ -213,10 +213,10 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
               placeholder="What impact did this milestone have?"
               rows="2"
               value={newMilestone.impact}
-              onChange={(e) => setNewMilestone({...newMilestone, impact: e.target.value})}
+              onChange={(e) => setNewMilestone({ ...newMilestone, impact: e.target.value })}
             ></textarea>
           </div>
-          
+
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => setShowForm(false)}
@@ -233,7 +233,7 @@ const MarketingMilestones = ({ milestones, onAddMilestone, currentProfile }) => 
           </div>
         </div>
       )}
-      
+
       {milestones.length === 0 ? (
         <div className="text-center py-6 text-gray-500">
           No milestones added yet. Add your first marketing achievement!
@@ -276,10 +276,10 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
   const fileInputRef = useRef(null);
   const [expandedTask, setExpandedTask] = useState(null);
   const [noteText, setNoteText] = useState('');
-  
+
   const auth = getAuth();
   const db = getFirestore();
-  
+
   const handleAddTask = async () => {
     if (newTaskText.trim()) {
       try {
@@ -294,23 +294,23 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
           profileId: currentProfile?.id,
           createdAt: new Date().toISOString()
         };
-        
+
         // Add to UI first for immediate feedback
         onTaskAdd(newTask);
         setNewTaskText('');
-        
+
         // Then save to Firebase if user is logged in
         if (auth.currentUser && currentProfile) {
           // Get reference to the tasks document for this user and profile
           const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
-          
+
           // Get current tasks or create new array
           const tasksDoc = await getDoc(tasksDocRef);
           let currentTasks = [];
-          
+
           if (tasksDoc.exists()) {
             currentTasks = tasksDoc.data().tasks || [];
-            await updateDoc(tasksDocRef, { 
+            await updateDoc(tasksDocRef, {
               tasks: [...currentTasks, newTask],
               updatedAt: new Date().toISOString()
             });
@@ -322,12 +322,12 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
               createdAt: new Date().toISOString()
             });
           }
-          
+
           // Update contribution data for today
           const today = new Date().toISOString().split('T')[0];
           const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
           const contributionDoc = await getDoc(contributionRef);
-          
+
           if (contributionDoc.exists()) {
             const contributionData = contributionDoc.data().data || {};
             contributionData[today] = (contributionData[today] || 0) + 1;
@@ -340,7 +340,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
               createdAt: new Date().toISOString()
             });
           }
-          
+
           toast.success('Task saved successfully!');
         }
       } catch (error) {
@@ -349,16 +349,16 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
       }
     }
   };
-  
+
   const handleProofClick = (taskId) => {
     fileInputRef.current.taskId = taskId;
     fileInputRef.current.click();
   };
-  
+
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     const taskId = fileInputRef.current.taskId;
-    
+
     if (files.length > 0 && taskId) {
       try {
         const proofs = files.map(file => ({
@@ -369,30 +369,30 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
           size: file.size,
           uploadDate: new Date().toISOString()
         }));
-        
+
         // Update task in Firebase
         if (auth.currentUser && currentProfile) {
           // Find the task document
           const taskQuery = collection(db, 'marketing_tasks');
           const taskSnapshot = await getDoc(doc(db, 'marketing_tasks', taskId));
-          
+
           if (taskSnapshot.exists()) {
             const taskData = taskSnapshot.data();
             const updatedProofs = [...(taskData.proofs || []), ...proofs];
-            
+
             await updateDoc(doc(db, 'marketing_tasks', taskId), {
               proofs: updatedProofs
             });
-            
+
             // Update contribution data for today
             const today = new Date().toISOString().split('T')[0];
             const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
-            
+
             const contributionDoc = await getDoc(contributionRef);
             if (contributionDoc.exists()) {
               const contributionData = contributionDoc.data().data || {};
               contributionData[today] = (contributionData[today] || 0) + 1;
-              
+
               await updateDoc(contributionRef, { data: contributionData });
             } else {
               await setDoc(contributionRef, {
@@ -403,7 +403,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
             }
           }
         }
-        
+
         onProofAttach(taskId, proofs);
         toast.success('Proof attached successfully!');
       } catch (error) {
@@ -412,7 +412,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
       }
     }
   };
-  
+
   const handleAddNotes = async (taskId) => {
     if (noteText.trim()) {
       try {
@@ -420,16 +420,16 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
         if (auth.currentUser && currentProfile) {
           // Find the task document
           const taskSnapshot = await getDoc(doc(db, 'marketing_tasks', taskId));
-          
+
           if (taskSnapshot.exists()) {
             await updateDoc(doc(db, 'marketing_tasks', taskId), {
               notes: noteText
             });
-            
+
             toast.success('Notes added successfully!');
           }
         }
-        
+
         onAddNotes(taskId, noteText);
         setNoteText('');
       } catch (error) {
@@ -438,13 +438,13 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
       }
     }
   };
-  
+
   const categories = ['Content', 'Social', 'Email', 'SEO', 'Partnership', 'Analysis'];
-  
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold mb-4">Marketing Tasks</h2>
-      
+
       <div className="mb-6">
         <div className="flex mb-2">
           <input
@@ -462,24 +462,23 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
             <PlusCircle size={20} />
           </button>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 mt-3">
           {categories.map(category => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category.toLowerCase())}
-              className={`px-3 py-1 text-xs rounded-full ${
-                selectedCategory === category.toLowerCase()
+              className={`px-3 py-1 text-xs rounded-full ${selectedCategory === category.toLowerCase()
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+                }`}
             >
               {category}
             </button>
           ))}
         </div>
       </div>
-      
+
       <input
         type="file"
         ref={fileInputRef}
@@ -487,33 +486,32 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
         onChange={handleFileChange}
         multiple
       />
-      
+
       <div className="space-y-6">
         {categories.map(category => {
           const categoryTasks = tasks.filter(task => task.category.toLowerCase() === category.toLowerCase());
           if (categoryTasks.length === 0) return null;
-          
+
           return (
             <div key={category} className="pb-4">
               <h3 className="font-medium text-gray-700 mb-3 flex items-center">
-                {category} 
+                {category}
                 <span className="ml-2 bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full">
                   {categoryTasks.length}
                 </span>
               </h3>
               <div className="space-y-3">
-              {categoryTasks.map(task => (
+                {categoryTasks.map(task => (
                   <div key={task.id} className="border rounded-md p-3 group hover:shadow-sm">
                     <div className="flex items-center">
                       <button
                         onClick={() => onTaskToggle(task.id)}
-                        className={`flex-shrink-0 w-5 h-5 rounded-full border ${
-                          task.completed ? 'bg-green-600 border-slate-500' : 'border-gray-300'
-                        } mr-3 flex items-center justify-center`}
+                        className={`flex-shrink-0 w-5 h-5 rounded-full border ${task.completed ? 'bg-green-600 border-slate-500' : 'border-gray-300'
+                          } mr-3 flex items-center justify-center`}
                       >
                         {task.completed && <CircleCheck size={16} className="text-white" />}
                       </button>
-                      <span 
+                      <span
                         className={`flex-1 cursor-pointer font-medium ${task.completed ? 'line-through text-gray-400' : ''}`}
                         onClick={() => setExpandedTask(expandedTask === task.id ? null : task.id)}
                       >
@@ -538,7 +536,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
                         </button>
                       </div>
                     </div>
-                    
+
                     {expandedTask === task.id && (
                       <div className="mt-3 pt-3 border-t">
                         {task.proofs && task.proofs.length > 0 && (
@@ -550,9 +548,9 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
                               {task.proofs.map(proof => (
                                 <div key={proof.id} className="flex items-center text-xs bg-gray-50 p-2 rounded">
                                   <Paperclip size={12} className="mr-1 text-gray-500" />
-                                  <a 
-                                    href={proof.url} 
-                                    target="_blank" 
+                                  <a
+                                    href={proof.url}
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-slate-500 hover:underline truncate"
                                   >
@@ -566,11 +564,11 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
                             </div>
                           </div>
                         )}
-                        
+
                         <div>
                           <div className="text-xs font-medium text-gray-700 mb-1 flex items-center">
-                            <MessageSquare size={14} className="mr-1" /> 
-                            Notes: 
+                            <MessageSquare size={14} className="mr-1" />
+                            Notes:
                             {!task.notes ? <span className="ml-1 text-xs text-red-500">*</span> : null}
                           </div>
                           {task.notes ? (
@@ -605,7 +603,7 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
           );
         })}
       </div>
-      
+
       <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
         <div className="flex items-start">
           <AlertTriangle size={20} className="text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -625,20 +623,20 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
 const MarketingDashboard = ({ currentProfile }) => {
   // State for AI chat
   const [chatOpen, setChatOpen] = useState(false);
-  
+
   // Firebase references
   const auth = getAuth();
   const db = getFirestore();
-  
+
   // State for data
   const [tasks, setTasks] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [activityData, setActivityData] = useState({});
-  
+
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
   const hasLoadedRef = useRef({});
-  
+
   // Load data when profile changes
   useEffect(() => {
     // Only load data if we haven't loaded them for this profile yet
@@ -648,13 +646,15 @@ const MarketingDashboard = ({ currentProfile }) => {
     } else if (!currentProfile) {
       // Set default sample data if no profile selected
       setTasks([
-        { id: '1', text: 'Create blog post about customer success story', completed: true, category: 'content', proofs: [
-          { id: '101', name: 'blog-post-screenshot.png', url: '#', type: 'image/png', size: 245000, uploadDate: '2023-03-15T10:30:00Z' }
-        ], notes: 'Published on the company blog and shared to social media channels' },
+        {
+          id: '1', text: 'Create blog post about customer success story', completed: true, category: 'content', proofs: [
+            { id: '101', name: 'blog-post-screenshot.png', url: '#', type: 'image/png', size: 245000, uploadDate: '2023-03-15T10:30:00Z' }
+          ], notes: 'Published on the company blog and shared to social media channels'
+        },
         { id: '2', text: 'Schedule social media posts for the week', completed: false, category: 'social', proofs: [], notes: '' },
         { id: '3', text: 'Analyze February campaign metrics', completed: false, category: 'analysis', proofs: [], notes: '' }
       ]);
-      
+
       setMilestones([
         {
           id: '1',
@@ -664,26 +664,26 @@ const MarketingDashboard = ({ currentProfile }) => {
           impact: 'Increased our potential marketing reach by 40% compared to last quarter.'
         }
       ]);
-      
+
       setActivityData({
         "2023-03-15": 5,
         "2023-03-16": 3,
         "2023-03-17": 7
       });
-      
+
       setIsLoading(false);
     }
   }, [currentProfile, auth.currentUser]);
-  
+
   // Function to load all data
   const loadData = async () => {
     setIsLoading(true);
-    
+
     try {
       // Load tasks
       const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
       const tasksDoc = await getDoc(tasksDocRef);
-      
+
       if (tasksDoc.exists()) {
         console.log('Loaded tasks:', tasksDoc.data().tasks);
         setTasks(tasksDoc.data().tasks || []);
@@ -691,11 +691,11 @@ const MarketingDashboard = ({ currentProfile }) => {
         console.log('No tasks found, setting empty array');
         setTasks([]);
       }
-      
+
       // Load milestones
       const milestonesDocRef = doc(db, 'marketing_milestones', `${currentProfile.id}_${auth.currentUser.uid}`);
       const milestonesDoc = await getDoc(milestonesDocRef);
-      
+
       if (milestonesDoc.exists()) {
         console.log('Loaded milestones:', milestonesDoc.data().milestones);
         setMilestones(milestonesDoc.data().milestones || []);
@@ -703,11 +703,11 @@ const MarketingDashboard = ({ currentProfile }) => {
         console.log('No milestones found, setting empty array');
         setMilestones([]);
       }
-      
+
       // Load contribution data
       const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
       const contributionDoc = await getDoc(contributionRef);
-      
+
       if (contributionDoc.exists()) {
         console.log('Loaded contribution data:', contributionDoc.data().data);
         setActivityData(contributionDoc.data().data || {});
@@ -715,7 +715,7 @@ const MarketingDashboard = ({ currentProfile }) => {
         console.log('No contribution data found, setting empty object');
         setActivityData({});
       }
-      
+
     } catch (error) {
       console.error('Error loading data:', error);
       toast.error('Failed to load data from database');
@@ -723,68 +723,68 @@ const MarketingDashboard = ({ currentProfile }) => {
       setIsLoading(false);
     }
   };
-  
+
   // Simple direct task management functions
-// Task management functions with Firebase integration
-const handleTaskToggle = async (taskId) => {
-  try {
-    // Update locally first for immediate UI response
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    );
-    setTasks(updatedTasks);
-    
-    if (auth.currentUser && currentProfile) {
-      // Update in Firebase
-      const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
-      await updateDoc(tasksDocRef, { 
-        tasks: updatedTasks,
-        updatedAt: new Date().toISOString()
-      });
-      
-      // Update contribution data for today
-      const today = new Date().toISOString().split('T')[0];
-      const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
-      const contributionDoc = await getDoc(contributionRef);
-      
-      if (contributionDoc.exists()) {
-        const contributionData = contributionDoc.data().data || {};
-        contributionData[today] = (contributionData[today] || 0) + 1;
-        await updateDoc(contributionRef, { data: contributionData });
-      } else {
-        await setDoc(contributionRef, {
-          data: { [today]: 1 },
-          userId: auth.currentUser.uid,
-          profileId: currentProfile.id,
-          createdAt: new Date().toISOString()
+  // Task management functions with Firebase integration
+  const handleTaskToggle = async (taskId) => {
+    try {
+      // Update locally first for immediate UI response
+      const updatedTasks = tasks.map(task =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      );
+      setTasks(updatedTasks);
+
+      if (auth.currentUser && currentProfile) {
+        // Update in Firebase
+        const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
+        await updateDoc(tasksDocRef, {
+          tasks: updatedTasks,
+          updatedAt: new Date().toISOString()
         });
+
+        // Update contribution data for today
+        const today = new Date().toISOString().split('T')[0];
+        const contributionRef = doc(db, 'marketing_contributions', `${currentProfile.id}_${auth.currentUser.uid}`);
+        const contributionDoc = await getDoc(contributionRef);
+
+        if (contributionDoc.exists()) {
+          const contributionData = contributionDoc.data().data || {};
+          contributionData[today] = (contributionData[today] || 0) + 1;
+          await updateDoc(contributionRef, { data: contributionData });
+        } else {
+          await setDoc(contributionRef, {
+            data: { [today]: 1 },
+            userId: auth.currentUser.uid,
+            profileId: currentProfile.id,
+            createdAt: new Date().toISOString()
+          });
+        }
       }
+    } catch (error) {
+      console.error('Error toggling task:', error);
+      toast.error('Failed to update task status');
     }
-  } catch (error) {
-    console.error('Error toggling task:', error);
-    toast.error('Failed to update task status');
-  }
-};
-  
+  };
+
   const handleTaskAdd = (newTask) => {
     console.log('Adding new task:', newTask);
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
-  
+
   const handleTaskDelete = async (taskId) => {
     try {
       // Update locally first
       const updatedTasks = tasks.filter(task => task.id !== taskId);
       setTasks(updatedTasks);
-      
+
       if (auth.currentUser && currentProfile) {
         // Update in Firebase
         const tasksDocRef = doc(db, 'marketing_tasks', `${currentProfile.id}_${auth.currentUser.uid}`);
-        await updateDoc(tasksDocRef, { 
+        await updateDoc(tasksDocRef, {
           tasks: updatedTasks,
           updatedAt: new Date().toISOString()
         });
-        
+
         toast.success('Task deleted');
       }
     } catch (error) {
@@ -792,38 +792,38 @@ const handleTaskToggle = async (taskId) => {
       toast.error('Failed to delete task from database');
     }
   };
-  
+
   const handleProofAttach = (taskId, proofs) => {
     console.log('Attaching proof to task:', taskId, proofs);
-    setTasks(tasks.map(task => 
-      task.id === taskId 
+    setTasks(tasks.map(task =>
+      task.id === taskId
         ? { ...task, proofs: [...(task.proofs || []), ...proofs] }
         : task
     ));
   };
-  
+
   const handleAddNotes = (taskId, notes) => {
     console.log('Adding notes to task:', taskId, notes);
-    setTasks(tasks.map(task => 
+    setTasks(tasks.map(task =>
       task.id === taskId ? { ...task, notes } : task
     ));
   };
-  
+
   // Add milestone
   const handleAddMilestone = (newMilestone) => {
     console.log('Adding new milestone:', newMilestone);
     setMilestones([...milestones, newMilestone]);
   };
-  
+
   // Calculate task completion stats
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.completed).length;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  
+
   // AI Chat Button Component
   const AIChatButton = ({ onClick }) => {
     const [isHovered, setIsHovered] = useState(false);
-    
+
     return (
       <div className="fixed bottom-6 right-6 z-50">
         {/* Message bubble */}
@@ -833,7 +833,7 @@ const handleTaskToggle = async (taskId) => {
             <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-3 h-3 bg-white"></div>
           </div>
         )}
-        
+
         {/* Chat button */}
         <button
           onClick={onClick}
@@ -846,19 +846,19 @@ const handleTaskToggle = async (taskId) => {
       </div>
     );
   };
-  
+
   // AI Chat Modal Component
   const AIChatModal = ({ isOpen, onClose }) => {
     const [messages, setMessages] = useState([
       { type: 'bot', text: 'Hi there! How can I help with your marketing today?' }
     ]);
     const [inputValue, setInputValue] = useState('');
-    
+
     const handleSendMessage = () => {
       if (inputValue.trim()) {
         // Add user message
         setMessages([...messages, { type: 'user', text: inputValue }]);
-        
+
         // Simulate AI response (in a real app, this would call an API)
         setTimeout(() => {
           const botResponses = [
@@ -868,17 +868,17 @@ const handleTaskToggle = async (taskId) => {
             "Email marketing still has one of the highest ROIs of any marketing channel. Make sure your subject lines are compelling and your content provides real value.",
             "When measuring marketing success, look beyond vanity metrics like followers. Focus on conversions, engagement rates, and ultimately revenue attributed to your campaigns."
           ];
-          
+
           const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
           setMessages(prev => [...prev, { type: 'bot', text: randomResponse }]);
         }, 1000);
-        
+
         setInputValue('');
       }
     };
-    
+
     if (!isOpen) return null;
-    
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] flex flex-col h-full">
@@ -889,27 +889,26 @@ const handleTaskToggle = async (taskId) => {
               <X size={20} />
             </button>
           </div>
-          
+
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div 
-                  className={`max-w-xs px-4 py-2 rounded-lg ${
-                    message.type === 'user' 
-                      ? 'bg-green-600 text-white rounded-br-none' 
+                <div
+                  className={`max-w-xs px-4 py-2 rounded-lg ${message.type === 'user'
+                      ? 'bg-green-600 text-white rounded-br-none'
                       : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                  }`}
+                    }`}
                 >
                   {message.text}
                 </div>
               </div>
             ))}
           </div>
-          
+
           {/* Input */}
           <div className="border-t p-4">
             <div className="flex">
@@ -920,7 +919,7 @@ const handleTaskToggle = async (taskId) => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
+              />
               <button
                 onClick={handleSendMessage}
                 className="bg-green-600 text-white p-2 rounded-r-md hover:bg-slate-600"
@@ -933,15 +932,15 @@ const handleTaskToggle = async (taskId) => {
       </div>
     );
   };
-  
+
   return (
     <div className="bg-gray-100 min-h-screen p-4">
       <div className="max-w-4xl mx-auto">
 
-        
+
         {/* Contribution graph at the top */}
         <ContributionGraph data={activityData} />
-        
+
         {/* Stats cards */}
         <div className="bg-white p-4 rounded-lg shadow mb-6">
           <div className="text-sm text-gray-500">Task Completion</div>
@@ -950,17 +949,17 @@ const handleTaskToggle = async (taskId) => {
             <div className="text-sm text-gray-600 ml-2">({completedTasks}/{totalTasks})</div>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-            <div 
-              className="bg-green-600 h-2.5 rounded-full" 
+            <div
+              className="bg-green-600 h-2.5 rounded-full"
               style={{ width: `${completionRate}%` }}
             ></div>
           </div>
         </div>
-        
+
         {/* Main content */}
         <div className="space-y-6">
-          <MarketingTaskList 
-            tasks={tasks} 
+          <MarketingTaskList
+            tasks={tasks}
             onTaskToggle={handleTaskToggle}
             onTaskAdd={handleTaskAdd}
             onTaskDelete={handleTaskDelete}
@@ -968,15 +967,15 @@ const handleTaskToggle = async (taskId) => {
             onAddNotes={handleAddNotes}
             currentProfile={currentProfile}
           />
-          
-          <MarketingMilestones 
+
+          <MarketingMilestones
             milestones={milestones}
             onAddMilestone={handleAddMilestone}
             currentProfile={currentProfile}
           />
         </div>
       </div>
-      
+
       {/* AI Chat Button & Modal */}
       <AIChatButton onClick={() => setChatOpen(true)} />
       <AIChatModal isOpen={chatOpen} onClose={() => setChatOpen(false)} />

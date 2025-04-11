@@ -469,8 +469,8 @@ const MarketingTaskList = ({ tasks, onTaskToggle, onTaskAdd, onTaskDelete, onPro
               key={category}
               onClick={() => setSelectedCategory(category.toLowerCase())}
               className={`px-3 py-1 text-xs rounded-full ${selectedCategory === category.toLowerCase()
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
             >
               {category}
@@ -899,8 +899,8 @@ const MarketingDashboard = ({ currentProfile }) => {
               >
                 <div
                   className={`max-w-xs px-4 py-2 rounded-lg ${message.type === 'user'
-                      ? 'bg-green-600 text-white rounded-br-none'
-                      : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                    ? 'bg-green-600 text-white rounded-br-none'
+                    : 'bg-gray-100 text-gray-800 rounded-bl-none'
                     }`}
                 >
                   {message.text}

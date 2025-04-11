@@ -741,8 +741,8 @@ export default function Dashboard() {
               icon={item.icon}
               label={item.label}
               active={activeTab === item.id || (item.id === 'more-options' && isMoreOptionsOpen)}
-              onClick={() => item.id === 'more-options' 
-                ? setIsMoreOptionsOpen(true) 
+              onClick={() => item.id === 'more-options'
+                ? setIsMoreOptionsOpen(true)
                 : handleNavItemClick(item.id)
               }
             />
@@ -754,18 +754,18 @@ export default function Dashboard() {
       <OnBoardingPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
       <BillingModal isOpen={isBillingOpen} onClose={() => setIsBillingOpen(false)} />
       <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
-      
+
       {/* More Options Modal */}
-      <MoreOptionsModal 
-        isOpen={isMoreOptionsOpen} 
+      <MoreOptionsModal
+        isOpen={isMoreOptionsOpen}
         onClose={() => setIsMoreOptionsOpen(false)}
         onSelectOption={handleNavItemClick}
       />
 
       {/* API Key Manager Modal */}
-      <Modal 
-        isOpen={showApiKeyManager} 
-        onClose={() => setShowApiKeyManager(false)} 
+      <Modal
+        isOpen={showApiKeyManager}
+        onClose={() => setShowApiKeyManager(false)}
         title="API Key Manager"
       >
         <div className="p-4">

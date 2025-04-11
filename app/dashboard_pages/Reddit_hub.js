@@ -891,38 +891,38 @@ const RedditExplorer = () => {
     );
   };
 
-// Update the API calls in the RedditExplorer component
+  // Update the API calls in the RedditExplorer component
 
-// For the generatePostIdeas function:
-const generatePostIdeas = async (posts) => {
-  if (!productInfo) {
-    console.log('No product info available');
-    return;
-  }
+  // For the generatePostIdeas function:
+  const generatePostIdeas = async (posts) => {
+    if (!productInfo) {
+      console.log('No product info available');
+      return;
+    }
 
-  const topPosts = posts.sort((a, b) => b.score - a.score).slice(0, 5);
-  const openaiKey = getOpenAIKey(); // Use the utility function
+    const topPosts = posts.sort((a, b) => b.score - a.score).slice(0, 5);
+    const openaiKey = getOpenAIKey(); // Use the utility function
 
-  if (!openaiKey) {
-    setErrorMessage('OpenAI API key not found. Please set your API key in the settings.');
-    return;
-  }
+    if (!openaiKey) {
+      setErrorMessage('OpenAI API key not found. Please set your API key in the settings.');
+      return;
+    }
 
-  try {
-    setIsGeneratingIdeas(true);
-    const response = await fetch('/api/openai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiKey}`
-      },
-      body: JSON.stringify({
-        temperature: 0.7,
-        max_tokens: 4000,
-        model: "gpt-4o-mini", // Explicitly set the model
-        messages: [{
-          role: "user",
-          content: `Based on these top performing Reddit posts and our product information, generate 5 engaging post ideas. Format each idea with a clear title and detailed description.
+    try {
+      setIsGeneratingIdeas(true);
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiKey}`
+        },
+        body: JSON.stringify({
+          temperature: 0.7,
+          max_tokens: 4000,
+          model: "gpt-4o-mini", // Explicitly set the model
+          messages: [{
+            role: "user",
+            content: `Based on these top performing Reddit posts and our product information, generate 5 engaging post ideas. Format each idea with a clear title and detailed description.
 
 Top Posts: ${JSON.stringify(topPosts, null, 2)}
 Product Info: ${JSON.stringify(productInfo, null, 2)}
@@ -935,70 +935,70 @@ Description: [2-3 sentences explaining the post idea]
 Description: [2-3 sentences explaining the post idea]
 
 ... and so on for all 5 ideas.`
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'API request failed');
-    }
-
-    const data = await response.json();
-    console.log('API Response:', data); // Debug log
-
-    // Parse the response (updated structure)
-    const ideas = data.choices[0].message.content.split(/\d+\.\s+/)
-      .filter(idea => idea.trim() !== '')
-      .map(idea => {
-        const titleMatch = idea.match(/Title:\s*(.*?)\nDescription:/s);
-        const descriptionMatch = idea.match(/Description:\s*(.*?)(?=\n|$)/s);
-
-        return {
-          title: titleMatch ? titleMatch[1].trim() : '',
-          description: descriptionMatch ? descriptionMatch[1].trim() : ''
-        };
+          }]
+        })
       });
 
-    console.log('Parsed Ideas:', ideas); // Debug log
-    setPostIdeas(ideas);
-  } catch (error) {
-    console.error('Error generating post ideas:', error);
-    setErrorMessage(`Error generating post ideas: ${error.message}`);
-  } finally {
-    setIsGeneratingIdeas(false);
-  }
-};
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
+      }
 
-// For the generateCommentSuggestion function:
-const generateCommentSuggestion = async (postId, postTitle, postContent) => {
-  if (!productInfo) {
-    console.log('No product info available');
-    return;
-  }
+      const data = await response.json();
+      console.log('API Response:', data); // Debug log
 
-  const openaiKey = getOpenAIKey(); // Use the utility function
-  
-  if (!openaiKey) {
-    setErrorMessage('OpenAI API key not found. Please set your API key in the settings.');
-    return;
-  }
+      // Parse the response (updated structure)
+      const ideas = data.choices[0].message.content.split(/\d+\.\s+/)
+        .filter(idea => idea.trim() !== '')
+        .map(idea => {
+          const titleMatch = idea.match(/Title:\s*(.*?)\nDescription:/s);
+          const descriptionMatch = idea.match(/Description:\s*(.*?)(?=\n|$)/s);
 
-  try {
-    console.log('Generating comment for post:', postId);
-    const response = await fetch('/api/openai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiKey}`
-      },
-      body: JSON.stringify({
-        temperature: 0.7,
-        max_tokens: 4000,
-        model: "gpt-4o-mini", // Explicitly set the model
-        messages: [{
-          role: "user",
-          content: `Create an engaging comment for this Reddit post that naturally mentions our product/service when relevant. The comment should:
+          return {
+            title: titleMatch ? titleMatch[1].trim() : '',
+            description: descriptionMatch ? descriptionMatch[1].trim() : ''
+          };
+        });
+
+      console.log('Parsed Ideas:', ideas); // Debug log
+      setPostIdeas(ideas);
+    } catch (error) {
+      console.error('Error generating post ideas:', error);
+      setErrorMessage(`Error generating post ideas: ${error.message}`);
+    } finally {
+      setIsGeneratingIdeas(false);
+    }
+  };
+
+  // For the generateCommentSuggestion function:
+  const generateCommentSuggestion = async (postId, postTitle, postContent) => {
+    if (!productInfo) {
+      console.log('No product info available');
+      return;
+    }
+
+    const openaiKey = getOpenAIKey(); // Use the utility function
+
+    if (!openaiKey) {
+      setErrorMessage('OpenAI API key not found. Please set your API key in the settings.');
+      return;
+    }
+
+    try {
+      console.log('Generating comment for post:', postId);
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiKey}`
+        },
+        body: JSON.stringify({
+          temperature: 0.7,
+          max_tokens: 4000,
+          model: "gpt-4o-mini", // Explicitly set the model
+          messages: [{
+            role: "user",
+            content: `Create an engaging comment for this Reddit post that naturally mentions our product/service when relevant. The comment should:
 
 1. Provide genuine value to the discussion
 2. Share relevant experience or insights
@@ -1013,61 +1013,61 @@ Product/Service Context:
 ${JSON.stringify(productInfo, null, 2)}
 
 Generate a natural, engaging comment that someone would actually write on Reddit (100-200 words).`
-        }]
-      })
-    });
+          }]
+        })
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'API request failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data); // Debug log
+
+      const suggestion = data.choices[0].message.content.trim();
+      console.log('Generated comment:', suggestion); // Debug log
+
+      setCommentSuggestions(prev => ({ ...prev, [postId]: suggestion }));
+    } catch (error) {
+      console.error('Error generating comment suggestion:', error);
+      setErrorMessage(`Error generating comment suggestion: ${error.message}`);
     }
+  };
 
-    const data = await response.json();
-    console.log('API Response:', data); // Debug log
-
-    const suggestion = data.choices[0].message.content.trim();
-    console.log('Generated comment:', suggestion); // Debug log
-
-    setCommentSuggestions(prev => ({ ...prev, [postId]: suggestion }));
-  } catch (error) {
-    console.error('Error generating comment suggestion:', error);
-    setErrorMessage(`Error generating comment suggestion: ${error.message}`);
-  }
-};
-
-// For the analyzePostContent function:
-const analyzePostContent = async (post) => {
-  try {
-    const openaiKey = getOpenAIKey(); // Use the utility function
-    const trainingData = localStorage.getItem('getTrainingData');
-
-    if (!openaiKey) {
-      setErrorMessage('OpenAI API key not found. Please set your API key in the settings.');
-      return post;
-    }
-
-    let parsedTrainingData;
+  // For the analyzePostContent function:
+  const analyzePostContent = async (post) => {
     try {
-      parsedTrainingData = trainingData ? JSON.parse(trainingData) : {};
-    } catch (e) {
-      console.error('Error parsing training data:', e);
-      parsedTrainingData = {};
-    }
+      const openaiKey = getOpenAIKey(); // Use the utility function
+      const trainingData = localStorage.getItem('getTrainingData');
 
-    console.log('Analyzing post content with training data...');
-    const response = await fetch('/api/openai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiKey}`
-      },
-      body: JSON.stringify({
-        temperature: 0.7,
-        max_tokens: 4000,
-        model: "gpt-4o-mini", // Explicitly set the model
-        messages: [{
-          role: "user",
-          content: `Analyze this Reddit post's marketing potential. Consider how the user could naturally promote their product/service in the comments or participate in the discussion.
+      if (!openaiKey) {
+        setErrorMessage('OpenAI API key not found. Please set your API key in the settings.');
+        return post;
+      }
+
+      let parsedTrainingData;
+      try {
+        parsedTrainingData = trainingData ? JSON.parse(trainingData) : {};
+      } catch (e) {
+        console.error('Error parsing training data:', e);
+        parsedTrainingData = {};
+      }
+
+      console.log('Analyzing post content with training data...');
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiKey}`
+        },
+        body: JSON.stringify({
+          temperature: 0.7,
+          max_tokens: 4000,
+          model: "gpt-4o-mini", // Explicitly set the model
+          messages: [{
+            role: "user",
+            content: `Analyze this Reddit post's marketing potential. Consider how the user could naturally promote their product/service in the comments or participate in the discussion.
 
 Assess the following:
 1. Keywords (comma-separated list focused on business/marketing opportunities)
@@ -1087,45 +1087,45 @@ Title: ${post.title}
 Content: ${post.selftext}
 
 Focus on finding genuine opportunities to add value while promoting the product/service. Score higher for posts where promotion would feel natural and helpful rather than forced.`
-        }]
-      })
-    });
+          }]
+        })
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'API request failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
+      }
+
+      const data = await response.json();
+      console.log('Raw API response:', data);
+
+      // Parse the response (updated structure)
+      const analysisResult = data.choices[0].message.content;
+      console.log('Analysis result:', analysisResult);
+
+      const keywords = analysisResult.match(/\*\*Keywords:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(k => k.trim()) || [];
+      const summary = analysisResult.match(/\*\*Summary:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
+      const categories = analysisResult.match(/\*\*Categories:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(c => c.trim()) || [];
+      const relevancyScore = parseInt(analysisResult.match(/\*\*Marketing Relevancy Score:?\*\*:?\s*(\d+)/i)?.[1]) || 0;
+      const relevancyExplanation = analysisResult.match(/\*\*Marketing Opportunity Explanation:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
+
+      console.log('Parsed results:', { keywords, summary, categories, relevancyScore, relevancyExplanation });
+
+      return {
+        ...post,
+        keywords,
+        summary,
+        categories,
+        relevancyScore,
+        relevancyExplanation
+      };
+
+    } catch (error) {
+      console.error('Error analyzing post:', error);
+      setErrorMessage(`Error analyzing post: ${error.message}`);
+      return post;
     }
-
-    const data = await response.json();
-    console.log('Raw API response:', data);
-
-    // Parse the response (updated structure)
-    const analysisResult = data.choices[0].message.content;
-    console.log('Analysis result:', analysisResult);
-
-    const keywords = analysisResult.match(/\*\*Keywords:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(k => k.trim()) || [];
-    const summary = analysisResult.match(/\*\*Summary:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
-    const categories = analysisResult.match(/\*\*Categories:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.split(',').map(c => c.trim()) || [];
-    const relevancyScore = parseInt(analysisResult.match(/\*\*Marketing Relevancy Score:?\*\*:?\s*(\d+)/i)?.[1]) || 0;
-    const relevancyExplanation = analysisResult.match(/\*\*Marketing Opportunity Explanation:?\*\*:?\s*(.*?)(?=\n\n|\*\*|$)/i)?.[1]?.trim() || '';
-
-    console.log('Parsed results:', { keywords, summary, categories, relevancyScore, relevancyExplanation });
-
-    return {
-      ...post,
-      keywords,
-      summary,
-      categories,
-      relevancyScore,
-      relevancyExplanation
-    };
-
-  } catch (error) {
-    console.error('Error analyzing post:', error);
-    setErrorMessage(`Error analyzing post: ${error.message}`);
-    return post;
-  }
-};
+  };
 
   // Helper functions
   const handleSort = (column) => {

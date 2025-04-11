@@ -502,7 +502,7 @@ const ElevenLabsVoiceSettings = ({ voiceSettings, updateVoiceSettings }) => {
               const style = e.target.value;
               const preset = VOICE_STYLES.find(vs => vs.id === style);
               updateVoiceSettings('style', style);
-              
+
               // Apply preset settings
               if (preset) {
                 updateVoiceSettings('stability', preset.settings.stability);
@@ -650,7 +650,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
     window.addEventListener('resize', handleResize);
     handleResize(); // Initial call
-    
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -846,7 +846,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
       if (toolSettings.AI_AUDIO || toolSettings.ELEVEN_LABS) {
         scriptText += `Voice Direction:\n${scene.aiPrompts.voicePrompt}\n`;
-        
+
         if (toolSettings.ELEVEN_LABS) {
           scriptText += `\nElevenLabs Voice Settings:\n`;
           scriptText += `- Voice: ${ELEVEN_LABS_VOICES.find(v => v.id === scene.elevenLabsSettings.voiceId)?.name || scene.elevenLabsSettings.voiceId}\n`;
@@ -856,7 +856,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
           scriptText += `- Similarity: ${(scene.elevenLabsSettings.similarity * 100).toFixed(0)}%\n`;
         }
       }
-      
+
       scriptText += `\n----------------------------------------\n\n`;
     });
 
@@ -1022,25 +1022,25 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
     }
   };
 
-// Loading and Auth States
-if (isAuthChecking) {
-  return (
-    <div className="min-h-[200px] flex items-center justify-center">
-      <div className="flex items-center gap-2 text-slate-500">
-        <Loader className="animate-spin" size={20} />
-        <span>Checking authentication...</span>
+  // Loading and Auth States
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center">
+        <div className="flex items-center gap-2 text-slate-500">
+          <Loader className="animate-spin" size={20} />
+          <span>Checking authentication...</span>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-if (!isAuthenticated) {
-  return (
-    <div className="min-h-[200px] flex items-center justify-center p-4">
-      <div className="text-red-500 text-center">Please add your Claude API key in settings</div>
-    </div>
-  );
-}
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center p-4">
+        <div className="text-red-500 text-center">Please add your Claude API key in settings</div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-md overflow-hidden p-2 md:p-4">
@@ -1473,10 +1473,10 @@ if (!isAuthenticated) {
                               onChange={(e) => {
                                 const style = e.target.value;
                                 const preset = VOICE_STYLES.find(vs => vs.id === style);
-                                
+
                                 // Update style
                                 updateVoiceSettings(getCurrentScene().id, 'style', style);
-                                
+
                                 // Apply preset settings if available
                                 if (preset) {
                                   updateVoiceSettings(getCurrentScene().id, 'stability', preset.settings.stability);

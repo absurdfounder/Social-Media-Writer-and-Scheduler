@@ -25,7 +25,7 @@ import ReplyModal from './ReplyModal';
 export default function SocialBotTable({ posts }) {
   // Ref for auto-scrolling
   const tableEndRef = useRef(null);
-  
+
   // Filter states
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState("all");
@@ -242,7 +242,7 @@ export default function SocialBotTable({ posts }) {
   const displayRelevance = (relevance) => {
     const relevanceNum = parseFloat(relevance);
     let bgColor = "bg-slate-100 text-slate-800";
-    
+
     if (isNaN(relevanceNum)) {
       bgColor = "bg-gray-100 text-gray-800";
     } else if (relevanceNum < 30) {
@@ -250,7 +250,7 @@ export default function SocialBotTable({ posts }) {
     } else if (relevanceNum < 70) {
       bgColor = "bg-yellow-100 text-yellow-800";
     }
-    
+
     return <span className={`px-2 py-1 text-xs rounded ${bgColor} font-medium`}>{relevance}</span>;
   };
 

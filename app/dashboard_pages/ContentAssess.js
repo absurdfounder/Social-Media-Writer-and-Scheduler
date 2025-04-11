@@ -1,19 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Check, 
-  Settings, 
-  Twitter, 
-  MessageCircle, 
-  Send, 
-  Discord, 
-  Filter, 
-  Eye, 
-  Code, 
-  Trash2, 
-  Layers 
-} from 'lucide-react';
+import { Check, Settings, Zap, RefreshCw, Eye, EyeOff, Twitter, Reddit, MessageCircle, Share2, Filter } from 'lucide-react';
 import SocialBotTable from "./SocialBotTable";
 
 export default function PostExtractor() {
@@ -41,18 +29,11 @@ export default function PostExtractor() {
   // — START_TRACKER → content script —
   useEffect(() => {
     if (activeStates.button3) {
-      // Use a try-catch to prevent errors if chrome API is not available
-      try {
-        if (typeof chrome !== 'undefined' && chrome.tabs) {
-          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            const tabId = tabs[0]?.id;
-            if (!tabId) return;
-            chrome.tabs.sendMessage(tabId, { type: "START_TRACKER" });
-          });
-        }
-      } catch (err) {
-        console.error("Chrome API not available:", err);
-      }
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tabId = tabs[0]?.id;
+        if (!tabId) return;
+        chrome.tabs.sendMessage(tabId, { type: "START_TRACKER" });
+      });
     }
   }, [activeStates.button3]);
   // — end START_TRACKER —
@@ -317,21 +298,16 @@ export default function PostExtractor() {
   // Listen for messages
   useEffect(() => {
     const handleMessage = (event) => {
-      // Make sure event and event.data are defined
-      if (!event || !event.data || typeof event.data !== 'object') return;
-      
       const msg = event.data;
       if (msg.type === 'PASTE_HTML') {
-        setRawHTML(msg.payload || "");
+        setRawHTML(msg.payload);
         setExtractedData(null);
         setExtractionError("");
       } else if (msg.type === 'EXTRACTED_DATA') {
         setExtractionError("");
-        setExtractedData(msg.payload || null);
+        setExtractedData(msg.payload);
 
         const data = msg.payload;
-        if (!data) return;
-        
         const key = data.tweet_url || data.permalink || `${data.postType}-${Date.now()}`;
         if (!seenKeys.current.has(key)) {
           seenKeys.current.add(key);
@@ -341,7 +317,7 @@ export default function PostExtractor() {
               key,
               id: Date.now(),
               username: data.user_handle || data.author || 'unknown',
-              platform: data.postType || 'unknown',
+              platform: data.postType,
               avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
               group: data.subreddit || data.group || null,
               content:
@@ -359,7 +335,7 @@ export default function PostExtractor() {
         }
       } else if (msg.type === 'EXTRACT_ERROR') {
         setExtractedData(null);
-        setExtractionError(msg.error || "Unknown extraction error");
+        setExtractionError(msg.error);
       }
     };
 
@@ -391,7 +367,7 @@ export default function PostExtractor() {
             platform: postType,
             avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
             group: data.subreddit || data.group || null,
-            content: data.tweet_text || data.content || data.message_text || data.message_content || '',
+            content: data.tweet_text || data.content || data.message_text || data.message_content,
             priority: "medium",
             timestamp: new Date().toLocaleTimeString(),
             attachment: data.attachment_url || null,
@@ -401,24 +377,19 @@ export default function PostExtractor() {
       }
     } catch (err) {
       console.error("Extraction failed:", err);
-      setExtractionError("Extraction failed: " + (err.message || "Unknown error"));
+      setExtractionError("Extraction failed: " + err.message);
     }
   };
 
-  // Get the icon based on platform type
-  const getPlatformIcon = (type) => {
-    switch(type) {
+  // Platform selector icons
+  const getPlatformIcon = (platform) => {
+    switch(platform) {
       case "twitter": return <Twitter size={18} />;
-      case "reddit": return <MessageCircle size={18} />;
-      case "telegram": return <Send size={18} />;
-      case "discord": return <Discord size={18} />;
-      default: return <MessageCircle size={18} />;
+      case "reddit": return <Reddit size={18} />;
+      case "telegram": return <MessageCircle size={18} />;
+      case "discord": return <Share2 size={18} />;
+      default: return null;
     }
-  };
-
-  const clearAllPosts = () => {
-    setPosts([]);
-    seenKeys.current.clear();
   };
 
   return (
@@ -427,58 +398,50 @@ export default function PostExtractor() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div className="flex items-center">
-            <h2 className="text-xl font-bold text-gray-800 mr-4">Social Post Extractor</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mr-4">Social Bot Extractor</h2>
             <div className="flex items-center bg-gray-50 p-2 rounded-full">
               <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
-                <Check size={16} className="mr-1" />
+                <Check size={16} className="mr-1 hidden sm:inline" />
                 <span className="truncate">Connected</span>
               </span>
-              <button 
-                className="p-1 sm:p-2 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
-                title="Settings"
-              >
+              <button className="p-1 sm:p-2 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
                 <Settings size={16} className="text-slate-700" />
               </button>
             </div>
           </div>
           
           <div className="flex space-x-2">
-            <button
+            <button 
+              onClick={() => setPosts([])}
+              className="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 text-sm font-medium flex items-center"
+            >
+              <RefreshCw size={16} className="mr-1" />
+              Clear All
+            </button>
+            <button 
               onClick={() => toggleActive('button3')}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+              className={`px-3 py-2 rounded-md text-sm font-medium flex items-center ${
                 activeStates.button3 
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
               }`}
             >
-              <div className="flex items-center">
-                <Layers size={16} className="mr-2" />
-                Track Posts
-              </div>
-            </button>
-            
-            <button
-              onClick={clearAllPosts}
-              className="px-3 py-2 rounded-md text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              <div className="flex items-center">
-                <Trash2 size={16} className="mr-2" />
-                Clear All
-              </div>
+              <Zap size={16} className="mr-1" />
+              {activeStates.button3 ? 'Tracking On' : 'Start Tracking'}
             </button>
           </div>
         </div>
-        
-        {/* Platform Selection */}
+
+        {/* Platform Selector */}
         <div className="mb-6">
           <div className="flex flex-wrap gap-2">
             {["twitter", "reddit", "telegram", "discord"].map((platform) => (
               <button
                 key={platform}
                 onClick={() => setPostType(platform)}
-                className={`px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors ${
+                className={`px-3 py-2 rounded-md flex items-center ${
                   postType === platform
-                    ? 'bg-blue-600 text-white' 
+                    ? 'bg-indigo-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -496,78 +459,73 @@ export default function PostExtractor() {
           </div>
         )}
 
-        {/* HTML Input Area */}
-        <div className="mb-6">
+        {/* Manual Extract Form */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <h3 className="text-md font-medium text-gray-700 mb-3">Manual Extraction</h3>
           <form onSubmit={handleSubmit} className="space-y-3">
-            <div>
-              <label htmlFor="rawHTML" className="block text-sm font-medium text-gray-700 mb-1">
-                Paste Post HTML
-              </label>
-              <textarea
-                id="rawHTML"
-                value={rawHTML}
-                onChange={(e) => setRawHTML(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                rows="4"
-                placeholder={`Paste ${postType} post HTML here...`}
-              />
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-              >
-                Extract Data
-              </button>
-            </div>
+            <textarea
+              value={rawHTML}
+              onChange={(e) => setRawHTML(e.target.value)}
+              placeholder={`Paste ${postType} HTML here...`}
+              className="w-full h-24 p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            <button
+              type="submit"
+              className="w-full sm:w-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium flex items-center justify-center"
+            >
+              <Zap size={16} className="mr-2" />
+              Extract {postType.charAt(0).toUpperCase() + postType.slice(1)} Data
+            </button>
           </form>
         </div>
 
         {/* Extracted Data JSON Toggle */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center">
-            {extractedData && (
+        {extractedData && (
+          <div className="mb-6">
+            <div className="flex justify-between items-center">
               <button
                 onClick={() => setShowExtractedJSON(!showExtractedJSON)}
-                className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
+                className="mb-2 text-indigo-600 hover:underline text-sm flex items-center"
               >
-                <Code size={16} className="mr-1" />
-                {showExtractedJSON ? "Hide" : "Show"} Extracted JSON
+                {showExtractedJSON ? <EyeOff size={16} className="mr-1" /> : <Eye size={16} className="mr-1" />}
+                {showExtractedJSON ? "Hide" : "Show"} Extracted Data JSON
               </button>
-            )}
-            
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={hideDuplicates}
-                onChange={() => setHideDuplicates(!hideDuplicates)}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <span className="text-sm flex items-center">
-                <Eye size={14} className="mr-1" />
-                Hide duplicates
-              </span>
-            </label>
-          </div>
-          
-          {showExtractedJSON && extractedData && (
-            <div className="mt-3 bg-gray-100 p-3 rounded overflow-x-auto border border-gray-200">
-              <pre className="text-xs whitespace-pre-wrap">
-                {JSON.stringify(extractedData, null, 2)}
-              </pre>
+              <label className="flex items-center space-x-2 mb-2">
+                <input
+                  type="checkbox"
+                  checked={hideDuplicates}
+                  onChange={() => setHideDuplicates(!hideDuplicates)}
+                  className="form-checkbox h-4 w-4 text-indigo-600 rounded"
+                />
+                <span className="text-sm flex items-center">
+                  <Filter size={14} className="mr-1" />
+                  Hide duplicates
+                </span>
+              </label>
             </div>
+            {showExtractedJSON && (
+              <div className="bg-gray-100 p-3 rounded overflow-x-auto">
+                <pre className="text-xs whitespace-pre-wrap">
+                  {JSON.stringify(extractedData, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Posts Header */}
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-lg font-medium text-gray-800">Extracted Posts ({posts.length})</h3>
+          {posts.length > 0 && (
+            <span className="text-sm text-gray-500">
+              {hideDuplicates ? 'Showing unique posts only' : 'Showing all posts'}
+            </span>
           )}
         </div>
 
         {/* Table */}
-        <div className="overflow-auto border rounded-lg shadow-sm">
-          <div className="flex justify-between items-center p-3 bg-gray-50 border-b">
-            <h3 className="font-medium text-gray-700 flex items-center">
-              <Filter size={16} className="mr-2" />
-              Extracted Posts ({posts.length})
-            </h3>
-          </div>
-          <div className="max-h-[60vh] overflow-auto">
+        <div className="overflow-auto max-h-[60vh] border rounded-lg">
+          {posts.length > 0 ? (
             <SocialBotTable
               posts={
                 hideDuplicates
@@ -577,7 +535,11 @@ export default function PostExtractor() {
                   : posts
               }
             />
-          </div>
+          ) : (
+            <div className="py-12 text-center text-gray-500">
+              <p>No posts extracted yet. Paste HTML or start tracking to extract posts.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

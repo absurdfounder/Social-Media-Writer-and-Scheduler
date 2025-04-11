@@ -383,7 +383,7 @@ export default function PostExtractor() {
 
   // Platform selector icons
   const getPlatformIcon = (platform) => {
-    switch(platform) {
+    switch (platform) {
       case "twitter": return <Twitter size={18} />;
       case "reddit": return <MessageCircle size={18} />;
       case "telegram": return <MessageCircle size={18} />;
@@ -397,37 +397,31 @@ export default function PostExtractor() {
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <div className="flex items-center">
-            <div className="flex items-center bg-gray-50 p-2 rounded-full">
-              <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
-                <Check size={16} className="mr-1 hidden sm:inline" />
-                <span className="truncate">Connected</span>
-              </span>
-              <button className="p-1 sm:p-2 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
-                <Settings size={16} className="text-slate-700" />
-              </button>
+
+
+          <div className="flex space-x-2 justify-between w-full">
+            <div className="flex items-center">
+              <div className="flex items-center bg-gray-100 p-2 rounded-full border">
+                <span className="px-2 sm:px-3 py-1 rounded-full border text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
+                  <Check size={16} className="mr-1 hidden sm:inline" />
+                  <span className="truncate">Connected</span>
+                </span>
+                <button className="p-1 sm:p-2 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                  <Settings size={16} className="text-slate-700" />
+                </button>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex space-x-2">
-            <button 
+
+            <button
               onClick={() => setPosts([])}
-              className="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 text-sm font-medium flex items-center"
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 text-xs font-medium flex items-center"
             >
               <RefreshCw size={16} className="mr-1" />
               Clear All
             </button>
-            <button 
-              onClick={() => toggleActive('button3')}
-              className={`px-3 py-2 rounded-md text-sm font-medium flex items-center ${
-                activeStates.button3 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-              }`}
-            >
-              <Zap size={16} className="mr-1" />
-              {activeStates.button3 ? 'Tracking On' : 'Start Tracking'}
-            </button>
+
+
+
           </div>
         </div>
 
@@ -438,11 +432,10 @@ export default function PostExtractor() {
               <button
                 key={platform}
                 onClick={() => setPostType(platform)}
-                className={`px-3 py-2 rounded-md flex items-center ${
-                  postType === platform
-                    ? 'bg-indigo-600 text-white'
+                className={`px-3 py-2 rounded-md flex items-center ${postType === platform
+                    ? 'bg-green-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 {getPlatformIcon(platform)}
                 <span className="ml-2 capitalize">{platform}</span>
@@ -529,8 +522,8 @@ export default function PostExtractor() {
               posts={
                 hideDuplicates
                   ? posts.filter((post, idx, arr) =>
-                      arr.findIndex(p => p.key === post.key) === idx
-                    )
+                    arr.findIndex(p => p.key === post.key) === idx
+                  )
                   : posts
               }
             />

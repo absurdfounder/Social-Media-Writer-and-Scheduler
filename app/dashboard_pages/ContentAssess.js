@@ -9,7 +9,7 @@ import {
   Send, 
   Discord, 
   Filter, 
-  EyeOff, 
+  Eye, 
   Code, 
   Trash2, 
   Layers 
@@ -41,11 +41,18 @@ export default function PostExtractor() {
   // — START_TRACKER → content script —
   useEffect(() => {
     if (activeStates.button3) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        const tabId = tabs[0]?.id;
-        if (!tabId) return;
-        chrome.tabs.sendMessage(tabId, { type: "START_TRACKER" });
-      });
+      // Use a try-catch to prevent errors if chrome API is not available
+      try {
+        if (typeof chrome !== 'undefined' && chrome.tabs) {
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const tabId = tabs[0]?.id;
+            if (!tabId) return;
+            chrome.tabs.sendMessage(tabId, { type: "START_TRACKER" });
+          });
+        }
+      } catch (err) {
+        console.error("Chrome API not available:", err);
+      }
     }
   }, [activeStates.button3]);
   // — end START_TRACKER —
@@ -310,16 +317,21 @@ export default function PostExtractor() {
   // Listen for messages
   useEffect(() => {
     const handleMessage = (event) => {
+      // Make sure event and event.data are defined
+      if (!event || !event.data || typeof event.data !== 'object') return;
+      
       const msg = event.data;
       if (msg.type === 'PASTE_HTML') {
-        setRawHTML(msg.payload);
+        setRawHTML(msg.payload || "");
         setExtractedData(null);
         setExtractionError("");
       } else if (msg.type === 'EXTRACTED_DATA') {
         setExtractionError("");
-        setExtractedData(msg.payload);
+        setExtractedData(msg.payload || null);
 
         const data = msg.payload;
+        if (!data) return;
+        
         const key = data.tweet_url || data.permalink || `${data.postType}-${Date.now()}`;
         if (!seenKeys.current.has(key)) {
           seenKeys.current.add(key);
@@ -329,7 +341,7 @@ export default function PostExtractor() {
               key,
               id: Date.now(),
               username: data.user_handle || data.author || 'unknown',
-              platform: data.postType,
+              platform: data.postType || 'unknown',
               avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
               group: data.subreddit || data.group || null,
               content:
@@ -347,7 +359,7 @@ export default function PostExtractor() {
         }
       } else if (msg.type === 'EXTRACT_ERROR') {
         setExtractedData(null);
-        setExtractionError(msg.error);
+        setExtractionError(msg.error || "Unknown extraction error");
       }
     };
 
@@ -379,7 +391,7 @@ export default function PostExtractor() {
             platform: postType,
             avatar: data.avatar_url || data.icon_url || '/api/placeholder/40/40',
             group: data.subreddit || data.group || null,
-            content: data.tweet_text || data.content || data.message_text || data.message_content,
+            content: data.tweet_text || data.content || data.message_text || data.message_content || '',
             priority: "medium",
             timestamp: new Date().toLocaleTimeString(),
             attachment: data.attachment_url || null,
@@ -389,7 +401,7 @@ export default function PostExtractor() {
       }
     } catch (err) {
       console.error("Extraction failed:", err);
-      setExtractionError("Extraction failed: " + err.message);
+      setExtractionError("Extraction failed: " + (err.message || "Unknown error"));
     }
   };
 
@@ -418,7 +430,7 @@ export default function PostExtractor() {
             <h2 className="text-xl font-bold text-gray-800 mr-4">Social Post Extractor</h2>
             <div className="flex items-center bg-gray-50 p-2 rounded-full">
               <span className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
-                <Check size={16} className="mr-1 hidden sm:inline" />
+                <Check size={16} className="mr-1" />
                 <span className="truncate">Connected</span>
               </span>
               <button 
@@ -532,7 +544,7 @@ export default function PostExtractor() {
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <span className="text-sm flex items-center">
-                <EyeOff size={14} className="mr-1" />
+                <Eye size={14} className="mr-1" />
                 Hide duplicates
               </span>
             </label>

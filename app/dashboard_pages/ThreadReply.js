@@ -1015,7 +1015,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
             </div>
           </div>
           <textarea
-            className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-slate-50 text-slate-900 text-sm sm:text-base'
+            className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-slate-50 text-slate-900 text-sm sm:text-base border-slate-200 border'
             value={overallPrompt}
             onChange={(e) => setOverallPrompt(e.target.value)}
             placeholder={mode === 'share' ? "I need to share an update with the community.." : "I want to reply to..."}

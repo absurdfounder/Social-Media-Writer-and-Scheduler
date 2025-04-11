@@ -214,7 +214,7 @@ export const QuestionnaireManager = ({ currentProfile }) => {
         >
           {currentQuestion === questions.length - 1 ? 'Finish' : 'Save & Next'}
           {saved && (
-            <svg className="w-5 h-5 ml-2 text-slate-300" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 ml-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
               <path d="M5 13l4 4L19 7"></path>
             </svg>
           )}

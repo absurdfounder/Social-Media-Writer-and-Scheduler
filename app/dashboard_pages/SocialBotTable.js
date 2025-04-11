@@ -220,9 +220,9 @@ export default function SocialBotTable({ posts }) {
   // Icon helpers
   const getPlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter': return <Twitter size={16} className="text-blue-400" />;
+      case 'twitter': return <Twitter size={16} className="text-green-400" />;
       case 'reddit': return <MessageCircle size={16} className="text-orange-500" />;
-      case 'facebook': return <Facebook size={16} className="text-blue-600" />;
+      case 'facebook': return <Facebook size={16} className="text-green-600" />;
       case 'discord': return <MessageSquare size={16} className="text-indigo-500" />;
       default: return <MessageCircle size={16} className="text-gray-500" />;
     }
@@ -230,9 +230,9 @@ export default function SocialBotTable({ posts }) {
 
   const getLargePlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter': return <Twitter size={24} className="text-blue-400" />;
+      case 'twitter': return <Twitter size={24} className="text-green-400" />;
       case 'reddit': return <MessageCircle size={24} className="text-orange-500" />;
-      case 'facebook': return <Facebook size={24} className="text-blue-600" />;
+      case 'facebook': return <Facebook size={24} className="text-green-600" />;
       case 'discord': return <MessageSquare size={24} className="text-indigo-500" />;
       default: return <MessageCircle size={24} className="text-gray-500" />;
     }
@@ -264,7 +264,7 @@ export default function SocialBotTable({ posts }) {
             <p className="text-sm text-gray-500">Posts collected from various platforms by your AI social assistant</p>
           </div>
           {relevanceLoading && (
-            <div className="flex items-center text-sm text-blue-600">
+            <div className="flex items-center text-sm text-green-600">
               <svg className="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -344,7 +344,7 @@ export default function SocialBotTable({ posts }) {
                   </button>
                   <button
                     onClick={() => handleRepostClick(post)}
-                    className="inline-flex items-center px-2.5 py-1.5 bg-blue-600 text-white rounded shadow-sm text-xs font-medium hover:bg-blue-700"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-green-600 text-white rounded shadow-sm text-xs font-medium hover:bg-green-700"
                   >
                     <Repeat size={14} className="mr-1" /> Repost
                   </button>
@@ -428,7 +428,7 @@ export default function SocialBotTable({ posts }) {
                     </button>
                     <button
                       onClick={() => handleRepostClick(post)}
-                      className="inline-flex items-center px-2.5 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+                      className="inline-flex items-center px-2.5 py-1.5 bg-green-600 text-white rounded text-xs hover:bg-green-700"
                     >
                       <Repeat size={14} className="mr-1" /> Repost
                     </button>
@@ -497,7 +497,7 @@ export default function SocialBotTable({ posts }) {
                     {selectedPost.metrics?.retweets || 0}
                   </div>
                   <div className="flex items-center">
-                    <MessageCircle size={16} className="mr-1 text-blue-500" />
+                    <MessageCircle size={16} className="mr-1 text-green-500" />
                     {selectedPost.metrics?.replies || 0}
                   </div>
                 </div>

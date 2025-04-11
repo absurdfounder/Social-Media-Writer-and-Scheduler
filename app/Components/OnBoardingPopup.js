@@ -145,7 +145,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       />
                       X
                     </span>
-                    <span className="font-bold text-blue-800 bg-blue-50 border-blue-400 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
+                    <span className="font-bold text-green-800 bg-green-50 border-green-400 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/960px-LinkedIn_logo_initials.png"
                         alt="LinkedIn logo"

@@ -1750,7 +1750,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
                             <div className="flex justify-between text-xs sm:text-sm text-gray-500 mb-2">
                               <span>Posted by u/{post.author} {selectedGroup && `in r/${post.subreddit}`}</span>
                               <span>
-                                <b className='text-slate-300'>Relevance Score : <span className='text-slate-600'>{post.relevancyScore || 0}</span>/100</b>
+                                <b className='text-green-500'>Relevance Score : <span className='text-slate-600'>{post.relevancyScore || 0}</span>/100</b>
                                 &nbsp; {post.created}
                               </span>
                             </div>

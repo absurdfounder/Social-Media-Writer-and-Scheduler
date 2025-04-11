@@ -937,9 +937,7 @@ const handleTaskToggle = async (taskId) => {
   return (
     <div className="bg-gray-100 min-h-screen p-4">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-2xl text-center mb-4 text-slate-800">
-          Marketing Dashboard {currentProfile ? `for Profile: ${currentProfile.name}` : ''}
-        </h2>
+
         
         {/* Contribution graph at the top */}
         <ContributionGraph data={activityData} />

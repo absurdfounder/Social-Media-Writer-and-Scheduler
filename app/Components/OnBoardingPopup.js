@@ -126,13 +126,13 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
               </div>
 
               <div>
-                <section>
+                <section className='py-6'>
                   <h2
-                    className="text-center text-slate-700 max-w-2xl mx-auto text-xl sm:text-2xl md:text-4xl"
+                    className="text-center text-black max-w-3xl mx-auto text-xl sm:text-2xl md:text-5xl font-bold"
                     style={{ lineHeight: "1.3" }}
                   >
                     <span>
-                      Get <b className="text-slate-500">more customers</b> from
+                      AI that <b className="text-green-500 "> scrolls for you </b> on
                     </span>
                     <br />
                   </h2>
@@ -179,8 +179,8 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       Reddit
                     </span>
                   </div>
-                  <h2 className="mt-4 text-center text-slate-700 max-w-2xl mx-auto text-xl sm:text-2xl md:text-4xl mb-3 sm:mb-6 px-2">
-                    using <b className="text-slate-500">AI trained</b> on <b className="text-slate-500">your brand</b>.
+                  <h2 className="mt-4 text-center text-slate-700 max-w-3xl mx-auto text-xl sm:text-2xl md:text-5xl mb-3 sm:mb-6 px-2">
+                      <b className="text-green-500 font-bold">more customers</b> , <b className="text-black ">automated</b>.
                   </h2>
                 </section>
 
@@ -191,7 +191,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                   </span>
                   <span className="flex items-center">
                     <CheckCircle2 size={16} className='mr-1 text-slate-500' />
-                    No coding needed
+                    No-coding needed
                   </span>
                 </p>
               </div>
@@ -244,7 +244,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
             </div>
 
             <div className="px-3 sm:px-6 max-w-6xl mx-auto mt-8 sm:mt-16">
-              <h3 className="my-3 font-medium text-2xl sm:text-4xl text-center"><strong>BUT</strong>... Creating Viral Content Is <span className="pt-1 text-slate-600 border-b-2 border-slate-500 font-semibold">Hard</span></h3>
+              <h3 className="my-3 font-medium text-2xl sm:text-4xl text-center"><strong>BUT</strong>... Consistency Is <span className="pt-1 text-slate-600 border-b-2 border-slate-500 font-semibold">Hard</span></h3>
               <div className="max-w-xl mx-auto mt-6 sm:mt-10 space-y-3 leading-6 text-gray-800 text-sm sm:text-base md:text-xl">
                 <ul className="space-y-6 sm:space-y-8">
                   <li className="flex items-start justify-start leading-normal text-left sm:leading-7 md:leading-10 relative">
@@ -300,7 +300,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Write posts on X & BlueSky <span className="font-source-serif-4 font-normal text-slate-600 border-b-4 border-slate-200">in your authentic voice</span>
+                          Write posts on X & BlueSky <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-slate-200">in your authentic voice</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Stop spending hours brainstorming. Our AI learns your unique writing style, tone, and expertise to generate posts that sound exactly like you. Keep your content consistent while saving hours every week.
@@ -328,7 +328,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Create viral TikTok & IG videos that <span className="font-source-serif-4 font-normal text-slate-600 border-b-4 border-slate-200">captures attention</span>
+                          Create viral TikTok & IG videos that <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-slate-200">captures attention</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Transform your expertise into engaging short-form videos. Our AI analyzes trending content in your niche and helps you create scripts that hook viewers in the first 3 seconds and keep them watching till the end.
@@ -356,7 +356,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Turn Reddit discussions into <span className="font-source-serif-4 font-normal text-slate-600 border-b-4 border-slate-200">traffic & leads.</span>
+                          Turn Reddit discussions into <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-slate-200">traffic & leads.</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Never run out of content ideas. Our AI helps you discover trending discussions in your niche and create valuable responses that establish your expertise. Turn real user questions into content that resonates.
@@ -384,7 +384,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <div className="md:w-1/2 w-full">
                       <div className="text-start mt-2 sm:mt-6 w-full p-2 sm:p-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-bold font-normal">
-                          Build your content strategy like a <span className="font-source-serif-4 font-normal text-slate-600 border-b-4 border-slate-200">pro creator</span>
+                          Build your content strategy like a <span className="font-source-serif-4 font-normal text-green-600 border-b-4 border-slate-200">pro creator</span>
                         </h2>
                         <p className="text-sm sm:text-base text-gray-700">
                           Get a birds-eye view of your content strategy. Our AI helps you plan, schedule, and optimize content across all platforms while maintaining your unique voice and expertise in every post.
@@ -418,7 +418,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 max-w-4xl m-auto">
-                      {plans.map((plan) => (
+                        {plans.map((plan) => (
                           <div
                             key={plan.name}
                             className={`relative rounded-lg border p-4 sm:p-6 transition-all hover:shadow-lg bg-white

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   MessageSquare,
   Eye,
@@ -11,10 +11,21 @@ import {
   MessageCircle,
   Users,
   X,
+  Filter,
+  ThumbsUp,
+  Repeat,
+  Share2,
+  Save,
+  Delete,
+  AlertTriangle,
+  Send,
 } from 'lucide-react';
 import ReplyModal from './ReplyModal';
 
 export default function SocialBotTable({ posts }) {
+  // Ref for auto-scrolling
+  const tableEndRef = useRef(null);
+  
   // Filter states
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState("all");
@@ -44,6 +55,13 @@ export default function SocialBotTable({ posts }) {
   // Computed posts with relevance scores
   const [computedPosts, setComputedPosts] = useState([]);
   const [relevanceLoading, setRelevanceLoading] = useState(false);
+
+  // Auto-scroll effect when new posts are added
+  useEffect(() => {
+    if (tableEndRef.current) {
+      tableEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [computedPosts]);
 
   // Shared AI generator for Reply, Quote, Repost, etc.
   async function generateAIContent(prompt, setLoading, setError, setResult) {
@@ -157,7 +175,7 @@ export default function SocialBotTable({ posts }) {
 
   const handleQuoteClick = (post) => {
     setQuotePost(post);
-    let prompt = `Write a concise “quote tweet” that offers a learning or new perspective on:\n\n"${post.tweet_text || post.content}"`;
+    let prompt = `Write a concise "quote tweet" that offers a learning or new perspective on:\n\n"${post.tweet_text || post.content}"`;
     if (post.attachment_url || post.attachment) {
       prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
     }
@@ -202,9 +220,9 @@ export default function SocialBotTable({ posts }) {
   // Icon helpers
   const getPlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter': return <Twitter size={16} className="text-green-400" />;
+      case 'twitter': return <Twitter size={16} className="text-blue-400" />;
       case 'reddit': return <MessageCircle size={16} className="text-orange-500" />;
-      case 'facebook': return <Facebook size={16} className="text-green-600" />;
+      case 'facebook': return <Facebook size={16} className="text-blue-600" />;
       case 'discord': return <MessageSquare size={16} className="text-indigo-500" />;
       default: return <MessageCircle size={16} className="text-gray-500" />;
     }
@@ -212,34 +230,58 @@ export default function SocialBotTable({ posts }) {
 
   const getLargePlatformIcon = (platform) => {
     switch (platform) {
-      case 'twitter': return <Twitter size={20} className="text-green-400" />;
-      case 'reddit': return <MessageCircle size={20} className="text-orange-500" />;
-      case 'facebook': return <Facebook size={20} className="text-green-600" />;
-      case 'discord': return <MessageSquare size={20} className="text-indigo-500" />;
-      default: return <MessageCircle size={20} className="text-gray-500" />;
+      case 'twitter': return <Twitter size={24} className="text-blue-400" />;
+      case 'reddit': return <MessageCircle size={24} className="text-orange-500" />;
+      case 'facebook': return <Facebook size={24} className="text-blue-600" />;
+      case 'discord': return <MessageSquare size={24} className="text-indigo-500" />;
+      default: return <MessageCircle size={24} className="text-gray-500" />;
     }
   };
 
   // Display computed relevance as a badge
   const displayRelevance = (relevance) => {
-    return <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">{relevance}</span>;
+    const relevanceNum = parseFloat(relevance);
+    let bgColor = "bg-green-100 text-green-800";
+    
+    if (isNaN(relevanceNum)) {
+      bgColor = "bg-gray-100 text-gray-800";
+    } else if (relevanceNum < 30) {
+      bgColor = "bg-red-100 text-red-800";
+    } else if (relevanceNum < 70) {
+      bgColor = "bg-yellow-100 text-yellow-800";
+    }
+    
+    return <span className={`px-2 py-1 text-xs rounded ${bgColor} font-medium`}>{relevance}</span>;
   };
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-6">
       {/* Header */}
       <div className="p-4 bg-gray-50 border-b border-gray-200">
-        <h2 className="text-lg font-medium text-gray-800">Social Posts Requiring Response</h2>
-        <p className="text-sm text-gray-500">Posts collected from various platforms by your AI social assistant</p>
-        {relevanceLoading && <p className="text-sm text-gray-500">Loading relevance scores...</p>}
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-medium text-gray-800">Social Posts Requiring Response</h2>
+            <p className="text-sm text-gray-500">Posts collected from various platforms by your AI social assistant</p>
+          </div>
+          {relevanceLoading && (
+            <div className="flex items-center text-sm text-blue-600">
+              <svg className="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Analyzing relevance...
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Filter Controls */}
-      <div className="flex space-x-4 p-4">
+      <div className="flex items-center space-x-4 p-4 bg-gray-50 border-b border-gray-200">
+        <Filter size={16} className="text-gray-400" />
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="border rounded p-1"
+          className="border rounded-md px-3 py-1.5 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="all">All Priorities</option>
           <option value="high">High</option>
@@ -249,7 +291,7 @@ export default function SocialBotTable({ posts }) {
         <select
           value={channelFilter}
           onChange={(e) => setChannelFilter(e.target.value)}
-          className="border rounded p-1"
+          className="border rounded-md px-3 py-1.5 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="all">All Channels</option>
           <option value="twitter">Twitter</option>
@@ -260,7 +302,7 @@ export default function SocialBotTable({ posts }) {
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden">
+      <div className="md:hidden overflow-y-auto max-h-screen">
         {filteredPosts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 p-4">
             <div className="flex items-start space-x-3">
@@ -290,25 +332,25 @@ export default function SocialBotTable({ posts }) {
                   </button>
                   <button
                     onClick={() => handleReplyClick(post)}
-                    className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium hover:bg-indigo-700"
                   >
                     <Reply size={14} className="mr-1" /> Reply
                   </button>
                   <button
                     onClick={() => handleQuoteClick(post)}
-                    className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-green-600 text-white rounded shadow-sm text-xs font-medium hover:bg-green-700"
                   >
-                    <Reply size={14} className="mr-1" /> Quote
+                    <Share2 size={14} className="mr-1" /> Quote
                   </button>
                   <button
                     onClick={() => handleRepostClick(post)}
-                    className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs font-medium"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-blue-600 text-white rounded shadow-sm text-xs font-medium hover:bg-blue-700"
                   >
-                    <Reply size={14} className="mr-1" /> Repost
+                    <Repeat size={14} className="mr-1" /> Repost
                   </button>
                   <button
                     onClick={() => handleDeleteTweet(post.id)}
-                    className="inline-flex items-center px-2.5 py-1.5 bg-red-500 text-white rounded shadow-sm text-xs font-medium"
+                    className="inline-flex items-center px-2.5 py-1.5 bg-red-500 text-white rounded shadow-sm text-xs font-medium hover:bg-red-600"
                   >
                     <X size={14} className="mr-1" /> Delete
                   </button>
@@ -317,19 +359,20 @@ export default function SocialBotTable({ posts }) {
             </div>
           </div>
         ))}
+        <div ref={tableEndRef} />
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto max-h-screen">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avatar</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Group</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Post</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Relevance</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avatar</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relevance</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -367,33 +410,33 @@ export default function SocialBotTable({ posts }) {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => openPostModal(post)}
-                      className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 bg-white text-gray-700 rounded text-xs"
+                      className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 bg-white text-gray-700 rounded text-xs hover:bg-gray-50"
                     >
                       <Eye size={14} className="mr-1" /> View
                     </button>
                     <button
                       onClick={() => handleReplyClick(post)}
-                      className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs"
+                      className="inline-flex items-center px-2.5 py-1.5 bg-indigo-600 text-white rounded shadow-sm text-xs hover:bg-indigo-700"
                     >
                       <Reply size={14} className="mr-1" /> Reply
                     </button>
                     <button
                       onClick={() => handleQuoteClick(post)}
-                      className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                      className="inline-flex items-center px-2.5 py-1.5 bg-green-600 text-white rounded text-xs hover:bg-green-700"
                     >
-                      <Reply size={14} className="mr-1" /> Quote
+                      <Share2 size={14} className="mr-1" /> Quote
                     </button>
                     <button
                       onClick={() => handleRepostClick(post)}
-                      className="inline-flex items-center px-2 py-1 text-gray-400 hover:text-yellow-500"
+                      className="inline-flex items-center px-2.5 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
                     >
-                      <Reply size={14} className="mr-1" /> Repost
+                      <Repeat size={14} className="mr-1" /> Repost
                     </button>
                     <button
                       onClick={() => handleDeleteTweet(post.id)}
-                      className="inline-flex items-center px-2 py-1 bg-red-500 text-white rounded text-xs"
+                      className="inline-flex items-center px-2.5 py-1.5 bg-red-500 text-white rounded text-xs hover:bg-red-600"
                     >
-                      <X size={14} className="mr-1" /> Delete
+                      <Delete size={14} className="mr-1" /> Delete
                     </button>
                   </div>
                 </td>
@@ -401,18 +444,19 @@ export default function SocialBotTable({ posts }) {
             ))}
           </tbody>
         </table>
+        <div ref={tableEndRef} />
       </div>
 
       {/* Post View Modal */}
       {isModalOpen && selectedPost && (
         <div className="fixed inset-0 z-10 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen p-4 text-center">
-            <div className="fixed inset-0 bg-gray-500 opacity-75" />
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
             <div className="inline-block bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full">
               <div className="relative bg-white px-4 pt-5 pb-4 sm:p-6">
                 <button
                   onClick={closeModal}
-                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 focus:outline-none"
                 >
                   <X size={20} />
                 </button>
@@ -445,16 +489,16 @@ export default function SocialBotTable({ posts }) {
 
                 <div className="flex space-x-6 text-sm text-gray-600 mb-4">
                   <div className="flex items-center">
-                    <span className="mr-1">❤️</span>
-                    {selectedPost.metrics?.likes}
+                    <ThumbsUp size={16} className="mr-1 text-red-500" />
+                    {selectedPost.metrics?.likes || 0}
                   </div>
                   <div className="flex items-center">
-                    <span className="mr-1">🔁</span>
-                    {selectedPost.metrics?.retweets}
+                    <Repeat size={16} className="mr-1 text-green-500" />
+                    {selectedPost.metrics?.retweets || 0}
                   </div>
                   <div className="flex items-center">
-                    <span className="mr-1">💬</span>
-                    {selectedPost.metrics?.replies}
+                    <MessageCircle size={16} className="mr-1 text-blue-500" />
+                    {selectedPost.metrics?.replies || 0}
                   </div>
                 </div>
 
@@ -463,13 +507,13 @@ export default function SocialBotTable({ posts }) {
                   <div className="flex space-x-2">
                     <button
                       onClick={handleViewReplyNow}
-                      className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white rounded-md"
+                      className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                      <Reply size={16} className="mr-2" />
+                      <Send size={16} className="mr-2" />
                       Reply Now
                     </button>
-                    <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                      <Star size={16} className="mr-2" />
+                    <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                      <Save size={16} className="mr-2" />
                       Save
                     </button>
                   </div>

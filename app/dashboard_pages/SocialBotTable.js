@@ -64,7 +64,10 @@ export default function SocialBotTable({ posts }) {
         document.body.scrollHeight, 
         document.documentElement.scrollHeight
       );
-      window.scrollTo({ top: scrollHeight, behavior: 'smooth' });
+      window.scrollTo({ 
+        top: scrollHeight, 
+        behavior: 'smooth' 
+      });
     }, 100);
   }, [computedPosts]);
   

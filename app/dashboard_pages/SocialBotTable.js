@@ -369,6 +369,15 @@ useEffect(() => {
         <div ref={tableEndRef} />
       </div>
 
+      <button 
+  onClick={computeRelevanceForAllPosts} 
+  className="bg-green-400 text-white rounded-md w-full p-2 m-auto mb-4"
+>
+  Chomp out Useless Crap
+</button>
+
+
+
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto max-h-screen">
         <table className="min-w-full divide-y divide-gray-200">

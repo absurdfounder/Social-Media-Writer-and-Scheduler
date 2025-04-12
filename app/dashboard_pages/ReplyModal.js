@@ -20,7 +20,7 @@ export default function ReplyModal({
         onClick={onClose}
       />
       {/* Modal */}
-      <div className="relative bg-white p-6 rounded-lg shadow-lg w-96 z-10">
+      <div className="relative bg-white p-6 rounded-lg shadow-lg w-3xl z-10">
         <button
           className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
           onClick={onClose}

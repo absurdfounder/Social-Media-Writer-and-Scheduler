@@ -583,7 +583,6 @@ export default function PostExtractor() {
           )}
         </div>
 
-        <button className="bg-green-400 text-white rounded-md w-full p-2 m-auto mb-4">Chomp out Useless Crap</button>
 
 
         {/* Table */}

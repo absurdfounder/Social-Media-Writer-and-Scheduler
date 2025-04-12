@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation'; // <-- Use new next/navigation hooks
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
@@ -17,7 +17,6 @@ import 'react-toastify/dist/ReactToastify.css';
 // Modal Component
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
@@ -36,7 +35,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 // Billing Modal Component
 const BillingModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
-
   const plans = [
     {
       name: "Basic Plan",
@@ -80,7 +78,6 @@ const BillingModal = ({ isOpen, onClose }) => {
               <X className="h-5 w-5" />
             </button>
           </div>
-
           <div className="p-6">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-500 to-slate-700">
@@ -88,7 +85,6 @@ const BillingModal = ({ isOpen, onClose }) => {
               </h3>
               <p className="text-gray-600 mt-2">Unlock all features with our premium plans</p>
             </div>
-
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl m-auto">
               {plans.map((plan) => (
                 <div key={plan.name} className={`relative rounded-lg border p-6 ${plan.popular ? 'border-2 border-slate-500' : ''}`}>
@@ -137,7 +133,6 @@ const BillingModal = ({ isOpen, onClose }) => {
 // Feedback Modal Component
 const FeedbackModal = ({ isOpen, onClose }) => {
   const [selectedTab, setSelectedTab] = useState('feedback');
-
   const handleScheduleCall = () => {
     window.open('https://calendly.com/your-calendar-link', '_blank');
   };
@@ -165,7 +160,6 @@ const FeedbackModal = ({ isOpen, onClose }) => {
             Schedule Call
           </button>
         </div>
-
         {selectedTab === 'feedback' ? (
           <div className="h-[500px] overflow-hidden rounded-lg border border-gray-200">
             <iframe
@@ -191,7 +185,6 @@ const FeedbackModal = ({ isOpen, onClose }) => {
                 </p>
               </div>
             </div>
-
             <div className="bg-gray-50 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-900">What to expect:</h4>
               <ul className="mt-2 space-y-2">
@@ -225,8 +218,6 @@ const FeedbackModal = ({ isOpen, onClose }) => {
 // More Options Modal Component
 const MoreOptionsModal = ({ isOpen, onClose, onSelectOption }) => {
   if (!isOpen) return null;
-
-  // Items to show in More Options
   const moreOptions = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
     { icon: ShieldAlert, label: 'Reddit Post', id: 'RedditPost' },
@@ -237,7 +228,6 @@ const MoreOptionsModal = ({ isOpen, onClose, onSelectOption }) => {
     { icon: DollarSign, label: 'Billing', id: 'billing' },
     { icon: Chrome, label: 'Extension', id: 'extension' },
   ];
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
@@ -249,7 +239,6 @@ const MoreOptionsModal = ({ isOpen, onClose, onSelectOption }) => {
               <X className="h-5 w-5" />
             </button>
           </div>
-
           <div className="p-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {moreOptions.map((option) => (
@@ -273,7 +262,7 @@ const MoreOptionsModal = ({ isOpen, onClose, onSelectOption }) => {
   );
 };
 
-// Import your components
+// Importing additional components
 import Reddit_hub from './dashboard_pages/Reddit_hub';
 import KnowledgeWall from './dashboard_pages/KnowledgeWall';
 import BrandTraning from './dashboard_pages/BrandTraning';
@@ -281,7 +270,6 @@ import OutreachAgent from './dashboard_pages/Outreach';
 import Crypto from './dashboard_pages/crypto';
 import HackerNewsPostGenerator from './dashboard_pages/Hackernews_Post';
 import RedditPostGenerator from './dashboard_pages/Reddit_Post';
-
 import ElevenLabsScriptOptimizer from './dashboard_pages/ElevenLabsScriptOptimizer';
 import TweetExtractor from './dashboard_pages/ContentAssess';
 import Captions from './dashboard_pages/captions';
@@ -296,37 +284,31 @@ import OnBoardingPopup from './Components/OnBoardingPopup';
 import UserProfileSection from './Components/UserProfileSection';
 import ApiKeyManager from './Components/ApiKeyManager';
 
-// Component for subscription banner
+// Subscription Banner Component
 const SubscriptionBanner = ({ onUpgrade }) => {
   const [trialStatus, setTrialStatus] = useState(null);
-
   useEffect(() => {
     const checkTrialStatus = () => {
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
       const subscription = userData.subscription;
-
       if (subscription?.isTrialing) {
         const trialEndDate = new Date(subscription.trialEndDate);
         const now = new Date();
-
         if (now > trialEndDate) {
           setTrialStatus(null);
           return;
         }
-
         setTrialStatus({
           status: 'trialing',
           daysLeft: Math.ceil((trialEndDate - now) / (1000 * 60 * 60 * 24))
         });
       }
     };
-
     checkTrialStatus();
     const interval = setInterval(checkTrialStatus, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Return null if there's no trial or if status isn't 'trialing'
   if (!trialStatus || trialStatus.status !== 'trialing') {
     return null;
   }
@@ -367,7 +349,6 @@ const NavItemWithBadge = ({ icon: Icon, label, active, onClick, isNew }) => (
   </button>
 );
 
-
 const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex flex-col items-center justify-center p-2 
@@ -379,8 +360,8 @@ const MobileNavItem = ({ icon: Icon, label, active, onClick }) => (
   </button>
 );
 
-// Main Dashboard Component
-export default function Dashboard() {
+// Dashboard main component (wrapped later in Suspense)
+function DashboardComponent() {
   const [activeTab, setActiveTab] = useState('BrandTraning');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoSrc, setLogoSrc] = useState('/logo.png');
@@ -394,7 +375,7 @@ export default function Dashboard() {
   const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false);
   const [showApiKeyManager, setShowApiKeyManager] = useState(false);
 
-  // Navigation items configuration - Restructured for better organization
+  // Navigation items configuration
   const mainNavItems = [
     { icon: HandMetal, label: 'Marketing Week', id: 'dashboard', featured: true },
     { icon: Atom, label: 'Big Mouth AI', id: 'TweetExtractor' },
@@ -408,7 +389,7 @@ export default function Dashboard() {
     { icon: CalendarRange, label: 'Scheduler', id: 'planner' },
   ];
 
-  // More options items for the modal/menu
+  // More options for modal/menu
   const moreOptionsItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
     { icon: ShieldAlert, label: 'Reddit Post', id: 'RedditPost' },
@@ -428,32 +409,29 @@ export default function Dashboard() {
     { icon: Ellipsis, label: 'More', id: 'more-options' },
   ];
 
-  // Access the router and search params for URL-based tab handling
+  // Access router and searchParams
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Initialize training data in localStorage if it doesn't exist
-    const initializeLocalStorage = () => {
-      try {
-        let trainingData = localStorage.getItem('getTrainingData');
-        if (!trainingData) {
+    // Initialize localStorage data if needed
+    try {
+      let trainingData = localStorage.getItem('getTrainingData');
+      if (!trainingData) {
+        localStorage.setItem('getTrainingData', JSON.stringify({}));
+        console.log('Initialized empty getTrainingData in localStorage');
+      } else {
+        try {
+          JSON.parse(trainingData);
+          console.log('Verified getTrainingData exists in localStorage');
+        } catch (parseError) {
           localStorage.setItem('getTrainingData', JSON.stringify({}));
-          console.log('Initialized empty getTrainingData in localStorage');
-        } else {
-          try {
-            const parsed = JSON.parse(trainingData);
-            console.log('Verified getTrainingData exists in localStorage');
-          } catch (parseError) {
-            localStorage.setItem('getTrainingData', JSON.stringify({}));
-            console.error('Found corrupted getTrainingData, reset to empty object');
-          }
+          console.error('Found corrupted getTrainingData, reset to empty object');
         }
-      } catch (error) {
-        console.error('Error initializing localStorage:', error);
       }
-    };
-    initializeLocalStorage();
+    } catch (error) {
+      console.error('Error initializing localStorage:', error);
+    }
   }, []);
 
   useEffect(() => {
@@ -462,9 +440,8 @@ export default function Dashboard() {
         setIsLoading(true);
         const key = localStorage.getItem('apiKey');
         const userData = localStorage.getItem('userData');
-        const isValid = key && userData;
-        setIsAuthenticated(isValid);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        setIsAuthenticated(key && userData);
+        await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (error) {
         console.error('Error checking login state:', error);
         setIsAuthenticated(false);
@@ -478,7 +455,7 @@ export default function Dashboard() {
     return () => window.removeEventListener('userLoggedIn', handleLogin);
   }, []);
 
-  // On mount, read the "tab" from the URL query string using useSearchParams
+  // Read the "tab" query parameter
   useEffect(() => {
     const urlTab = searchParams.get("tab");
     if (urlTab) {
@@ -515,7 +492,6 @@ export default function Dashboard() {
         break;
       default:
         setActiveTab(id);
-        // Update the URL with the new tab value.
         router.push(`/?tab=${id}`);
     }
     setIsMobileMenuOpen(false);
@@ -557,18 +533,10 @@ export default function Dashboard() {
   // Enhanced Mobile Menu Component
   const MobileMenu = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
-
     const menuGroups = [
-      {
-        category: "Main Tools",
-        items: mainNavItems
-      },
-      {
-        category: "More Tools",
-        items: moreOptionsItems
-      }
+      { category: "Main Tools", items: mainNavItems },
+      { category: "More Tools", items: moreOptionsItems }
     ];
-
     return (
       <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
         <div className="sticky top-0 bg-white border-b z-10">
@@ -628,30 +596,16 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-100 text-gray-900">
       <ToastContainer />
       <div className="flex h-screen overflow-hidden">
-        <MobileMenu
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-        />
-
+        <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
         <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white transform 
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
           <div className="p-4 my-3 flex justify-between items-center">
-            <Image
-              src={logoSrc}
-              alt="Logo"
-              width={250}
-              height={50}
-              onError={() => setLogoSrc('/logo.png')}
-            />
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="md:hidden text-gray-500 hover:text-gray-700"
-            >
+            <Image src={logoSrc} alt="Logo" width={250} height={50} onError={() => setLogoSrc('/logo.png')} />
+            <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-500 hover:text-gray-700">
               <X className="h-6 w-6" />
             </button>
           </div>
-
           <nav className="mt-2 px-6 space-y-2 flex-grow overflow-y-auto">
             <button
               className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center mb-4
@@ -663,7 +617,6 @@ export default function Dashboard() {
               <HandMetal className="mr-2 h-5 w-5" />
               <span>Marketing Week</span>
             </button>
-
             <div className="flex flex-col flex-grow">
               <div className="mb-6">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2">
@@ -708,7 +661,6 @@ export default function Dashboard() {
             </div>
           </nav>
         </aside>
-
         <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-100 rounded-md">
           <SubscriptionBanner onUpgrade={() => handleNavItemClick('billing')} />
           <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
@@ -721,7 +673,6 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
-
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
         <div className="grid grid-cols-4 p-4">
           {primaryMobileNavItems.map((item) => (
@@ -738,27 +689,15 @@ export default function Dashboard() {
           ))}
         </div>
       </nav>
-
       <OnBoardingPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
       <BillingModal isOpen={isBillingOpen} onClose={() => setIsBillingOpen(false)} />
       <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
-
-      <MoreOptionsModal
-        isOpen={isMoreOptionsOpen}
-        onClose={() => setIsMoreOptionsOpen(false)}
-        onSelectOption={handleNavItemClick}
-      />
-
-      <Modal
-        isOpen={showApiKeyManager}
-        onClose={() => setShowApiKeyManager(false)}
-        title="API Key Manager"
-      >
+      <MoreOptionsModal isOpen={isMoreOptionsOpen} onClose={() => setIsMoreOptionsOpen(false)} onSelectOption={handleNavItemClick} />
+      <Modal isOpen={showApiKeyManager} onClose={() => setShowApiKeyManager(false)} title="API Key Manager">
         <div className="p-4">
           <ApiKeyManager />
         </div>
       </Modal>
-
       <Modal isOpen={isHowToUseOpen} onClose={() => setIsHowToUseOpen(false)} title="How to Use">
         <div className="py-4">
           <iframe
@@ -771,5 +710,14 @@ export default function Dashboard() {
         </div>
       </Modal>
     </div>
+  );
+}
+
+// Wrap the DashboardComponent in a Suspense boundary for client-side hooks like useSearchParams.
+export default function DashboardWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardComponent />
+    </Suspense>
   );
 }

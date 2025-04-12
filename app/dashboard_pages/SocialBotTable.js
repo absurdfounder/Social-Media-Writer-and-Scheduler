@@ -57,12 +57,11 @@ export default function SocialBotTable({ posts }) {
   const [relevanceLoading, setRelevanceLoading] = useState(false);
 
 // Auto-scroll effect: scroll to the bottom whenever computedPosts change
-useEffect(() => {
-  setTimeout(() => {
-    if (tableEndRef.current) {
-      tableEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, 100); // Adjust delay as necessary
+
+useLayoutEffect(() => {
+  if (tableEndRef.current) {
+    tableEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }
 }, [computedPosts]);
 
 

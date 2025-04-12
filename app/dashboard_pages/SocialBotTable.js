@@ -57,10 +57,14 @@ export default function SocialBotTable({ posts }) {
   const [relevanceLoading, setRelevanceLoading] = useState(false);
 
   // Auto-scroll effect when new posts are added
-// Auto-scroll effect: scroll to the bottom when the filtered posts update
+  // Auto-scroll effect: scroll to the bottom when the filtered posts update
+// Auto-scroll effect: scroll to the bottom whenever computed posts change
 useEffect(() => {
-  tableEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-}, [filteredPosts]);
+  if (tableEndRef.current) {
+    tableEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }
+}, [computedPosts]);
+
 
 
   // Shared AI generator for Reply, Quote, Repost, etc.

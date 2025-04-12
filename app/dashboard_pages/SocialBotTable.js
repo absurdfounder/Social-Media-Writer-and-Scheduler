@@ -129,34 +129,54 @@ useEffect(() => {
   async function computeRelevanceForAllPosts() {
     setRelevanceLoading(true);
     try {
-      const results = await Promise.all(
-        posts.map(async (post) => {
-          const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
-          const relevance = await generateRelevanceForPost(post, prompt);
-          return { ...post, relevance };
-        })
-      );
-      const sorted = results.sort((a, b) => {
+      // Make a shallow copy of the posts array.
+      let updatedPosts = [...posts];
+  
+      // Process the posts in batches of 5.
+      for (let i = 0; i < updatedPosts.length; i += 5) {
+        const batch = updatedPosts.slice(i, i + 5);
+        // Process each batch sequentially.
+        const batchResults = await Promise.all(
+          batch.map(async (post) => {
+            const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${
+              post.tweet_text || post.content
+            }"`;
+            // Generate the relevance score for this post.
+            const relevance = await generateRelevanceForPost(post, prompt);
+            return { ...post, relevance };
+          })
+        );
+  
+        // Replace posts in the updatedPosts array with the processed batch results.
+        updatedPosts.splice(i, batchResults.length, ...batchResults);
+        // Optionally update the UI after each batch to show progressive updates.
+        setComputedPosts((prev) => {
+          const temp = [...prev];
+          // Replace the portion corresponding to the current batch.
+          temp.splice(i, batchResults.length, ...batchResults);
+          return temp;
+        });
+      }
+  
+      // Sort the computed posts by relevance in descending order.
+      const sortedPosts = updatedPosts.sort((a, b) => {
         const getVal = (item) => {
           const num = parseFloat(item.relevance);
           return isNaN(num) ? 0 : num;
         };
         return getVal(b) - getVal(a);
       });
-      setComputedPosts(sorted);
+      setComputedPosts(sortedPosts);
     } catch (error) {
       console.error(error);
     } finally {
       setRelevanceLoading(false);
     }
   }
+  
 
   // When posts change, compute relevance automatically
-  useEffect(() => {
-    if (posts && posts.length) {
-      computeRelevanceForAllPosts();
-    }
-  }, [posts]);
+
 
   // Delete a tweet from the computed posts list
   function handleDeleteTweet(id) {
@@ -308,6 +328,13 @@ useEffect(() => {
         </select>
       </div>
 
+      <button 
+  onClick={computeRelevanceForAllPosts} 
+  className="bg-green-400 text-white rounded-md w-full p-2 m-auto mb-4"
+>
+  Chomp out Useless Crap
+</button>
+
       {/* Mobile Card View */}
       <div className="md:hidden">
         {filteredPosts.map((post) => (
@@ -369,12 +396,7 @@ useEffect(() => {
         <div ref={tableEndRef} />
       </div>
 
-      <button 
-  onClick={computeRelevanceForAllPosts} 
-  className="bg-green-400 text-white rounded-md w-full p-2 m-auto mb-4"
->
-  Chomp out Useless Crap
-</button>
+
 
 
 

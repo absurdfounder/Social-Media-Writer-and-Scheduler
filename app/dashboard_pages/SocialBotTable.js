@@ -59,16 +59,16 @@ export default function SocialBotTable({ posts }) {
   // Auto-scroll effect when new posts are added
   useEffect(() => {
     if (!tableEndRef.current) return;
-  
+
     const observer = new ResizeObserver(() => {
       tableEndRef.current.scrollIntoView({ behavior: 'smooth' });
     });
-  
+
     observer.observe(tableEndRef.current.parentElement);
-  
+
     return () => observer.disconnect();
   }, [computedPosts]);
-  
+
 
   // Shared AI generator for Reply, Quote, Repost, etc.
   async function generateAIContent(prompt, setLoading, setError, setResult) {
@@ -258,7 +258,7 @@ export default function SocialBotTable({ posts }) {
       bgColor = "bg-yellow-100 text-yellow-800";
     }
 
-    return <span className={`px-2 py-1 text-xs rounded ${bgColor} font-medium`}>{relevance}</span>;
+    return <span className={`px-2 py-1 text-xs rounded ${bgColor} font-medium`}>Relevance : {relevance}</span>;
   };
 
   return (
@@ -309,7 +309,7 @@ export default function SocialBotTable({ posts }) {
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden max-h-screen">
+      <div className="md:hidden">
         {filteredPosts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 p-4">
             <div className="flex items-start space-x-3">
@@ -359,7 +359,7 @@ export default function SocialBotTable({ posts }) {
                     onClick={() => handleDeleteTweet(post.id)}
                     className="inline-flex items-center px-2.5 py-1.5 bg-red-500 text-white rounded shadow-sm text-xs font-medium hover:bg-red-600"
                   >
-                    <X size={14} className="mr-1" />
+                    <X size={14} />
                   </button>
                 </div>
               </div>

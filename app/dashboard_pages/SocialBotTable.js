@@ -70,7 +70,7 @@ export default function SocialBotTable({ posts }) {
   useEffect(() => {
     setComputedPosts(posts);
   }, [posts]);
-  
+
 
 
   // Shared AI generator for Reply, Quote, Repost, etc.
@@ -135,32 +135,31 @@ export default function SocialBotTable({ posts }) {
       // Start with a copy of the posts passed in as props.  
       // This ensures that computedPosts isn't empty.
       let updatedPosts = [...posts];
-  
+
       // Process posts in batches of 5
       for (let i = 0; i < updatedPosts.length; i += 5) {
         // Extract the current batch
         const batch = updatedPosts.slice(i, i + 5);
-        
+
         // Process each post in the batch concurrently
         const batchResults = await Promise.all(
           batch.map(async (post) => {
-            const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${
-              post.tweet_text || post.content
-            }"`;
+            const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content
+              }"`;
             const relevance = await generateRelevanceForPost(post, prompt);
             return { ...post, relevance };
           })
         );
-  
+
         // Replace the segment in updatedPosts with the newly computed batch results
         for (let j = 0; j < batchResults.length; j++) {
           updatedPosts[i + j] = batchResults[j];
         }
-  
+
         // Optionally update the UI after each batch so that progress is visible.
         setComputedPosts([...updatedPosts]);
       }
-  
+
       // Sort the final updated posts by relevance (desc order)
       const sortedPosts = updatedPosts.sort((a, b) => {
         const getVal = (item) => {
@@ -169,7 +168,7 @@ export default function SocialBotTable({ posts }) {
         };
         return getVal(b) - getVal(a);
       });
-  
+
       // Update state with sorted posts
       setComputedPosts([...sortedPosts]);
     } catch (error) {
@@ -178,7 +177,7 @@ export default function SocialBotTable({ posts }) {
       setRelevanceLoading(false);
     }
   }
-  
+
 
 
   // When posts change, compute relevance automatically
@@ -288,7 +287,7 @@ export default function SocialBotTable({ posts }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg mt-6">
+    <div className="bg-white rounded-lg shadow-lg">
       {/* Header */}
       <div className="p-4 bg-gray-50 border-b border-gray-200">
         <div className="flex justify-between items-center">
@@ -336,7 +335,7 @@ export default function SocialBotTable({ posts }) {
 
       <button
         onClick={computeRelevanceForAllPosts}
-        className="bg-green-400 text-white rounded-md w-full p-2 m-auto mb-4"
+        className="bg-green-400 my-4 text-gray-900 border-2 border-slate-500 rounded-md w-96 p-2 m-auto mb-4 justify-center flex shadow-2xl"
       >
         Chomp out Useless Crap
       </button>

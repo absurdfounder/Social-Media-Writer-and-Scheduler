@@ -334,7 +334,7 @@ const Toggle = ({ enabled, onToggle, size = 'default' }) => {
 // Frame Type Toggle Component
 const FrameToggle = ({ isAvatar, onToggle, className = "" }) => {
   return (
-    <div className={`relative inline-flex items-center rounded-full p-1 bg-gray-100 ${className}`}>
+    <div className={`relative inline-flex items-center rounded-full p-1 bg-slate-100 ${className}`}>
       <button
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${!isAvatar ? 'bg-green-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
           }`}
@@ -1062,7 +1062,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
           <h1 className="text-lg md:text-xl font-bold text-gray-900">Create Your <span className='text-slate-600'>TikTok / IG Video</span> Script</h1>
           <button
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors text-sm"
+            className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-gray-600 bg-slate-100 hover:bg-gray-200 rounded-md transition-colors text-sm"
           >
             <Settings size={16} />
             <span className="hidden sm:inline">Settings</span>
@@ -1197,7 +1197,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
               <button
                 className={`flex items-center gap-1 md:gap-2 px-4 md:px-6 py-1.5 md:py-2 rounded-md text-sm transition-colors w-full sm:w-auto justify-center
                 ${isGenerating ?
-                    'bg-gray-100 text-gray-400 cursor-not-allowed' :
+                    'bg-slate-100 text-gray-400 cursor-not-allowed' :
                     'bg-green-600 text-white hover:bg-slate-600'}`}
                 onClick={generateVideoScript}
                 disabled={isGenerating}
@@ -1308,7 +1308,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                           if (currentScene > 0) setCurrentScene(currentScene - 1);
                         }}
                         disabled={currentScene === 0}
-                        className="p-1 md:p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                        className="p-1 md:p-1.5 rounded-full hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
                       >
                         <ArrowLeft size={isMobileView ? 14 : 16} className="text-gray-600" />
                       </button>
@@ -1317,7 +1317,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                           if (currentScene < scenes.length - 1) setCurrentScene(currentScene + 1);
                         }}
                         disabled={currentScene === scenes.length - 1}
-                        className="p-1 md:p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                        className="p-1 md:p-1.5 rounded-full hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
                       >
                         <ArrowRight size={isMobileView ? 14 : 16} className="text-gray-600" />
                       </button>
@@ -1383,7 +1383,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
                   {/* AI Prompts Grid */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
                     {/* Visual/Avatar Prompt */}
-                    <div className="border rounded-lg p-3 md:p-4 bg-gray-100">
+                    <div className="border rounded-lg p-3 md:p-4 bg-slate-100">
                       <h4 className="text-xs md:text-sm font-medium text-gray-900 mb-1 md:mb-2">
                         {getCurrentScene().frameType === FRAME_TYPES.AI_VISUAL ?
                           'AI Visual Scene Direction' :
@@ -1418,7 +1418,7 @@ const VideoScriptConstructor = ({ onConfigureTrainingData }) => {
 
                     {/* Voice Direction for regular AI audio */}
                     {toolSettings.AI_AUDIO && !toolSettings.ELEVEN_LABS && (
-                      <div className="border rounded-lg p-3 md:p-4 bg-gray-100">
+                      <div className="border rounded-lg p-3 md:p-4 bg-slate-100">
                         <h4 className="text-xs md:text-sm font-medium text-gray-900 mb-1 md:mb-2">Voice Direction</h4>
                         <textarea
                           value={getCurrentScene().aiPrompts.voicePrompt}

@@ -90,19 +90,19 @@ const TipTapEditor = ({ content, onUpdate, onImageUpload, onVideoUpload, onLinkA
       <div className="flex space-x-2 mt-2">
         <button
           onClick={onImageUpload}
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full hover:bg-slate-100"
         >
           <ImageIcon size={20} />
         </button>
         <button
           onClick={onVideoUpload}
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full hover:bg-slate-100"
         >
           <Video size={20} />
         </button>
         <button
           onClick={onLinkAdd}
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full hover:bg-slate-100"
         >
           <LinkIcon size={20} />
         </button>
@@ -983,7 +983,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
               ) : null}
             </div>
 
-            <div className={`flex items-center p-0.5 rounded-full bg-gray-100 shadow-inner w-fit`}>
+            <div className={`flex items-center p-0.5 rounded-full bg-slate-100 shadow-inner w-fit`}>
               <button
                 onClick={() => {
                   setMode('share');
@@ -1164,7 +1164,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                           }}
                           className={`p-3 rounded-md cursor-pointer flex items-center ${selectedProfile === profile.id
                               ? 'bg-slate-100 border border-slate-300'
-                              : 'bg-gray-50 hover:bg-gray-100'
+                              : 'bg-gray-50 hover:bg-slate-100'
                             }`}
                         >
                           <User size={18} className="mr-2 text-slate-500" />
@@ -1178,7 +1178,7 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center p-4 bg-gray-100 rounded-md">
+                    <div className="text-center p-4 bg-slate-100 rounded-md">
                       <p className="text-gray-500">No profiles found. Please create a profile first.</p>
                       <button
                         className="mt-2 text-sm text-slate-500 hover:underline"

@@ -332,7 +332,7 @@ export const Login = () => {
       <button
         onClick={user ? handleLogout : handleGoogleLogin}
         disabled={loading}
-        className={`min-w-64 h-16 px-8 mt-4 rounded-full justify-between items-center  flex  space-x-2 mb-4 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed ${user ? 'hover:bg-gray-100' : 'hover:bg-gray-100'
+        className={`min-w-64 h-16 px-8 mt-4 rounded-full justify-between items-center  flex  space-x-2 mb-4 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed ${user ? 'hover:bg-slate-100' : 'hover:bg-slate-100'
           }`}
       >
         {renderButtonContent()}

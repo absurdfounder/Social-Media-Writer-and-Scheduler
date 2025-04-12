@@ -137,7 +137,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     <br />
                   </h2>
                   <div className="flex flex-wrap justify-center gap-2 md:gap-4 mt-4">
-                    <span className="font-bold text-gray-800 bg-gray-100 border-gray-400 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
+                    <span className="font-bold text-gray-800 bg-slate-100 border-gray-400 border rounded-full px-2 py-1 sm:px-4 sm:py-2 font-sans flex items-center whitespace-nowrap text-sm sm:text-xl md:text-2xl leading-none">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/X_logo.jpg/768px-X_logo.jpg"
                         alt="X logo"

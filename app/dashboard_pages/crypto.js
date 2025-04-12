@@ -610,7 +610,7 @@ export default function App() {
         if (action.startsWith("Receive")) {
           return <span className="bg-slate-100 text-slate-800 px-2 py-1 rounded-md text-xs font-medium">{action}</span>;
         }
-        return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-md text-xs font-medium">{action}</span>;
+        return <span className="bg-slate-100 text-gray-800 px-2 py-1 rounded-md text-xs font-medium">{action}</span>;
     }
   };
 

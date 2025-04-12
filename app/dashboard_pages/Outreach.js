@@ -445,7 +445,7 @@ const generateMessage = async () => {
               <button
                 onClick={() => setPlatform('twitter')}
                 className={`flex items-center px-4 py-2 rounded-md ${
-                  platform === 'twitter' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700'
+                  platform === 'twitter' ? 'bg-green-600 text-white' : 'bg-slate-100 text-gray-700'
                 }`}
               >
                 <AtSign size={16} className="mr-2" /> Twitter/X
@@ -453,7 +453,7 @@ const generateMessage = async () => {
               <button
                 onClick={() => setPlatform('linkedin')}
                 className={`flex items-center px-4 py-2 rounded-md ${
-                  platform === 'linkedin' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700'
+                  platform === 'linkedin' ? 'bg-green-600 text-white' : 'bg-slate-100 text-gray-700'
                 }`}
               >
                 <Linkedin size={16} className="mr-2" /> LinkedIn
@@ -461,7 +461,7 @@ const generateMessage = async () => {
               <button
                 onClick={() => setPlatform('email')}
                 className={`flex items-center px-4 py-2 rounded-md ${
-                  platform === 'email' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700'
+                  platform === 'email' ? 'bg-green-600 text-white' : 'bg-slate-100 text-gray-700'
                 }`}
               >
                 <Mail size={16} className="mr-2" /> Email
@@ -655,7 +655,7 @@ const generateMessage = async () => {
                   </p>
                   
                   {profiles.length === 0 ? (
-                    <div className="text-center p-4 bg-gray-100 rounded-md">
+                    <div className="text-center p-4 bg-slate-100 rounded-md">
                       <p className="text-gray-500">No profiles found</p>
                     </div>
                   ) : (
@@ -670,7 +670,7 @@ const generateMessage = async () => {
                           className={`p-3 rounded-md cursor-pointer flex items-center ${
                             selectedProfile === profile.id 
                               ? 'bg-slate-100 border border-slate-300' 
-                              : 'bg-gray-50 hover:bg-gray-100'
+                              : 'bg-gray-50 hover:bg-slate-100'
                           }`}
                         >
                           <User size={18} className="mr-2 text-slate-500" />

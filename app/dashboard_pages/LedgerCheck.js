@@ -53,7 +53,7 @@ const LedgerCheckDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-gray-100 dark:bg-gray-500 rounded-lg p-4 mb-6">
+      <div className="bg-slate-100 dark:bg-gray-500 rounded-lg p-4 mb-6">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Lookup Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-500 p-4 rounded-md shadow">
@@ -94,7 +94,7 @@ const LedgerCheckDashboard = () => {
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-500">
             {ledgerData.map((row, index) => (
               <tr key={index}>
-                <td className="p-3 text-sm text-gray-900 dark:text-gray-100">{row.party}</td>
+                <td className="p-3 text-sm text-gray-900 dark:text-slate-100">{row.party}</td>
                 <td className="p-3 text-sm text-gray-500 dark:text-gray-400">{row.date}</td>
                 <td className="p-3 text-sm text-gray-500 dark:text-gray-400">{row.cases}</td>
                 <td className="p-3 text-sm text-gray-500 dark:text-gray-400">{row.debit}</td>

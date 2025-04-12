@@ -139,7 +139,7 @@ const ApiKeyManager = () => {
     <div>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 text-gray-500 hover:bg-gray-100"
+        className="flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 text-gray-500 hover:bg-slate-100"
       >
         <Key className="mr-3 h-5 w-5" />
         <span className="font-medium">API Keys</span>

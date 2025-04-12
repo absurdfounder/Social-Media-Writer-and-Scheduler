@@ -119,7 +119,7 @@ const BillingModal = ({ isOpen, onClose }) => {
                   </ul>
                   <button className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${plan.popular
                     ? 'bg-green-600 hover:bg-slate-600 text-white'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                    : 'bg-slate-100 hover:bg-gray-200 text-gray-800'
                     }`}>
                     Get Started
                   </button>
@@ -144,7 +144,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Share Your Feedback">
       <div className="flex flex-col space-y-6 max-h-[80vh]">
-        <div className="flex rounded-lg bg-gray-100 p-1">
+        <div className="flex rounded-lg bg-slate-100 p-1">
           <button
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${selectedTab === 'feedback'
               ? 'bg-white text-slate-600 shadow-sm'
@@ -347,7 +347,7 @@ const SubscriptionBanner = ({ onUpgrade }) => {
 const NavItem = ({ icon: Icon, label, active, onClick }) => (
   <button
     className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 
-      ${active ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
+      ${active ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-slate-100'}`}
     onClick={onClick}
   >
     <Icon className="mr-3 h-5 w-5" />
@@ -358,7 +358,7 @@ const NavItem = ({ icon: Icon, label, active, onClick }) => (
 const NavItemWithBadge = ({ icon: Icon, label, active, onClick, isNew }) => (
   <button
     className={`flex items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 
-      ${active ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}`}
+      ${active ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-slate-100'}`}
     onClick={onClick}
   >
     <Icon className="mr-3 h-5 w-5" />
@@ -612,7 +612,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-slate-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your workspace...</p>
@@ -622,7 +622,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="min-h-screen bg-slate-100 text-gray-900">
       <ToastContainer />
       <div className="flex h-screen overflow-hidden">
         {/* Mobile Menu Component */}
@@ -704,7 +704,7 @@ export default function Dashboard() {
               {/* More Options Button */}
               <button
                 className="w-full py-2 px-6 rounded-lg font-medium transition-colors flex items-center justify-start 
-                  bg-gray-100 text-gray-700 hover:bg-gray-200 mb-6"
+                  bg-slate-100 text-gray-700 hover:bg-gray-200 mb-6"
                 onClick={() => setIsMoreOptionsOpen(true)}
               >
                 <span>More Tools</span>
@@ -719,7 +719,7 @@ export default function Dashboard() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 rounded-md">
+        <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-100 rounded-md">
           <SubscriptionBanner onUpgrade={() => handleNavItemClick('billing')} />
           <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">

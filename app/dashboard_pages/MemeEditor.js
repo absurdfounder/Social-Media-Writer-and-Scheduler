@@ -220,13 +220,13 @@ function TrainingDataManager() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-slate-100">
       {/* Sidebar */}
       <div className="w-96 bg-white p-4 overflow-y-auto border-r">
         {/* Toggle buttons */}
         <div className="flex mb-4 gap-2">
           <button
-            className={`p-2 rounded w-full ${showImageLibrary ? 'bg-green-600 text-white' : 'bg-gray-100'}`}
+            className={`p-2 rounded w-full ${showImageLibrary ? 'bg-green-600 text-white' : 'bg-slate-100'}`}
             onClick={() => {
               setShowImageLibrary(true);
               setShowMemeLibrary(false);
@@ -235,7 +235,7 @@ function TrainingDataManager() {
             Images
           </button>
           <button
-            className={`p-2 rounded w-full ${showMemeLibrary ? 'bg-green-600 text-white' : 'bg-gray-100'}`}
+            className={`p-2 rounded w-full ${showMemeLibrary ? 'bg-green-600 text-white' : 'bg-slate-100'}`}
             onClick={() => {
               setShowImageLibrary(false);
               setShowMemeLibrary(true);
@@ -294,13 +294,13 @@ function TrainingDataManager() {
                 )}
                 <div className="flex justify-end gap-2">
                   <button
-                    className="p-1 hover:bg-gray-100 rounded"
+                    className="p-1 hover:bg-slate-100 rounded"
                     onClick={() => handleLoadTemplate(template)}
                   >
                     Load
                   </button>
                   <button
-                    className="p-1 hover:bg-gray-100 rounded text-red-500"
+                    className="p-1 hover:bg-slate-100 rounded text-red-500"
                     onClick={() => handleDeleteTemplate(template.id)}
                   >
                     Delete
@@ -317,21 +317,21 @@ function TrainingDataManager() {
         {/* Toolbar */}
         <div className="mb-4 p-2 bg-white rounded-lg shadow flex items-center gap-2">
           <button
-            className={`p-2 rounded ${selectedTool === 'select' ? 'bg-green-600 text-white' : 'hover:bg-gray-100'}`}
+            className={`p-2 rounded ${selectedTool === 'select' ? 'bg-green-600 text-white' : 'hover:bg-slate-100'}`}
             onClick={() => setSelectedTool('select')}
           >
             <Move size={20} />
           </button>
 
           <button
-            className={`p-2 rounded hover:bg-gray-100`}
+            className={`p-2 rounded hover:bg-slate-100`}
             onClick={addText}
           >
             <Type size={20} />
           </button>
 
           <button
-            className={`p-2 rounded hover:bg-gray-100`}
+            className={`p-2 rounded hover:bg-slate-100`}
             onClick={addRectangle}
           >
             <Square size={20} />
@@ -340,14 +340,14 @@ function TrainingDataManager() {
           <div className="h-6 w-px bg-gray-300 mx-2" />
 
           <button
-            className="p-2 rounded hover:bg-gray-100"
+            className="p-2 rounded hover:bg-slate-100"
             onClick={() => moveLayer('up')}
           >
             <ChevronUp size={20} />
           </button>
 
           <button
-            className="p-2 rounded hover:bg-gray-100"
+            className="p-2 rounded hover:bg-slate-100"
             onClick={() => moveLayer('down')}
           >
             <ChevronDown size={20} />
@@ -364,20 +364,20 @@ function TrainingDataManager() {
           />
           <label
             htmlFor="load-canvas"
-            className="p-2 rounded hover:bg-gray-100 cursor-pointer"
+            className="p-2 rounded hover:bg-slate-100 cursor-pointer"
           >
             Load Canvas
           </label>
 
           <button
-            className="p-2 rounded hover:bg-gray-100"
+            className="p-2 rounded hover:bg-slate-100"
             onClick={handleSaveCanvas}
           >
             <Save size={20} />
           </button>
 
           <button
-            className="p-2 rounded hover:bg-gray-100"
+            className="p-2 rounded hover:bg-slate-100"
             onClick={handleExportPNG}
           >
             <Download size={20} />

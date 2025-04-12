@@ -281,7 +281,7 @@ export default function SocialBotTable({ posts }) {
     let bgColor = "bg-slate-100 text-slate-800";
 
     if (isNaN(relevanceNum)) {
-      bgColor = "bg-gray-100 text-gray-800";
+      bgColor = "bg-slate-100 text-gray-800";
     } else if (relevanceNum < 30) {
       bgColor = "bg-red-100 text-red-800";
     } else if (relevanceNum < 70) {

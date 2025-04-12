@@ -468,7 +468,7 @@ export default function PostExtractor() {
 
           <div className="flex space-x-2 justify-between w-full">
             <div className="flex items-center">
-              <div className="flex items-center bg-gray-100 p-2 rounded-full border">
+              <div className="flex items-center bg-slate-100 p-2 rounded-full border">
                 <span className="px-2 sm:px-3 py-1 rounded-full border text-xs sm:text-sm font-medium mr-2 bg-green-100 text-green-800 flex items-center">
                   <Check size={16} className="mr-1 hidden sm:inline" />
                   <span className="truncate">Connected</span>
@@ -501,7 +501,7 @@ export default function PostExtractor() {
                 onClick={() => setPostType(platform)}
                 className={`px-3 py-2 rounded-md flex items-center ${postType === platform
                   ? 'bg-slate-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-slate-100 text-gray-700 hover:bg-gray-200'
                   }`}
               >
                 {getPlatformIcon(platform)}
@@ -563,7 +563,7 @@ export default function PostExtractor() {
               </label>
             </div>
             {showExtractedJSON && (
-              <div className="bg-gray-100 p-3 rounded overflow-x-auto">
+              <div className="bg-slate-100 p-3 rounded overflow-x-auto">
                 <pre className="text-xs whitespace-pre-wrap">
                   {JSON.stringify(extractedData, null, 2)}
                 </pre>

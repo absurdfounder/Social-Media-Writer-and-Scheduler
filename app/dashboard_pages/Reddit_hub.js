@@ -1460,7 +1460,7 @@ Focus on finding genuine opportunities to add value while promoting the product/
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-slate-100 min-h-screen">
       {errorMessage && (
         <div className="bg-red-100 border border-red-400 text-red-500 px-4 py-3 rounded relative mb-4" role="alert">
           <strong className="font-bold">Error! </strong>

@@ -1,3 +1,4 @@
+// SocialBotTable.js
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -56,27 +57,20 @@ export default function SocialBotTable({ posts }) {
   const [computedPosts, setComputedPosts] = useState([]);
   const [relevanceLoading, setRelevanceLoading] = useState(false);
 
-  // Auto-scroll effect: scroll to the bottom whenever computedPosts change
-
+  // Auto-scroll effect: scroll to bottom whenever computedPosts change
   useEffect(() => {
     setTimeout(() => {
       const scrollHeight = Math.max(
         document.body.scrollHeight, 
         document.documentElement.scrollHeight
       );
-      window.scrollTo({ 
-        top: scrollHeight, 
-        behavior: 'smooth' 
-      });
+      window.scrollTo({ top: scrollHeight, behavior: 'smooth' });
     }, 100);
   }, [computedPosts]);
-  
 
   useEffect(() => {
     setComputedPosts(posts);
   }, [posts]);
-
-
 
   // Shared AI generator for Reply, Quote, Repost, etc.
   async function generateAIContent(prompt, setLoading, setError, setResult) {
@@ -126,7 +120,7 @@ export default function SocialBotTable({ posts }) {
       if (isNaN(score)) {
         return "N/A";
       }
-      return `${score}%`;
+      return `${score}% Relevance`;
     } catch (error) {
       console.error("Error generating relevance for post", post.id, error);
       return "Error";
@@ -137,8 +131,7 @@ export default function SocialBotTable({ posts }) {
   async function computeRelevanceForAllPosts() {
     setRelevanceLoading(true);
     try {
-      // Start with a copy of the posts passed in as props.  
-      // This ensures that computedPosts isn't empty.
+      // Start with a copy of the posts passed in as props.
       let updatedPosts = [...posts];
 
       // Process posts in batches of 5
@@ -149,8 +142,7 @@ export default function SocialBotTable({ posts }) {
         // Process each post in the batch concurrently
         const batchResults = await Promise.all(
           batch.map(async (post) => {
-            const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content
-              }"`;
+            const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
             const relevance = await generateRelevanceForPost(post, prompt);
             return { ...post, relevance };
           })
@@ -161,7 +153,7 @@ export default function SocialBotTable({ posts }) {
           updatedPosts[i + j] = batchResults[j];
         }
 
-        // Optionally update the UI after each batch so that progress is visible.
+        // Optionally update the UI after each batch so progress is visible.
         setComputedPosts([...updatedPosts]);
       }
 
@@ -182,11 +174,6 @@ export default function SocialBotTable({ posts }) {
       setRelevanceLoading(false);
     }
   }
-
-
-
-  // When posts change, compute relevance automatically
-
 
   // Delete a tweet from the computed posts list
   function handleDeleteTweet(id) {
@@ -288,7 +275,7 @@ export default function SocialBotTable({ posts }) {
       bgColor = "bg-yellow-100 text-yellow-800";
     }
 
-    return <span className={`px-2 py-1 text-xs rounded ${bgColor} font-medium`}>Relevance : {relevance}</span>;
+    return <span className={`px-2 py-1 text-xs rounded ${bgColor} font-medium`}>{relevance}</span>;
   };
 
   return (
@@ -354,8 +341,8 @@ export default function SocialBotTable({ posts }) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-1">
-                    {getPlatformIcon(post.postType)}
                     <p className="text-sm font-medium text-gray-900 truncate">{post.user_name}</p>
+                    {getPlatformIcon(post.postType)}
                   </div>
                   {displayRelevance(post.relevance)}
                 </div>
@@ -405,10 +392,6 @@ export default function SocialBotTable({ posts }) {
         ))}
         <div ref={tableEndRef} />
       </div>
-
-
-
-
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto max-h-screen">
@@ -579,9 +562,8 @@ export default function SocialBotTable({ posts }) {
         error={replyError}
         generated={replyGenerated}
         onClose={() => setReplyPost(null)}
-        onSend={() => {
-          setReplyPost(null);
-        }}
+        onSend={() => setReplyPost(null)}
+        actionType="reply"
       />
 
       {/* Quote Modal */}
@@ -595,9 +577,8 @@ export default function SocialBotTable({ posts }) {
             : null
         }
         onClose={() => setQuotePost(null)}
-        onSend={() => {
-          setQuotePost(null);
-        }}
+        onSend={() => setQuotePost(null)}
+        actionType="quote"
       />
 
       {/* Repost Modal */}
@@ -607,9 +588,8 @@ export default function SocialBotTable({ posts }) {
         error={repostError}
         generated={repostGenerated}
         onClose={() => setRepostPost(null)}
-        onSend={() => {
-          setRepostPost(null);
-        }}
+        onSend={() => setRepostPost(null)}
+        actionType="repost"
       />
     </div>
   );

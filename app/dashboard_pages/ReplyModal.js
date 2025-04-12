@@ -1,3 +1,4 @@
+// ReplyModal.js
 "use client";
 
 import React from 'react';
@@ -10,15 +11,40 @@ export default function ReplyModal({
   generated,
   onClose,
   onSend,
+  actionType, // "reply" | "quote" | "repost"
 }) {
   if (!post) return null;
+
+  // Determine header, button text, and Twitter URL based on the action type.
+  let headerText = "";
+  let sendButtonText = "";
+  let twitterUrl = "";
+
+  if (actionType === "reply") {
+    headerText = "Reply";
+    sendButtonText = "Reply Now";
+    // Twitter reply URL (update in_reply_to parameter dynamically if needed)
+    twitterUrl = "https://x.com/intent/post?in_reply_to=1910674031252037843&text=I%20agree%20with%20your%20point";
+  } else if (actionType === "quote") {
+    headerText = "Quote Post";
+    sendButtonText = "Post Now";
+    twitterUrl = "https://x.com/intent/post?text=Hello%2C%20world!%20Check%20out%20this%20link.";
+  } else if (actionType === "repost") {
+    headerText = "Re-Post";
+    sendButtonText = "Post Now";
+    twitterUrl = "https://x.com/intent/post?text=Hello%2C%20world!%20Check%20out%20this%20link.";
+  }
+
+  // Function to open the Twitter URL
+  const handleSendClick = () => {
+    window.open(twitterUrl, "_blank");
+    onSend(); // Optionally close the modal or clear state after sending
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
-      <div
-        className="absolute inset-0 bg-black opacity-50"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black opacity-50" onClick={onClose} />
       {/* Modal */}
       <div className="relative bg-white p-6 rounded-lg shadow-lg w-3xl z-10">
         <button
@@ -27,17 +53,7 @@ export default function ReplyModal({
         >
           <X size={20} />
         </button>
-        <h3 className="text-lg font-bold mb-4">
-          Reply
-        </h3>
-        <h3 className="text-lg font-bold mb-4">
-          Quote post
-        </h3>
-        <h3 className="text-lg font-bold mb-4">
-          Re-Post
-        </h3>
-
-
+        <h3 className="text-lg font-bold mb-4">{headerText}</h3>
 
         {loading ? (
           <div className="flex justify-center py-8">
@@ -63,28 +79,11 @@ export default function ReplyModal({
           </button>
           <button
             className="px-4 py-2 bg-indigo-600 text-white rounded disabled:opacity-50"
-            onClick={onSend}
+            onClick={handleSendClick}
             disabled={loading || !generated}
           >
-            Reply to Post
+            {sendButtonText}
           </button>
-
-          <button
-            className="px-4 py-2 bg-indigo-600 text-white rounded disabled:opacity-50"
-            onClick={onSend}
-            disabled={loading || !generated}
-          >
-            Repost
-          </button>
-
-          <button
-            className="px-4 py-2 bg-indigo-600 text-white rounded disabled:opacity-50"
-            onClick={onSend}
-            disabled={loading || !generated}
-          >
-            Quote
-          </button>
-
         </div>
       </div>
     </div>

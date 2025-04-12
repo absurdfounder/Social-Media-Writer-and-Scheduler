@@ -572,6 +572,7 @@ export default function PostExtractor() {
           </div>
         )}
 
+
         {/* Posts Header */}
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-medium text-gray-800">Posts ({posts.length})</h3>
@@ -581,6 +582,9 @@ export default function PostExtractor() {
             </span>
           )}
         </div>
+
+<button className="bg-green-600 text-white rounded-md w-full p-2 m-auto">Weed out Useless Crap</button>
+
 
         {/* Table */}
         <div className="overflow-auto max-h-[60vh] border rounded-lg">

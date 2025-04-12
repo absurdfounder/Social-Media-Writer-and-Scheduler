@@ -28,8 +28,16 @@ export default function ReplyModal({
           <X size={20} />
         </button>
         <h3 className="text-lg font-bold mb-4">
-          Reply to {post.username}
+          Reply
         </h3>
+        <h3 className="text-lg font-bold mb-4">
+          Quote post
+        </h3>
+        <h3 className="text-lg font-bold mb-4">
+          Re-Post
+        </h3>
+
+
 
         {loading ? (
           <div className="flex justify-center py-8">
@@ -41,7 +49,7 @@ export default function ReplyModal({
           <textarea
             readOnly
             value={generated}
-            rows={4}
+            rows={18}
             className="w-full p-3 border border-gray-300 rounded mb-4 bg-gray-50"
           />
         ) : null}
@@ -58,8 +66,25 @@ export default function ReplyModal({
             onClick={onSend}
             disabled={loading || !generated}
           >
-            Send Reply
+            Reply to Post
           </button>
+
+          <button
+            className="px-4 py-2 bg-indigo-600 text-white rounded disabled:opacity-50"
+            onClick={onSend}
+            disabled={loading || !generated}
+          >
+            Repost
+          </button>
+
+          <button
+            className="px-4 py-2 bg-indigo-600 text-white rounded disabled:opacity-50"
+            onClick={onSend}
+            disabled={loading || !generated}
+          >
+            Quote
+          </button>
+
         </div>
       </div>
     </div>

@@ -72,8 +72,6 @@ export default function SocialBotTable({ posts }) {
   }, [computedPosts]);
   
 
-
-
   useEffect(() => {
     setComputedPosts(posts);
   }, [posts]);
@@ -342,7 +340,7 @@ export default function SocialBotTable({ posts }) {
 
       <button
         onClick={computeRelevanceForAllPosts}
-        className="bg-green-400 my-4 text-gray-900 border-2 border-slate-500 rounded-md w-96 p-2 m-auto mb-4 justify-center flex shadow-2xl"
+        className="bg-green-400 my-4 text-gray-900 border-2 border-slate-500 rounded-md w-fit p-2 px-8 m-auto mb-4 justify-center flex shadow-2xl"
       >
         Chomp out Useless Crap
       </button>

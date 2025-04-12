@@ -544,7 +544,7 @@ export default function PostExtractor() {
             <div className="flex justify-between items-center">
               <button
                 onClick={() => setShowExtractedJSON(!showExtractedJSON)}
-                className="mb-2 text-indigo-600 hover:underline text-sm flex items-center"
+                className="mb-2 text-green-600 hover:underline text-sm flex items-center"
               >
                 {showExtractedJSON ? <EyeOff size={16} className="mr-1" /> : <Eye size={16} className="mr-1" />}
                 {showExtractedJSON ? "Hide" : "Show"} Extracted Data JSON

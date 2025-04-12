@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router'; // <-- Added for URL-based tab management
 import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
@@ -363,7 +364,6 @@ const NavItemWithBadge = ({ icon: Icon, label, active, onClick, isNew }) => (
   >
     <Icon className="mr-3 h-5 w-5" />
     <span className="font-medium">{label}</span>
-
   </button>
 );
 
@@ -425,9 +425,11 @@ export default function Dashboard() {
     { icon: HandMetal, label: 'Marketing', id: 'dashboard' },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
     { icon: Atom, label: 'Big Mouth AI', id: 'TweetExtractor' },
-
     { icon: Ellipsis, label: 'More', id: 'more-options' },
   ];
+
+  // Access the router for URL based tab handling
+  const router = useRouter();
 
   useEffect(() => {
     // Initialize training data in localStorage if it doesn't exist
@@ -482,6 +484,14 @@ export default function Dashboard() {
     return () => window.removeEventListener('userLoggedIn', handleLogin);
   }, []);
 
+  // On mount, read the tab from the URL query string (if available)
+  useEffect(() => {
+    if (router && router.query && router.query.tab) {
+      setActiveTab(router.query.tab);
+    }
+  }, [router.query.tab]);
+
+  // Update the URL when a new tab is selected
   const handleNavItemClick = (id) => {
     switch (id) {
       case 'more-options':
@@ -510,6 +520,8 @@ export default function Dashboard() {
         break;
       default:
         setActiveTab(id);
+        // Update the URL with the new tab value, shallow routing avoids full page reload.
+        router.push(`/?tab=${id}`, undefined, { shallow: true });
     }
     setIsMobileMenuOpen(false);
   };
@@ -652,7 +664,7 @@ export default function Dashboard() {
           </div>
 
           {/* Main navigation */}
-          <nav className="mt-2 px-6 space-y-2 flex-grow overflow-y-auto scrollbar-thin flex flex-col">
+          <nav className="mt-2 px-6 space-y-2 flex-grow overflow-y-auto">
             {/* Featured Marketing Week Button */}
             <button
               className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center mb-4

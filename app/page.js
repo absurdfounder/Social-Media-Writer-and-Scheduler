@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router'; // <-- Added for URL-based tab management
+import { useRouter, useSearchParams } from 'next/navigation'; // <-- Use new next/navigation hooks
 import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
@@ -408,7 +408,7 @@ export default function Dashboard() {
     { icon: CalendarRange, label: 'Scheduler', id: 'planner' },
   ];
 
-  // More options are now moved to a modal/menu
+  // More options items for the modal/menu
   const moreOptionsItems = [
     { icon: Book, label: 'How to Use', id: 'how-to-use' },
     { icon: ShieldAlert, label: 'Reddit Post', id: 'RedditPost' },
@@ -420,7 +420,7 @@ export default function Dashboard() {
     { icon: Chrome, label: 'Extension', id: 'extension' },
   ];
 
-  // Primary mobile nav items - limited to only the most important ones
+  // Primary mobile nav items
   const primaryMobileNavItems = [
     { icon: HandMetal, label: 'Marketing', id: 'dashboard' },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
@@ -428,27 +428,23 @@ export default function Dashboard() {
     { icon: Ellipsis, label: 'More', id: 'more-options' },
   ];
 
-  // Access the router for URL based tab handling
+  // Access the router and search params for URL-based tab handling
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Initialize training data in localStorage if it doesn't exist
     const initializeLocalStorage = () => {
       try {
-        // Check if getTrainingData exists
         let trainingData = localStorage.getItem('getTrainingData');
-
         if (!trainingData) {
-          // If it doesn't exist, create it with an empty object
           localStorage.setItem('getTrainingData', JSON.stringify({}));
           console.log('Initialized empty getTrainingData in localStorage');
         } else {
-          // If it does exist, make sure it's valid JSON
           try {
             const parsed = JSON.parse(trainingData);
             console.log('Verified getTrainingData exists in localStorage');
           } catch (parseError) {
-            // If it's not valid JSON, reset it
             localStorage.setItem('getTrainingData', JSON.stringify({}));
             console.error('Found corrupted getTrainingData, reset to empty object');
           }
@@ -457,7 +453,6 @@ export default function Dashboard() {
         console.error('Error initializing localStorage:', error);
       }
     };
-
     initializeLocalStorage();
   }, []);
 
@@ -477,19 +472,19 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
-
     checkLoginState();
     const handleLogin = () => checkLoginState();
     window.addEventListener('userLoggedIn', handleLogin);
     return () => window.removeEventListener('userLoggedIn', handleLogin);
   }, []);
 
-  // On mount, read the tab from the URL query string (if available)
+  // On mount, read the "tab" from the URL query string using useSearchParams
   useEffect(() => {
-    if (router && router.query && router.query.tab) {
-      setActiveTab(router.query.tab);
+    const urlTab = searchParams.get("tab");
+    if (urlTab) {
+      setActiveTab(urlTab);
     }
-  }, [router.query.tab]);
+  }, [searchParams]);
 
   // Update the URL when a new tab is selected
   const handleNavItemClick = (id) => {
@@ -520,8 +515,8 @@ export default function Dashboard() {
         break;
       default:
         setActiveTab(id);
-        // Update the URL with the new tab value, shallow routing avoids full page reload.
-        router.push(`/?tab=${id}`, undefined, { shallow: true });
+        // Update the URL with the new tab value.
+        router.push(`/?tab=${id}`);
     }
     setIsMobileMenuOpen(false);
   };
@@ -563,7 +558,6 @@ export default function Dashboard() {
   const MobileMenu = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
-    // Group items for better organization in the mobile menu
     const menuGroups = [
       {
         category: "Main Tools",
@@ -585,7 +579,6 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-
         <div className="p-4 pb-24">
           {menuGroups.map((group, index) => (
             <div key={index} className="mb-6">
@@ -612,8 +605,6 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
-
-          {/* User profile section for mobile menu */}
           <div className="mt-8 pt-6 border-t">
             <UserProfileSection />
           </div>
@@ -637,13 +628,11 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-100 text-gray-900">
       <ToastContainer />
       <div className="flex h-screen overflow-hidden">
-        {/* Mobile Menu Component */}
         <MobileMenu
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
         />
 
-        {/* Sidebar */}
         <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white transform 
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:relative md:translate-x-0 transition duration-200 ease-in-out flex flex-col`}>
@@ -663,9 +652,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Main navigation */}
           <nav className="mt-2 px-6 space-y-2 flex-grow overflow-y-auto">
-            {/* Featured Marketing Week Button */}
             <button
               className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center mb-4
                 ${activeTab === 'dashboard'
@@ -677,9 +664,7 @@ export default function Dashboard() {
               <span>Marketing Week</span>
             </button>
 
-            {/* Main Navigation Sections */}
             <div className="flex flex-col flex-grow">
-              {/* Primary Tools Section */}
               <div className="mb-6">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2">
                   Primary Tools
@@ -695,8 +680,6 @@ export default function Dashboard() {
                   />
                 ))}
               </div>
-
-              {/* Secondary Tools Section */}
               <div className="mb-6">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2">
                   More Tools
@@ -712,8 +695,6 @@ export default function Dashboard() {
                   />
                 ))}
               </div>
-
-              {/* More Options Button */}
               <button
                 className="w-full py-2 px-6 rounded-lg font-medium transition-colors flex items-center justify-start 
                   bg-slate-100 text-gray-700 hover:bg-gray-200 mb-6"
@@ -722,15 +703,12 @@ export default function Dashboard() {
                 <span>More Tools</span>
               </button>
             </div>
-
-            {/* User Section */}
             <div className="mt-auto">
               <UserProfileSection />
             </div>
           </nav>
         </aside>
 
-        {/* Main content */}
         <main className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-100 rounded-md">
           <SubscriptionBanner onUpgrade={() => handleNavItemClick('billing')} />
           <div className="mt-4 pb-20 md:pb-6 rounded-xl max-w-7xl mx-auto">
@@ -744,7 +722,6 @@ export default function Dashboard() {
         </main>
       </div>
 
-      {/* Mobile navigation - Limited to few options + "More" */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
         <div className="grid grid-cols-4 p-4">
           {primaryMobileNavItems.map((item) => (
@@ -762,19 +739,16 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* Modals */}
       <OnBoardingPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
       <BillingModal isOpen={isBillingOpen} onClose={() => setIsBillingOpen(false)} />
       <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
 
-      {/* More Options Modal */}
       <MoreOptionsModal
         isOpen={isMoreOptionsOpen}
         onClose={() => setIsMoreOptionsOpen(false)}
         onSelectOption={handleNavItemClick}
       />
 
-      {/* API Key Manager Modal */}
       <Modal
         isOpen={showApiKeyManager}
         onClose={() => setShowApiKeyManager(false)}
@@ -785,7 +759,6 @@ export default function Dashboard() {
         </div>
       </Modal>
 
-      {/* How to Use Modal */}
       <Modal isOpen={isHowToUseOpen} onClose={() => setIsHowToUseOpen(false)} title="How to Use">
         <div className="py-4">
           <iframe

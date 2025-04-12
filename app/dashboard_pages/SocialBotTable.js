@@ -59,12 +59,16 @@ export default function SocialBotTable({ posts }) {
   // Auto-scroll effect: scroll to the bottom whenever computedPosts change
 
   useEffect(() => {
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    });
+    setTimeout(() => {
+      const scrollHeight = Math.max(
+        document.body.scrollHeight, 
+        document.documentElement.scrollHeight
+      );
+      window.scrollTo({ top: scrollHeight, behavior: 'smooth' });
+    }, 100);
   }, [computedPosts]);
   
-  
+
 
 
   useEffect(() => {

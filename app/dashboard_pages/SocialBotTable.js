@@ -262,7 +262,7 @@ export default function SocialBotTable({ posts }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-6">
+    <div className="bg-white rounded-lg shadow-lg mt-6">
       {/* Header */}
       <div className="p-4 bg-gray-50 border-b border-gray-200">
         <div className="flex justify-between items-center">
@@ -309,7 +309,7 @@ export default function SocialBotTable({ posts }) {
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden overflow-y-auto max-h-screen">
+      <div className="md:hidden max-h-screen">
         {filteredPosts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 p-4">
             <div className="flex items-start space-x-3">
@@ -459,7 +459,7 @@ export default function SocialBotTable({ posts }) {
         <div className="fixed inset-0 z-10 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen p-4 text-center">
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-            <div className="inline-block bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full">
+            <div className="inline-block bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg w-full">
               <div className="relative bg-white px-4 pt-5 pb-4 sm:p-6">
                 <button
                   onClick={closeModal}

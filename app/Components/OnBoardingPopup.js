@@ -132,7 +132,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
                     style={{ lineHeight: "1.3" }}
                   >
                     <span>
-                      AI that <b className="text-green-500 "> scrolls for you </b> on
+                      AI that <b className="text-green-500 font-bold "> scrolls for you </b> on
                     </span>
                     <br />
                   </h2>
@@ -244,7 +244,7 @@ const OnBoardingPopup = ({ isOpen: propIsOpen, onClose }) => {
             </div>
 
             <div className="px-3 sm:px-6 max-w-6xl mx-auto mt-8 sm:mt-16">
-              <h3 className="my-3 font-medium text-2xl sm:text-4xl text-center"><strong>BUT</strong>... Consistency Is <span className="pt-1 text-slate-600 border-b-2 border-slate-500 font-semibold">Hard</span></h3>
+              <h3 className="my-3 font-medium text-2xl sm:text-4xl text-center"><strong>We know</strong>... Consistency Is <span className="pt-1 text-slate-600 border-b-2 border-slate-500 font-semibold">Hard</span></h3>
               <div className="max-w-xl mx-auto mt-6 sm:mt-10 space-y-3 leading-6 text-gray-800 text-sm sm:text-base md:text-xl">
                 <ul className="space-y-6 sm:space-y-8">
                   <li className="flex items-start justify-start leading-normal text-left sm:leading-7 md:leading-10 relative">

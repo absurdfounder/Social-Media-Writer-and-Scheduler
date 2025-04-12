@@ -58,10 +58,17 @@ export default function SocialBotTable({ posts }) {
 
   // Auto-scroll effect when new posts are added
   useEffect(() => {
-    if (tableEndRef.current) {
+    if (!tableEndRef.current) return;
+  
+    const observer = new ResizeObserver(() => {
       tableEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    });
+  
+    observer.observe(tableEndRef.current.parentElement);
+  
+    return () => observer.disconnect();
   }, [computedPosts]);
+  
 
   // Shared AI generator for Reply, Quote, Repost, etc.
   async function generateAIContent(prompt, setLoading, setError, setResult) {

@@ -50,50 +50,50 @@ export default function PostExtractor() {
   const extractLinkedinData = (html) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-  
+
     let authorName = "Unknown Author",
-        authorProfileUrl = "",
-        avatarUrl = "",
-        contentText = "",
-        imageUrl = "",
-        postUrl = "",
-        datePosted = "Unknown",
-        reactionsCount = 0,
-        commentsCount = 0,
-        repostsCount = 0;
-  
+      authorProfileUrl = "",
+      avatarUrl = "",
+      contentText = "",
+      imageUrl = "",
+      postUrl = "",
+      datePosted = "Unknown",
+      reactionsCount = 0,
+      commentsCount = 0,
+      repostsCount = 0;
+
     const actorContainer = doc.querySelector('.update-components-actor__container');
     if (actorContainer) {
       const authorElem = actorContainer.querySelector('.update-components-actor__title span[dir="ltr"]');
       if (authorElem) authorName = authorElem.textContent.trim();
-  
+
       const profileLink = actorContainer.querySelector('a.update-components-actor__meta-link');
       if (profileLink) authorProfileUrl = profileLink.href;
-  
+
       const avatarElem = actorContainer.querySelector('.update-components-actor__avatar img');
       if (avatarElem) avatarUrl = avatarElem.src;
-  
+
       const dateElem = actorContainer.querySelector('.update-components-actor__sub-description');
       if (dateElem) datePosted = dateElem.textContent.trim().split('•')[0].trim();
     }
-  
+
     const contentElem = doc.querySelector('.feed-shared-update-v2__description .update-components-text');
     if (contentElem) {
       contentText = contentElem.textContent.trim();
     }
-  
+
     const imageElem = doc.querySelector('.update-components-image__image');
     if (imageElem) imageUrl = imageElem.src;
-  
+
     const reactionsElem = doc.querySelector('.social-details-social-counts__reactions-count');
     if (reactionsElem) reactionsCount = parseInt(reactionsElem.textContent.trim().replace(/,/g, ''), 10) || 0;
-  
+
     const commentsElem = doc.querySelector('.social-details-social-counts__comments button');
     if (commentsElem) commentsCount = parseInt(commentsElem.textContent.trim().replace(/\D/g, ''), 10) || 0;
-  
+
     const repostElem = doc.querySelector('.social-details-social-counts__item--truncate-text');
     if (repostElem) repostsCount = parseInt(repostElem.textContent.trim().replace(/\D/g, ''), 10) || 0;
-  
+
     return {
       postType: "linkedin",
       author_name: authorName,
@@ -109,7 +109,7 @@ export default function PostExtractor() {
       },
     };
   };
-  
+
 
   const extractTwitterData = (html) => {
     const parser = new DOMParser();
@@ -359,7 +359,7 @@ export default function PostExtractor() {
     if (postType === "discord") return extractDiscordData(html);
     throw new Error("Unknown post type: " + postType);
   };
-  
+
 
   // Listen for messages
   useEffect(() => {
@@ -583,11 +583,11 @@ export default function PostExtractor() {
           )}
         </div>
 
-<button className="bg-green-600 text-white rounded-md w-full p-2 m-auto">Weed out Useless Crap</button>
+        <button className="bg-green-400 text-white rounded-md w-full p-2 m-auto mb-4">Chomp out Useless Crap</button>
 
 
         {/* Table */}
-        <div className="overflow-auto max-h-[60vh] border rounded-lg">
+        <div className="border rounded-lg">
           {posts.length > 0 ? (
             <SocialBotTable
               posts={

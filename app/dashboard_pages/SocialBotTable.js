@@ -359,7 +359,7 @@ export default function SocialBotTable({ posts }) {
                     onClick={() => handleDeleteTweet(post.id)}
                     className="inline-flex items-center px-2.5 py-1.5 bg-red-500 text-white rounded shadow-sm text-xs font-medium hover:bg-red-600"
                   >
-                    <X size={14} className="mr-1" /> Delete
+                    <X size={14} className="mr-1" />
                   </button>
                 </div>
               </div>

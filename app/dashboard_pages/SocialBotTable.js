@@ -60,11 +60,11 @@ export default function SocialBotTable({ posts }) {
 
   useEffect(() => {
     requestAnimationFrame(() => {
-      if (tableEndRef.current) {
-        tableEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     });
   }, [computedPosts]);
+  
+  
 
 
   useEffect(() => {

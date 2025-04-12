@@ -167,7 +167,7 @@ export default function PostExtractor() {
       tweetURL = href.startsWith("http") ? href : `https://twitter.com${href}`;
     }
 
-    const userHandleElem = doc.querySelector('div[data-testid="User-Name"] + div span');
+    const userHandleElem = doc.querySelector('div[data-testid="User-Name"] + div a span');
     if (userHandleElem && userHandleElem.textContent.trim().startsWith('@')) {
       userHandle = userHandleElem.textContent.trim();
     } else {

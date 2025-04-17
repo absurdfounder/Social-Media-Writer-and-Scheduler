@@ -192,7 +192,11 @@ export default function SocialBotTable({ posts }) {
     prompt += `\n\nReply:`;
     generateAIContent(prompt, setReplyLoading, setReplyError, setReplyGenerated);
   };
-
+  
+  
+  const handleReplyTextChange = (newText) => {
+    setReplyGenerated(newText);
+  };
   const handleReplyClick = (post) => {
     handleGenerateReplyForPost(post);
   };
@@ -204,18 +208,22 @@ export default function SocialBotTable({ posts }) {
       prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
     }
     prompt += `\n\nQuote Tweet:`;
+    // We just need the generated text for quotes
+    // Twitter's intent system will handle adding the original tweet as a card
     generateAIContent(prompt, setQuoteLoading, setQuoteError, setQuoteGenerated);
   };
+  
+// For Repost generation
+const handleRepostClick = (post) => {
+  setRepostPost(post);
+  let prompt = `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.tweet_text || post.content}"`;
+  if (post.attachment_url || post.attachment) {
+    prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
+  }
+  prompt += `\n\nRewritten Tweet:`;
+  generateAIContent(prompt, setRepostLoading, setRepostError, setRepostGenerated);
+};
 
-  const handleRepostClick = (post) => {
-    setRepostPost(post);
-    let prompt = `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.tweet_text || post.content}"`;
-    if (post.attachment_url || post.attachment) {
-      prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
-    }
-    prompt += `\n\nRewritten Tweet:`;
-    generateAIContent(prompt, setRepostLoading, setRepostError, setRepostGenerated);
-  };
 
   const openPostModal = (post) => {
     setSelectedPost(post);
@@ -557,40 +565,38 @@ export default function SocialBotTable({ posts }) {
 
       {/* Reply Modal */}
       <ReplyModal
-        post={replyPost}
-        loading={replyLoading}
-        error={replyError}
-        generated={replyGenerated}
-        onClose={() => setReplyPost(null)}
-        onSend={() => setReplyPost(null)}
-        actionType="reply"
-      />
-
+  post={replyPost}
+  loading={replyLoading}
+  error={replyError}
+  generated={replyGenerated}
+  onClose={() => setReplyPost(null)}
+  onSend={() => setReplyPost(null)}
+  onGeneratedChange={handleReplyTextChange}
+  actionType="reply"
+/>
       {/* Quote Modal */}
       <ReplyModal
-        post={quotePost}
-        loading={quoteLoading}
-        error={quoteError}
-        generated={
-          quoteGenerated
-            ? `${quoteGenerated}\n\n${quotePost?.tweet_url || quotePost?.permalink || ''}`
-            : null
-        }
-        onClose={() => setQuotePost(null)}
-        onSend={() => setQuotePost(null)}
-        actionType="quote"
-      />
+  post={quotePost}
+  loading={quoteLoading}
+  error={quoteError}
+  generated={quoteGenerated} // Just the AI-generated text
+  onClose={() => setQuotePost(null)}
+  onSend={() => setQuotePost(null)}
+  onGeneratedChange={(newText) => setQuoteGenerated(newText)}
+  actionType="quote" // This tells the modal to build a quote tweet URL
+/>
 
       {/* Repost Modal */}
       <ReplyModal
-        post={repostPost}
-        loading={repostLoading}
-        error={repostError}
-        generated={repostGenerated}
-        onClose={() => setRepostPost(null)}
-        onSend={() => setRepostPost(null)}
-        actionType="repost"
-      />
+  post={repostPost}
+  loading={repostLoading}
+  error={repostError}
+  generated={repostGenerated}
+  onClose={() => setRepostPost(null)}
+  onSend={() => setRepostPost(null)}
+  onGeneratedChange={(newText) => setRepostGenerated(newText)}
+  actionType="repost"
+/>
     </div>
   );
 }

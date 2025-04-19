@@ -177,7 +177,7 @@ export default function SocialBotTable({ posts }) {
   }
 
   // Modified generateRelevanceForPost with rate limiting
-  async function generateRelevanceForPost(post, prompt, retryCount = 0, delayMs = 1000) {
+  async function generateRelevanceForPost(post, prompt, retryCount = 0, delayMs = 4000) {
     const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
     const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
 

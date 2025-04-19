@@ -255,7 +255,7 @@ export default function SocialBotTable({ posts }) {
           const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
 
           // Process the post with rate limiting
-          const relevance = await generateRelevanceForPost(post, prompt, 0, delay);
+          const relevance = await generateRelevanceForPost(post, prompt, 3, delay);
 
           // Add the processed post to our results
           processedPosts.push({ ...post, relevance });

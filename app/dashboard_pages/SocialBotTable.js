@@ -56,45 +56,48 @@ export default function SocialBotTable({ posts }) {
   // Computed posts with relevance scores
   const [computedPosts, setComputedPosts] = useState([]);
   const [relevanceLoading, setRelevanceLoading] = useState(false);
-
-
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [processingPosts, setProcessingPosts] = useState({});
 
   // Improved scrollToLatestPosts function with mobile-specific handling
-  const scrollToLatestPosts = () => {
-    // Wait a bit to ensure DOM updates are complete
+  const scrollToLatestPosts = (shouldScroll = true) => {
+    // If scrolling is disabled, return early
+    if (!shouldScroll) return;
+    
+    // Rest of your scrolling code remains the same
     setTimeout(() => {
       // DESKTOP VIEW: Scroll container to maximum height
       if (tableContainerRef.current) {
         const container = tableContainerRef.current;
         container.scrollTop = container.scrollHeight;
-
+        
         // Force a second scroll after a tiny delay (often helps with dynamic content)
         setTimeout(() => {
           container.scrollTop = container.scrollHeight;
         }, 50);
       }
-
+  
       // MOBILE VIEW: Get the mobile container specifically
       const mobileContainer = document.querySelector('.md\\:hidden.overflow-y-auto');
       if (mobileContainer) {
         mobileContainer.scrollTop = mobileContainer.scrollHeight;
-
+        
         // Force a second scroll for mobile view after a delay
         setTimeout(() => {
           mobileContainer.scrollTop = mobileContainer.scrollHeight;
         }, 50);
       }
-
+  
       // Try using scrollIntoView on the end element - works for both views
       if (tableEndRef.current) {
         tableEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
-
+        
         // Try again after a short delay in case of rendering delays
         setTimeout(() => {
           tableEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
         }, 100);
       }
-
+  
       // Last resort: window scrolling as a fallback
       const scrollHeight = Math.max(
         document.body.scrollHeight,
@@ -103,6 +106,7 @@ export default function SocialBotTable({ posts }) {
       window.scrollTo(0, scrollHeight);
     }, 100);
   };
+  
 
   // Updated useEffect for auto-scrolling
   useEffect(() => {
@@ -229,154 +233,198 @@ export default function SocialBotTable({ posts }) {
       return "Error";
     }
   }
-  async function computeRelevanceForAllPosts() {
-    setRelevanceLoading(true);
-  
-    let traindata = JSON.stringify(localStorage.getItem('getTrainingData'));
-    try {
-      // Start with a copy of the posts passed in as props
-      let updatedPosts = [...posts];
-  
-      // Create a queue of posts to process
-      const postQueue = [...posts];
-      const processedPosts = [];
-      const naRetryQueue = []; // New queue for posts that returned N/A
-  
-      // Process posts sequentially with controlled delays
-      while (postQueue.length > 0) {
-        // Take the next post from the queue
-        const post = postQueue.shift();
-  
-        // Add some random jitter to the delay to make requests less predictable
-        // This helps avoid synchronized requests that can trigger rate limits
-        const jitter = Math.floor(Math.random() * 500);
-        const delay = 1000 + jitter;
-  
-        try {
-          const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
-  
-          // Process the post with rate limiting
-          const relevance = await generateRelevanceForPost(post, prompt, 0, delay);
-  
-          console.log('relevance  - ', relevance);
+
+  // 4. Modified computeRelevanceForAllPosts function
+async function computeRelevanceForAllPosts() {
+  // Set button loading state
+  setButtonLoading(true);
+  setRelevanceLoading(true);
+
+  let traindata = JSON.stringify(localStorage.getItem('getTrainingData'));
+  try {
+    // Start with a copy of the posts passed in as props
+    let updatedPosts = [...posts];
+
+    // Create a queue of posts to process
+    const postQueue = [...posts];
+    const processedPosts = [];
+    const naRetryQueue = []; // New queue for posts that returned N/A
+    
+    // Initialize the processing state for all posts
+    const initialProcessingState = {};
+    posts.forEach(post => {
+      initialProcessingState[post.id] = true;
+    });
+    setProcessingPosts(initialProcessingState);
+
+    // Process posts sequentially with controlled delays
+    while (postQueue.length > 0) {
+      // Take the next post from the queue
+      const post = postQueue.shift();
+
+      // Add some random jitter to the delay to make requests less predictable
+      // This helps avoid synchronized requests that can trigger rate limits
+      const jitter = Math.floor(Math.random() * 500);
+      const delay = 1000 + jitter;
+
+      try {
+        const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
+
+        // Process the post with rate limiting
+        const relevance = await generateRelevanceForPost(post, prompt, 0, delay);
+
+        console.log('relevance  - ', relevance);
+        
+        // Update the processing state for this post (mark as done)
+        setProcessingPosts(prev => ({
+          ...prev,
+          [post.id]: false
+        }));
+        
+        // Check if relevance is N/A
+        if (relevance === "N/A") {
+          // Add to retry queue instead of processed posts
+          naRetryQueue.push(post);
+          console.log(`Post ${post.id} returned N/A, adding to retry queue`);
           
-          // Check if relevance is N/A
-          if (relevance === "N/A") {
-            // Add to retry queue instead of processed posts
-            naRetryQueue.push(post);
-            console.log(`Post ${post.id} returned N/A, adding to retry queue`);
+          // For N/A posts, mark them as still processing since they'll be retried
+          setProcessingPosts(prev => ({
+            ...prev,
+            [post.id]: true
+          }));
+        } else {
+          // Add the processed post to our results
+          processedPosts.push({ ...post, relevance });
+        }
+
+        // Update the UI after each post is processed to show progress
+        // Create a new array that maintains the original order but includes processed results
+        const currentResults = updatedPosts.map(original => {
+          const processed = processedPosts.find(p => p.id === original.id);
+          return processed || original;
+        });
+
+        // Update the UI with current progress - don't scroll
+        setComputedPosts([...currentResults]);
+
+        // Optional: Add progress indicator
+        console.log(`Processed ${processedPosts.length}/${updatedPosts.length} posts (${naRetryQueue.length} waiting for retry)`);
+      } catch (error) {
+        console.error("Error processing post:", post.id, error);
+        // Still add the post to processed, but with an error relevance
+        processedPosts.push({ ...post, relevance: "Error" });
+        
+        // Update the processing state for this post (mark as done, even though it errored)
+        setProcessingPosts(prev => ({
+          ...prev,
+          [post.id]: false
+        }));
+      }
+    }
+
+    // Now process the retry queue (posts that returned N/A)
+    console.log(`Processing ${naRetryQueue.length} posts that returned N/A...`);
+    let retryAttempt = 1;
+    const maxRetryAttempts = 3;
+    
+    // Continue retrying as long as there are posts in the retry queue 
+    // and we haven't exceeded max retry attempts
+    while (naRetryQueue.length > 0 && retryAttempt <= maxRetryAttempts) {
+      console.log(`Retry attempt ${retryAttempt} for ${naRetryQueue.length} posts`);
+      
+      // Create a new queue for posts that still return N/A
+      const stillNaQueue = [];
+      
+      // Process all posts in the current retry queue
+      while (naRetryQueue.length > 0) {
+        const post = naRetryQueue.shift();
+        
+        // Use a longer delay for retries (increase with each retry attempt)
+        const retryDelay = 4000 + (retryAttempt * 1000) + Math.floor(Math.random() * 1000);
+        
+        try {
+          // Use a slightly modified prompt for retry attempts
+          const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide ONLY a percentage number from 0 to 100. Just output a number like 75 or 23. No other text.\n\n"${post.tweet_text || post.content}"`;
+          
+          console.log(`Retrying post ${post.id}, attempt ${retryAttempt}`);
+          const relevance = await generateRelevanceForPost(post, prompt, 0, retryDelay);
+          
+          console.log(`Retry result for post ${post.id}: ${relevance}`);
+          
+          if (relevance === "N/A" && retryAttempt < maxRetryAttempts) {
+            // Still N/A and we have more retries left - add to the still-NA queue
+            stillNaQueue.push(post);
           } else {
-            // Add the processed post to our results
-            processedPosts.push({ ...post, relevance });
+            // Either got a valid result or out of retries - add to processed posts
+            processedPosts.push({ ...post, relevance: relevance === "N/A" ? "0% Relevance" : relevance });
+            
+            // Mark this post as no longer processing
+            setProcessingPosts(prev => ({
+              ...prev,
+              [post.id]: false
+            }));
           }
-  
-          // Update the UI after each post is processed to show progress
-          // Create a new array that maintains the original order but includes processed results
+          
+          // Update UI - don't scroll
           const currentResults = updatedPosts.map(original => {
             const processed = processedPosts.find(p => p.id === original.id);
             return processed || original;
           });
-  
-          // Update the UI with current progress
+          
           setComputedPosts([...currentResults]);
-  
-          // Scroll to show progress
-          scrollToLatestPosts();
-  
-          // Optional: Add progress indicator
-          console.log(`Processed ${processedPosts.length}/${updatedPosts.length} posts (${naRetryQueue.length} waiting for retry)`);
         } catch (error) {
-          console.error("Error processing post:", post.id, error);
-          // Still add the post to processed, but with an error relevance
-          processedPosts.push({ ...post, relevance: "Error" });
-        }
-      }
-  
-      // Now process the retry queue (posts that returned N/A)
-      console.log(`Processing ${naRetryQueue.length} posts that returned N/A...`);
-      let retryAttempt = 1;
-      const maxRetryAttempts = 3;
-      
-      // Continue retrying as long as there are posts in the retry queue 
-      // and we haven't exceeded max retry attempts
-      while (naRetryQueue.length > 0 && retryAttempt <= maxRetryAttempts) {
-        console.log(`Retry attempt ${retryAttempt} for ${naRetryQueue.length} posts`);
-        
-        // Create a new queue for posts that still return N/A
-        const stillNaQueue = [];
-        
-        // Process all posts in the current retry queue
-        while (naRetryQueue.length > 0) {
-          const post = naRetryQueue.shift();
+          console.error(`Error in retry ${retryAttempt} for post:`, post.id, error);
+          processedPosts.push({ ...post, relevance: "Error (Retry)" });
           
-          // Use a longer delay for retries (increase with each retry attempt)
-          const retryDelay = 4000 + (retryAttempt * 1000) + Math.floor(Math.random() * 1000);
-          
-          try {
-            // Use a slightly modified prompt for retry attempts
-            const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide ONLY a percentage number from 0 to 100. Just output a number like 75 or 23. No other text.\n\n"${post.tweet_text || post.content}"`;
-            
-            console.log(`Retrying post ${post.id}, attempt ${retryAttempt}`);
-            const relevance = await generateRelevanceForPost(post, prompt, 0, retryDelay);
-            
-            console.log(`Retry result for post ${post.id}: ${relevance}`);
-            
-            if (relevance === "N/A" && retryAttempt < maxRetryAttempts) {
-              // Still N/A and we have more retries left - add to the still-NA queue
-              stillNaQueue.push(post);
-            } else {
-              // Either got a valid result or out of retries - add to processed posts
-              processedPosts.push({ ...post, relevance: relevance === "N/A" ? "0% Relevance" : relevance });
-            }
-            
-            // Update UI
-            const currentResults = updatedPosts.map(original => {
-              const processed = processedPosts.find(p => p.id === original.id);
-              return processed || original;
-            });
-            
-            setComputedPosts([...currentResults]);
-            scrollToLatestPosts();
-          } catch (error) {
-            console.error(`Error in retry ${retryAttempt} for post:`, post.id, error);
-            processedPosts.push({ ...post, relevance: "Error (Retry)" });
-          }
+          // Mark this post as no longer processing
+          setProcessingPosts(prev => ({
+            ...prev,
+            [post.id]: false
+          }));
         }
-        
-        // Move posts that still return N/A back to the retry queue for next attempt
-        naRetryQueue.push(...stillNaQueue);
-        retryAttempt++;
       }
       
-      // If we still have posts in the retry queue after max attempts, add them with a default value
-      if (naRetryQueue.length > 0) {
-        console.log(`${naRetryQueue.length} posts still returned N/A after ${maxRetryAttempts} attempts, using default value`);
-        for (const post of naRetryQueue) {
-          processedPosts.push({ ...post, relevance: "0% Relevance" });
-        }
-      }
-  
-      // Once all posts are processed, sort by relevance (desc order)
-      const sortedPosts = [...processedPosts].sort((a, b) => {
-        const getVal = (item) => {
-          const relevanceStr = (item.relevance || "").toString();
-          const num = parseFloat(relevanceStr);
-          return isNaN(num) ? 0 : num;
-        };
-        return getVal(b) - getVal(a);
-      });
-  
-      // Final update with sorted posts
-      setComputedPosts([...sortedPosts]);
-  
-      // Final scroll to show the sorted results
-      scrollToLatestPosts();
-    } catch (error) {
-      console.error("Error computing relevance:", error);
-    } finally {
-      setRelevanceLoading(false);
+      // Move posts that still return N/A back to the retry queue for next attempt
+      naRetryQueue.push(...stillNaQueue);
+      retryAttempt++;
     }
+    
+    // If we still have posts in the retry queue after max attempts, add them with a default value
+    if (naRetryQueue.length > 0) {
+      console.log(`${naRetryQueue.length} posts still returned N/A after ${maxRetryAttempts} attempts, using default value`);
+      for (const post of naRetryQueue) {
+        processedPosts.push({ ...post, relevance: "0% Relevance" });
+        
+        // Mark this post as no longer processing
+        setProcessingPosts(prev => ({
+          ...prev,
+          [post.id]: false
+        }));
+      }
+    }
+
+    // Once all posts are processed, sort by relevance (desc order)
+    const sortedPosts = [...processedPosts].sort((a, b) => {
+      const getVal = (item) => {
+        const relevanceStr = (item.relevance || "").toString();
+        const num = parseFloat(relevanceStr);
+        return isNaN(num) ? 0 : num;
+      };
+      return getVal(b) - getVal(a);
+    });
+
+    // Final update with sorted posts - NOW we can scroll
+    setComputedPosts([...sortedPosts]);
+    scrollToLatestPosts(true);
+  } catch (error) {
+    console.error("Error computing relevance:", error);
+  } finally {
+    // Clear all processing states
+    setProcessingPosts({});
+    setRelevanceLoading(false);
+    setButtonLoading(false);
   }
+}
   // Delete a tweet from the computed posts list
   function handleDeleteTweet(id) {
     const updated = computedPosts.filter(post => post.id !== id);
@@ -533,25 +581,46 @@ export default function SocialBotTable({ posts }) {
 
       <button
         onClick={computeRelevanceForAllPosts}
-        className="bg-green-400 my-4 text-gray-900 border-2 border-slate-500 rounded-md w-fit p-2 px-8 m-auto mb-4 justify-center flex shadow-2xl"
+        disabled={buttonLoading}
+        className={`bg-green-400 my-4 text-gray-900 border-2 border-slate-500 rounded-md w-fit p-2 px-8 m-auto mb-4 justify-center flex shadow-2xl ${buttonLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
       >
-        Chomp out Useless Crap
+        {buttonLoading ? (
+          <>
+            <svg className="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processing...
+          </>
+        ) : (
+          'Chomp out Useless Crap'
+        )}
       </button>
+
 
       {/* Mobile Card View */}
       <div className="md:hidden overflow-y-auto max-h-[70vh]" ref={tableContainerRef}>
-        {filteredPosts.map((post) => (
-          <div key={post.id} className="border-b border-gray-200 p-4">
-            <div className="flex items-start space-x-3">
-              <img className="h-10 w-10 rounded-full flex-shrink-0" src={post.avatar_url || post.avatar} alt="" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-1">
-                    <p className="text-sm font-medium text-gray-900 truncate">{post.user_name}</p>
-                    {getPlatformIcon(post.postType)}
-                  </div>
-                  {displayRelevance(post.relevance)}
+      {filteredPosts.map((post) => (
+        <div key={post.id} className="border-b border-gray-200 p-4">
+          <div className="flex items-start space-x-3">
+            <img className="h-10 w-10 rounded-full flex-shrink-0" src={post.avatar_url || post.avatar} alt="" />
+            <div className="flex-1 min-w-0">
+              {/* Show loading indicator if this post is being processed */}
+              {processingPosts[post.id] && (
+                <div className="absolute right-4 top-4">
+                  <svg className="animate-spin h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
                 </div>
+              )}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-1">
+                  <p className="text-sm font-medium text-gray-900 truncate">{post.user_name}</p>
+                  {getPlatformIcon(post.postType)}
+                </div>
+                {displayRelevance(post.relevance)}
+              </div>
                 <p className="text-sm text-gray-500">{post.date}</p>
                 {post.group && (
                   <div className="flex items-center mt-1">
@@ -618,15 +687,24 @@ export default function SocialBotTable({ posts }) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredPosts.map((post) => (
-              <tr key={post.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-1">
-                    {getPlatformIcon(post.postType)}
-                    <span className="text-sm font-medium text-gray-900">{post.user_name}</span>
-                  </div>
-                  <div className="text-xs text-gray-500">{post.date}</div>
+          {filteredPosts.map((post) => (
+            <tr key={post.id} className="hover:bg-gray-50 relative">
+              {/* Add loading overlay when post is being processed */}
+              {processingPosts[post.id] && (
+                <td className="absolute inset-0 bg-gray-50 bg-opacity-50 z-10 flex items-center justify-center" colSpan="6">
+                  <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
                 </td>
+              )}
+              <td className="px-4 py-4 whitespace-nowrap">
+                <div className="flex items-center space-x-1">
+                  {getPlatformIcon(post.postType)}
+                  <span className="text-sm font-medium text-gray-900">{post.user_name}</span>
+                </div>
+                <div className="text-xs text-gray-500">{post.date}</div>
+              </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <img className="h-10 w-10 rounded-full" src={post.avatar_url || post.avatar} alt="" />
                 </td>

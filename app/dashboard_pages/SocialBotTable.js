@@ -141,84 +141,140 @@ export default function SocialBotTable({ posts }) {
     }
   }
 
-  // Compute relevance for a single post using Gemini API (kept unchanged)
-  async function generateRelevanceForPost(post, prompt) {
-    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
-    const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
-    try {
-      const res = await fetch(API_ENDPOINT, {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error?.message || 'Generation failed');
-      }
-      const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      const score = parseFloat(text);
-      if (isNaN(score)) {
-        return "N/A";
-      }
-      return `${score}% Relevance`;
-    } catch (error) {
-      console.error("Error generating relevance for post", post.id, error);
-      return "Error";
-    }
-  }
 
-  // Compute relevance for all posts when posts change
-  async function computeRelevanceForAllPosts() {
-    setRelevanceLoading(true);
-    try {
-      // Start with a copy of the posts passed in as props.
-      let updatedPosts = [...posts];
 
-      // Process posts in batches of 5
-      for (let i = 0; i < updatedPosts.length; i += 5) {
-        // Extract the current batch
-        const batch = updatedPosts.slice(i, i + 5);
+// Function to add a controlled delay
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-        // Process each post in the batch concurrently
-        const batchResults = await Promise.all(
-          batch.map(async (post) => {
-            const prompt = `Evaluate the relevance of the following tweet to the topic "market sale". Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
-            const relevance = await generateRelevanceForPost(post, prompt);
-            return { ...post, relevance };
-          })
-        );
-
-        // Replace the segment in updatedPosts with the newly computed batch results
-        for (let j = 0; j < batchResults.length; j++) {
-          updatedPosts[i + j] = batchResults[j];
-        }
-
-        // Update the UI after each batch and scroll to show progress
-        setComputedPosts([...updatedPosts]);
-        scrollToLatestPosts();
-      }
-
-      // Sort the final updated posts by relevance (desc order)
-      const sortedPosts = updatedPosts.sort((a, b) => {
-        const getVal = (item) => {
-          const num = parseFloat(item.relevance);
-          return isNaN(num) ? 0 : num;
-        };
-        return getVal(b) - getVal(a);
-      });
-
-      // Update state with sorted posts
-      setComputedPosts([...sortedPosts]);
+// Modified generateRelevanceForPost with rate limiting
+async function generateRelevanceForPost(post, prompt, retryCount = 0, delayMs = 1000) {
+  const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
+  const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
+  
+  try {
+    // Add delay before making the API call to avoid rate limiting
+    await sleep(delayMs);
+    
+    const res = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    });
+    
+    if (!res.ok) {
+      const err = await res.json();
       
-      // Final scroll to show the sorted results
-      scrollToLatestPosts();
-    } catch (error) {
-      console.error("Error computing relevance:", error);
-    } finally {
-      setRelevanceLoading(false);
+      // Handle rate limit errors with exponential backoff
+      if (retryCount < 3 && (res.status === 429 || 
+          (err.error && (
+            err.error.message?.includes('rate') || 
+            err.error.message?.includes('quota') ||
+            err.error.message?.includes('limit')
+          ))
+        )) {
+        console.log(`Rate limited, retrying after ${delayMs * 2}ms (attempt ${retryCount + 1})`);
+        // Exponential backoff - double the delay for each retry
+        return generateRelevanceForPost(post, prompt, retryCount + 1, delayMs * 2);
+      }
+      
+      throw new Error(err.error?.message || 'Generation failed');
     }
+    
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const score = parseFloat(text);
+    if (isNaN(score)) {
+      return "N/A";
+    }
+    return `${score}% Relevance`;
+  } catch (error) {
+    console.error("Error generating relevance for post", post.id, error);
+    
+    // If we haven't exceeded retry attempts and it's a network error, try again
+    if (retryCount < 3 && (error.message.includes('network') || error.message.includes('fetch'))) {
+      console.log(`Network error, retrying after ${delayMs * 2}ms (attempt ${retryCount + 1})`);
+      return generateRelevanceForPost(post, prompt, retryCount + 1, delayMs * 2);
+    }
+    
+    return "Error";
   }
+}
+async function computeRelevanceForAllPosts() {
+  setRelevanceLoading(true);
+
+  let traindata = JSON.stringify(localStorage.getItem('getTrainingData'));
+  try {
+    // Start with a copy of the posts passed in as props
+    let updatedPosts = [...posts];
+
+    // Create a queue of posts to process
+    const postQueue = [...posts];
+    const processedPosts = [];
+    
+    // Process posts sequentially with controlled delays
+    while (postQueue.length > 0) {
+      // Take the next post from the queue
+      const post = postQueue.shift();
+      
+      // Add some random jitter to the delay to make requests less predictable
+      // This helps avoid synchronized requests that can trigger rate limits
+      const jitter = Math.floor(Math.random() * 500);
+      const delay = 1000 + jitter;
+      
+      try {
+        const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
+        
+        // Process the post with rate limiting
+        const relevance = await generateRelevanceForPost(post, prompt, 0, delay);
+        
+        // Add the processed post to our results
+        processedPosts.push({ ...post, relevance });
+        
+        // Update the UI after each post is processed to show progress
+        // Create a new array that maintains the original order but includes processed results
+        const currentResults = updatedPosts.map(original => {
+          const processed = processedPosts.find(p => p.id === original.id);
+          return processed || original;
+        });
+        
+        // Update the UI with current progress
+        setComputedPosts([...currentResults]);
+        
+        // Scroll to show progress
+        scrollToLatestPosts();
+        
+        // Optional: Add progress indicator
+        console.log(`Processed ${processedPosts.length}/${updatedPosts.length} posts`);
+      } catch (error) {
+        console.error("Error processing post:", post.id, error);
+        // Still add the post to processed, but with an error relevance
+        processedPosts.push({ ...post, relevance: "Error" });
+      }
+    }
+
+    // Once all posts are processed, sort by relevance (desc order)
+    const sortedPosts = [...processedPosts].sort((a, b) => {
+      const getVal = (item) => {
+        const relevanceStr = item.relevance || "";
+        const num = parseFloat(relevanceStr);
+        return isNaN(num) ? 0 : num;
+      };
+      return getVal(b) - getVal(a);
+    });
+
+    // Final update with sorted posts
+    setComputedPosts([...sortedPosts]);
+    
+    // Final scroll to show the sorted results
+    scrollToLatestPosts();
+  } catch (error) {
+    console.error("Error computing relevance:", error);
+  } finally {
+    setRelevanceLoading(false);
+  }
+}
 
   // Delete a tweet from the computed posts list
   function handleDeleteTweet(id) {

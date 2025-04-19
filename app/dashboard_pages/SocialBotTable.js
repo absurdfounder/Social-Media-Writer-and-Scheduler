@@ -58,52 +58,80 @@ export default function SocialBotTable({ posts }) {
   const [relevanceLoading, setRelevanceLoading] = useState(false);
 
 
-  // Function to scroll to the latest posts
+
+  // Improved scrollToLatestPosts function with mobile-specific handling
   const scrollToLatestPosts = () => {
-    // Try several scroll methods with increasing force
+    // Wait a bit to ensure DOM updates are complete
     setTimeout(() => {
-      // Method 1: Try scrolling the container to its maximum scroll height
+      // DESKTOP VIEW: Scroll container to maximum height
       if (tableContainerRef.current) {
         const container = tableContainerRef.current;
         container.scrollTop = container.scrollHeight;
-        
+
         // Force a second scroll after a tiny delay (often helps with dynamic content)
         setTimeout(() => {
           container.scrollTop = container.scrollHeight;
         }, 50);
       }
-      
-      // Method 2: Try using scrollIntoView on the end element
-      if (tableEndRef.current) {
-        tableEndRef.current.scrollIntoView({ behavior: 'auto' }); // Use 'auto' not 'smooth' for more reliable results
+
+      // MOBILE VIEW: Get the mobile container specifically
+      const mobileContainer = document.querySelector('.md\\:hidden.overflow-y-auto');
+      if (mobileContainer) {
+        mobileContainer.scrollTop = mobileContainer.scrollHeight;
+
+        // Force a second scroll for mobile view after a delay
+        setTimeout(() => {
+          mobileContainer.scrollTop = mobileContainer.scrollHeight;
+        }, 50);
       }
-      
-      // Method 3: If all else fails, try window scrolling as a fallback
+
+      // Try using scrollIntoView on the end element - works for both views
+      if (tableEndRef.current) {
+        tableEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+
+        // Try again after a short delay in case of rendering delays
+        setTimeout(() => {
+          tableEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+        }, 100);
+      }
+
+      // Last resort: window scrolling as a fallback
       const scrollHeight = Math.max(
-        document.body.scrollHeight, 
+        document.body.scrollHeight,
         document.documentElement.scrollHeight
       );
       window.scrollTo(0, scrollHeight);
     }, 100);
   };
-  
 
-  // Improved auto-scroll effect when computedPosts change
+  // Updated useEffect for auto-scrolling
   useEffect(() => {
     // Only attempt to scroll if we actually have posts
     if (computedPosts.length > 0) {
       // First immediate scroll attempt
       scrollToLatestPosts();
-      
-      // Second attempt after a delay (helps with rendered content)
+
+      // Second attempt after a longer delay for mobile
       const timer = setTimeout(() => {
         scrollToLatestPosts();
-      }, 300);
-      
+      }, 500); // Increased from 300ms to 500ms for mobile
+
       return () => clearTimeout(timer);
     }
   }, [computedPosts]);
-  
+
+  // Also add this to ensure proper scrolling when switching between mobile/desktop views
+  useEffect(() => {
+    const handleResize = () => {
+      if (computedPosts.length > 0) {
+        setTimeout(scrollToLatestPosts, 300);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [computedPosts]);
+
 
   // Update computedPosts when posts prop changes and scroll to latest
   useEffect(() => {
@@ -143,138 +171,138 @@ export default function SocialBotTable({ posts }) {
 
 
 
-// Function to add a controlled delay
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+  // Function to add a controlled delay
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
-// Modified generateRelevanceForPost with rate limiting
-async function generateRelevanceForPost(post, prompt, retryCount = 0, delayMs = 1000) {
-  const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
-  const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
-  
-  try {
-    // Add delay before making the API call to avoid rate limiting
-    await sleep(delayMs);
-    
-    const res = await fetch(API_ENDPOINT, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    });
-    
-    if (!res.ok) {
-      const err = await res.json();
-      
-      // Handle rate limit errors with exponential backoff
-      if (retryCount < 3 && (res.status === 429 || 
+  // Modified generateRelevanceForPost with rate limiting
+  async function generateRelevanceForPost(post, prompt, retryCount = 0, delayMs = 1000) {
+    const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBT3_dk3KhmZHFh1FZ_q5TgUSP1_CsW3mc`;
+    const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
+
+    try {
+      // Add delay before making the API call to avoid rate limiting
+      await sleep(delayMs);
+
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+
+        // Handle rate limit errors with exponential backoff
+        if (retryCount < 3 && (res.status === 429 ||
           (err.error && (
-            err.error.message?.includes('rate') || 
+            err.error.message?.includes('rate') ||
             err.error.message?.includes('quota') ||
             err.error.message?.includes('limit')
           ))
         )) {
-        console.log(`Rate limited, retrying after ${delayMs * 2}ms (attempt ${retryCount + 1})`);
-        // Exponential backoff - double the delay for each retry
+          console.log(`Rate limited, retrying after ${delayMs * 2}ms (attempt ${retryCount + 1})`);
+          // Exponential backoff - double the delay for each retry
+          return generateRelevanceForPost(post, prompt, retryCount + 1, delayMs * 2);
+        }
+
+        throw new Error(err.error?.message || 'Generation failed');
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      const score = parseFloat(text);
+      if (isNaN(score)) {
+        return "N/A";
+      }
+      return `${score}% Relevance`;
+    } catch (error) {
+      console.error("Error generating relevance for post", post.id, error);
+
+      // If we haven't exceeded retry attempts and it's a network error, try again
+      if (retryCount < 3 && (error.message.includes('network') || error.message.includes('fetch'))) {
+        console.log(`Network error, retrying after ${delayMs * 2}ms (attempt ${retryCount + 1})`);
         return generateRelevanceForPost(post, prompt, retryCount + 1, delayMs * 2);
       }
-      
-      throw new Error(err.error?.message || 'Generation failed');
+
+      return "Error";
     }
-    
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    const score = parseFloat(text);
-    if (isNaN(score)) {
-      return "N/A";
-    }
-    return `${score}% Relevance`;
-  } catch (error) {
-    console.error("Error generating relevance for post", post.id, error);
-    
-    // If we haven't exceeded retry attempts and it's a network error, try again
-    if (retryCount < 3 && (error.message.includes('network') || error.message.includes('fetch'))) {
-      console.log(`Network error, retrying after ${delayMs * 2}ms (attempt ${retryCount + 1})`);
-      return generateRelevanceForPost(post, prompt, retryCount + 1, delayMs * 2);
-    }
-    
-    return "Error";
   }
-}
-async function computeRelevanceForAllPosts() {
-  setRelevanceLoading(true);
+  async function computeRelevanceForAllPosts() {
+    setRelevanceLoading(true);
 
-  let traindata = JSON.stringify(localStorage.getItem('getTrainingData'));
-  try {
-    // Start with a copy of the posts passed in as props
-    let updatedPosts = [...posts];
+    let traindata = JSON.stringify(localStorage.getItem('getTrainingData'));
+    try {
+      // Start with a copy of the posts passed in as props
+      let updatedPosts = [...posts];
 
-    // Create a queue of posts to process
-    const postQueue = [...posts];
-    const processedPosts = [];
-    
-    // Process posts sequentially with controlled delays
-    while (postQueue.length > 0) {
-      // Take the next post from the queue
-      const post = postQueue.shift();
-      
-      // Add some random jitter to the delay to make requests less predictable
-      // This helps avoid synchronized requests that can trigger rate limits
-      const jitter = Math.floor(Math.random() * 500);
-      const delay = 1000 + jitter;
-      
-      try {
-        const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
-        
-        // Process the post with rate limiting
-        const relevance = await generateRelevanceForPost(post, prompt, 0, delay);
-        
-        // Add the processed post to our results
-        processedPosts.push({ ...post, relevance });
-        
-        // Update the UI after each post is processed to show progress
-        // Create a new array that maintains the original order but includes processed results
-        const currentResults = updatedPosts.map(original => {
-          const processed = processedPosts.find(p => p.id === original.id);
-          return processed || original;
-        });
-        
-        // Update the UI with current progress
-        setComputedPosts([...currentResults]);
-        
-        // Scroll to show progress
-        scrollToLatestPosts();
-        
-        // Optional: Add progress indicator
-        console.log(`Processed ${processedPosts.length}/${updatedPosts.length} posts`);
-      } catch (error) {
-        console.error("Error processing post:", post.id, error);
-        // Still add the post to processed, but with an error relevance
-        processedPosts.push({ ...post, relevance: "Error" });
+      // Create a queue of posts to process
+      const postQueue = [...posts];
+      const processedPosts = [];
+
+      // Process posts sequentially with controlled delays
+      while (postQueue.length > 0) {
+        // Take the next post from the queue
+        const post = postQueue.shift();
+
+        // Add some random jitter to the delay to make requests less predictable
+        // This helps avoid synchronized requests that can trigger rate limits
+        const jitter = Math.floor(Math.random() * 500);
+        const delay = 1000 + jitter;
+
+        try {
+          const prompt = `Evaluate the relevance of the following tweet to the topic ${traindata} Provide the relevance as a percentage from 0 to 100. Only output the number.\n\n"${post.tweet_text || post.content}"`;
+
+          // Process the post with rate limiting
+          const relevance = await generateRelevanceForPost(post, prompt, 0, delay);
+
+          // Add the processed post to our results
+          processedPosts.push({ ...post, relevance });
+
+          // Update the UI after each post is processed to show progress
+          // Create a new array that maintains the original order but includes processed results
+          const currentResults = updatedPosts.map(original => {
+            const processed = processedPosts.find(p => p.id === original.id);
+            return processed || original;
+          });
+
+          // Update the UI with current progress
+          setComputedPosts([...currentResults]);
+
+          // Scroll to show progress
+          scrollToLatestPosts();
+
+          // Optional: Add progress indicator
+          console.log(`Processed ${processedPosts.length}/${updatedPosts.length} posts`);
+        } catch (error) {
+          console.error("Error processing post:", post.id, error);
+          // Still add the post to processed, but with an error relevance
+          processedPosts.push({ ...post, relevance: "Error" });
+        }
       }
+
+      // Once all posts are processed, sort by relevance (desc order)
+      const sortedPosts = [...processedPosts].sort((a, b) => {
+        const getVal = (item) => {
+          const relevanceStr = item.relevance || "";
+          const num = parseFloat(relevanceStr);
+          return isNaN(num) ? 0 : num;
+        };
+        return getVal(b) - getVal(a);
+      });
+
+      // Final update with sorted posts
+      setComputedPosts([...sortedPosts]);
+
+      // Final scroll to show the sorted results
+      scrollToLatestPosts();
+    } catch (error) {
+      console.error("Error computing relevance:", error);
+    } finally {
+      setRelevanceLoading(false);
     }
-
-    // Once all posts are processed, sort by relevance (desc order)
-    const sortedPosts = [...processedPosts].sort((a, b) => {
-      const getVal = (item) => {
-        const relevanceStr = item.relevance || "";
-        const num = parseFloat(relevanceStr);
-        return isNaN(num) ? 0 : num;
-      };
-      return getVal(b) - getVal(a);
-    });
-
-    // Final update with sorted posts
-    setComputedPosts([...sortedPosts]);
-    
-    // Final scroll to show the sorted results
-    scrollToLatestPosts();
-  } catch (error) {
-    console.error("Error computing relevance:", error);
-  } finally {
-    setRelevanceLoading(false);
   }
-}
 
   // Delete a tweet from the computed posts list
   function handleDeleteTweet(id) {
@@ -293,11 +321,11 @@ async function computeRelevanceForAllPosts() {
     prompt += `\n\nReply:`;
     generateAIContent(prompt, setReplyLoading, setReplyError, setReplyGenerated);
   };
-  
+
   const handleReplyTextChange = (newText) => {
     setReplyGenerated(newText);
   };
-  
+
   const handleReplyClick = (post) => {
     handleGenerateReplyForPost(post);
   };
@@ -311,7 +339,7 @@ async function computeRelevanceForAllPosts() {
     prompt += `\n\nQuote Tweet:`;
     generateAIContent(prompt, setQuoteLoading, setQuoteError, setQuoteGenerated);
   };
-  
+
   const handleRepostClick = (post) => {
     setRepostPost(post);
     let prompt = `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.tweet_text || post.content}"`;
@@ -439,9 +467,7 @@ async function computeRelevanceForAllPosts() {
 
       {/* Mobile Card View */}
       <div className="md:hidden overflow-y-auto max-h-[70vh]" ref={tableContainerRef}>
-      <div ref={tableEndRef} className="h-1" /> {/* Add a small height to ensure it's reachable */}
-
-      {filteredPosts.map((post) => (
+        {filteredPosts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 p-4">
             <div className="flex items-start space-x-3">
               <img className="h-10 w-10 rounded-full flex-shrink-0" src={post.avatar_url || post.avatar} alt="" />
@@ -497,15 +523,15 @@ async function computeRelevanceForAllPosts() {
             </div>
           </div>
         ))}
-        <div ref={tableEndRef} />
+        <div ref={tableEndRef} className="h-1 w-full" />
       </div>
 
       {/* Desktop Table View */}
-      <div 
-          ref={tableContainerRef}
-          className="hidden md:block overflow-y-auto max-h-[70vh] relative"
-        >
-  <div ref={tableEndRef} className="h-1" /> {/* Add a small height to ensure it's reachable */}
+      <div
+        ref={tableContainerRef}
+        className="hidden md:block overflow-y-auto max-h-[70vh] relative"
+      >
+        <div ref={tableEndRef} className="h-1" /> {/* Add a small height to ensure it's reachable */}
 
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0">
@@ -678,7 +704,7 @@ async function computeRelevanceForAllPosts() {
         onGeneratedChange={handleReplyTextChange}
         actionType="reply"
       />
-      
+
       {/* Quote Modal */}
       <ReplyModal
         post={quotePost}

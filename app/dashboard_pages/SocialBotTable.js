@@ -257,6 +257,7 @@ export default function SocialBotTable({ posts }) {
           // Process the post with rate limiting
           const relevance = await generateRelevanceForPost(post, prompt, 3, delay);
 
+          console.log('relevance  - ',relevance);
           // Add the processed post to our results
           processedPosts.push({ ...post, relevance });
 

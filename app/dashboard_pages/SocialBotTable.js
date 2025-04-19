@@ -1,4 +1,3 @@
-// SocialBotTable.js
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -26,6 +25,7 @@ import ReplyModal from './ReplyModal';
 export default function SocialBotTable({ posts }) {
   // Ref for auto-scrolling
   const tableEndRef = useRef(null);
+  const tableContainerRef = useRef(null);
 
   // Filter states
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -57,19 +57,60 @@ export default function SocialBotTable({ posts }) {
   const [computedPosts, setComputedPosts] = useState([]);
   const [relevanceLoading, setRelevanceLoading] = useState(false);
 
-  // Auto-scroll effect: scroll to bottom whenever computedPosts change
-  useEffect(() => {
+
+  // Function to scroll to the latest posts
+  const scrollToLatestPosts = () => {
+    // Try several scroll methods with increasing force
     setTimeout(() => {
+      // Method 1: Try scrolling the container to its maximum scroll height
+      if (tableContainerRef.current) {
+        const container = tableContainerRef.current;
+        container.scrollTop = container.scrollHeight;
+        
+        // Force a second scroll after a tiny delay (often helps with dynamic content)
+        setTimeout(() => {
+          container.scrollTop = container.scrollHeight;
+        }, 50);
+      }
+      
+      // Method 2: Try using scrollIntoView on the end element
+      if (tableEndRef.current) {
+        tableEndRef.current.scrollIntoView({ behavior: 'auto' }); // Use 'auto' not 'smooth' for more reliable results
+      }
+      
+      // Method 3: If all else fails, try window scrolling as a fallback
       const scrollHeight = Math.max(
         document.body.scrollHeight, 
         document.documentElement.scrollHeight
       );
-      window.scrollTo({ top: scrollHeight, behavior: 'smooth' });
+      window.scrollTo(0, scrollHeight);
     }, 100);
-  }, [computedPosts]);
+  };
+  
 
+  // Improved auto-scroll effect when computedPosts change
+  useEffect(() => {
+    // Only attempt to scroll if we actually have posts
+    if (computedPosts.length > 0) {
+      // First immediate scroll attempt
+      scrollToLatestPosts();
+      
+      // Second attempt after a delay (helps with rendered content)
+      const timer = setTimeout(() => {
+        scrollToLatestPosts();
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [computedPosts]);
+  
+
+  // Update computedPosts when posts prop changes and scroll to latest
   useEffect(() => {
     setComputedPosts(posts);
+    if (posts.length > 0) {
+      scrollToLatestPosts();
+    }
   }, [posts]);
 
   // Shared AI generator for Reply, Quote, Repost, etc.
@@ -153,8 +194,9 @@ export default function SocialBotTable({ posts }) {
           updatedPosts[i + j] = batchResults[j];
         }
 
-        // Optionally update the UI after each batch so progress is visible.
+        // Update the UI after each batch and scroll to show progress
         setComputedPosts([...updatedPosts]);
+        scrollToLatestPosts();
       }
 
       // Sort the final updated posts by relevance (desc order)
@@ -168,6 +210,9 @@ export default function SocialBotTable({ posts }) {
 
       // Update state with sorted posts
       setComputedPosts([...sortedPosts]);
+      
+      // Final scroll to show the sorted results
+      scrollToLatestPosts();
     } catch (error) {
       console.error("Error computing relevance:", error);
     } finally {
@@ -193,10 +238,10 @@ export default function SocialBotTable({ posts }) {
     generateAIContent(prompt, setReplyLoading, setReplyError, setReplyGenerated);
   };
   
-  
   const handleReplyTextChange = (newText) => {
     setReplyGenerated(newText);
   };
+  
   const handleReplyClick = (post) => {
     handleGenerateReplyForPost(post);
   };
@@ -208,22 +253,18 @@ export default function SocialBotTable({ posts }) {
       prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
     }
     prompt += `\n\nQuote Tweet:`;
-    // We just need the generated text for quotes
-    // Twitter's intent system will handle adding the original tweet as a card
     generateAIContent(prompt, setQuoteLoading, setQuoteError, setQuoteGenerated);
   };
   
-// For Repost generation
-const handleRepostClick = (post) => {
-  setRepostPost(post);
-  let prompt = `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.tweet_text || post.content}"`;
-  if (post.attachment_url || post.attachment) {
-    prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
-  }
-  prompt += `\n\nRewritten Tweet:`;
-  generateAIContent(prompt, setRepostLoading, setRepostError, setRepostGenerated);
-};
-
+  const handleRepostClick = (post) => {
+    setRepostPost(post);
+    let prompt = `Rewrite the following tweet in your own words, preserving its meaning and tone:\n\n"${post.tweet_text || post.content}"`;
+    if (post.attachment_url || post.attachment) {
+      prompt += `\n\nAttachment URL: ${post.attachment_url || post.attachment}`;
+    }
+    prompt += `\n\nRewritten Tweet:`;
+    generateAIContent(prompt, setRepostLoading, setRepostError, setRepostGenerated);
+  };
 
   const openPostModal = (post) => {
     setSelectedPost(post);
@@ -341,8 +382,10 @@ const handleRepostClick = (post) => {
       </button>
 
       {/* Mobile Card View */}
-      <div className="md:hidden">
-        {filteredPosts.map((post) => (
+      <div className="md:hidden overflow-y-auto max-h-[70vh]" ref={tableContainerRef}>
+      <div ref={tableEndRef} className="h-1" /> {/* Add a small height to ensure it's reachable */}
+
+      {filteredPosts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 p-4">
             <div className="flex items-start space-x-3">
               <img className="h-10 w-10 rounded-full flex-shrink-0" src={post.avatar_url || post.avatar} alt="" />
@@ -402,9 +445,14 @@ const handleRepostClick = (post) => {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto max-h-screen">
+      <div 
+          ref={tableContainerRef}
+          className="hidden md:block overflow-y-auto max-h-[70vh] relative"
+        >
+  <div ref={tableEndRef} className="h-1" /> {/* Add a small height to ensure it's reachable */}
+
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 sticky top-0">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avatar</th>
@@ -565,38 +613,39 @@ const handleRepostClick = (post) => {
 
       {/* Reply Modal */}
       <ReplyModal
-  post={replyPost}
-  loading={replyLoading}
-  error={replyError}
-  generated={replyGenerated}
-  onClose={() => setReplyPost(null)}
-  onSend={() => setReplyPost(null)}
-  onGeneratedChange={handleReplyTextChange}
-  actionType="reply"
-/>
+        post={replyPost}
+        loading={replyLoading}
+        error={replyError}
+        generated={replyGenerated}
+        onClose={() => setReplyPost(null)}
+        onSend={() => setReplyPost(null)}
+        onGeneratedChange={handleReplyTextChange}
+        actionType="reply"
+      />
+      
       {/* Quote Modal */}
       <ReplyModal
-  post={quotePost}
-  loading={quoteLoading}
-  error={quoteError}
-  generated={quoteGenerated} // Just the AI-generated text
-  onClose={() => setQuotePost(null)}
-  onSend={() => setQuotePost(null)}
-  onGeneratedChange={(newText) => setQuoteGenerated(newText)}
-  actionType="quote" // This tells the modal to build a quote tweet URL
-/>
+        post={quotePost}
+        loading={quoteLoading}
+        error={quoteError}
+        generated={quoteGenerated} // Just the AI-generated text
+        onClose={() => setQuotePost(null)}
+        onSend={() => setQuotePost(null)}
+        onGeneratedChange={(newText) => setQuoteGenerated(newText)}
+        actionType="quote" // This tells the modal to build a quote tweet URL
+      />
 
       {/* Repost Modal */}
       <ReplyModal
-  post={repostPost}
-  loading={repostLoading}
-  error={repostError}
-  generated={repostGenerated}
-  onClose={() => setRepostPost(null)}
-  onSend={() => setRepostPost(null)}
-  onGeneratedChange={(newText) => setRepostGenerated(newText)}
-  actionType="repost"
-/>
+        post={repostPost}
+        loading={repostLoading}
+        error={repostError}
+        generated={repostGenerated}
+        onClose={() => setRepostPost(null)}
+        onSend={() => setRepostPost(null)}
+        onGeneratedChange={(newText) => setRepostGenerated(newText)}
+        actionType="repost"
+      />
     </div>
   );
 }

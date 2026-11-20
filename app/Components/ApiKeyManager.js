@@ -8,10 +8,13 @@ const ApiKeyManager = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [openAIKey, setOpenAIKey] = useState('');
   const [anthropicKey, setAnthropicKey] = useState('');
+  const [openRouterKey, setOpenRouterKey] = useState('');
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
   const [showAnthropicKey, setShowAnthropicKey] = useState(false);
+  const [showOpenRouterKey, setShowOpenRouterKey] = useState(false);
   const [openAICopied, setOpenAICopied] = useState(false);
   const [anthropicCopied, setAnthropicCopied] = useState(false);
+  const [openRouterCopied, setOpenRouterCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [keyError, setKeyError] = useState(null);
 
@@ -23,8 +26,10 @@ const ApiKeyManager = () => {
       if (!auth.currentUser) {
         const storedOpenAIKey = localStorage.getItem('openAIKey');
         const storedAnthropicKey = localStorage.getItem('anthropicKey');
+        const storedOpenRouterKey = localStorage.getItem('openRouterKey');
         if (storedOpenAIKey) setOpenAIKey(storedOpenAIKey);
         if (storedAnthropicKey) setAnthropicKey(storedAnthropicKey);
+        if (storedOpenRouterKey) setOpenRouterKey(storedOpenRouterKey);
         return;
       }
 
@@ -43,6 +48,11 @@ const ApiKeyManager = () => {
             const decrypted = decryptKey(data.anthropicKey);
             setAnthropicKey(decrypted);
             localStorage.setItem('anthropicKey', decrypted);
+          }
+          if (data.openRouterKey) {
+            const decrypted = decryptKey(data.openRouterKey);
+            setOpenRouterKey(decrypted);
+            localStorage.setItem('openRouterKey', decrypted);
           }
         }
       } catch (error) {
@@ -65,6 +75,11 @@ const ApiKeyManager = () => {
         setLoading(false);
         return;
       }
+      if (openRouterKey && !openRouterKey.startsWith('sk-or-')) {
+        setKeyError('OpenRouter API key should start with "sk-or-"');
+        setLoading(false);
+        return;
+      }
       
       if (auth.currentUser) {
         const userRef = doc(db, 'users', auth.currentUser.uid);
@@ -77,21 +92,29 @@ const ApiKeyManager = () => {
           localStorage.setItem('openAIKey', openAIKey);
         }
 
-        // Always save the default Anthropic key
-        const anthropicKeyToSave = anthropicKey || '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';
-        updates.anthropicKey = encryptKey(anthropicKeyToSave);
-        localStorage.setItem('anthropicKey', anthropicKeyToSave);
+        if (anthropicKey && anthropicKey.startsWith('sk-ant-')) {
+          updates.anthropicKey = encryptKey(anthropicKey);
+          localStorage.setItem('anthropicKey', anthropicKey);
+        }
+        if (openRouterKey && openRouterKey.startsWith('sk-or-')) {
+          updates.openRouterKey = encryptKey(openRouterKey);
+          localStorage.setItem('openRouterKey', openRouterKey);
+        }
 
         await setDoc(userRef, updates, { merge: true });
       } else {
         if (openAIKey && openAIKey.startsWith('sk-')) {
           localStorage.setItem('openAIKey', openAIKey);
         }
-        if (anthropicKey && anthropicKey.startsWith('sk-')) {
+        if (anthropicKey && anthropicKey.startsWith('sk-ant-')) {
           localStorage.setItem('anthropicKey', anthropicKey);
+        }
+        if (openRouterKey && openRouterKey.startsWith('sk-or-')) {
+          localStorage.setItem('openRouterKey', openRouterKey);
         }
       }
       setIsOpen(false);
+      window.dispatchEvent(new Event('bigmouth:api-keys-changed'));
     } catch (error) {
       console.error('Error saving API keys:', error);
       setKeyError('Failed to save API keys. Please try again later.');
@@ -108,15 +131,19 @@ const ApiKeyManager = () => {
         await setDoc(userRef, {
           openAIKey: null,
           anthropicKey: null,
+          openRouterKey: null,
           updatedAt: serverTimestamp()
         }, { merge: true });
       }
 
       localStorage.removeItem('openAIKey');
       localStorage.removeItem('anthropicKey');
+      localStorage.removeItem('openRouterKey');
       setOpenAIKey('');
       setAnthropicKey('');
+      setOpenRouterKey('');
       setIsOpen(false);
+      window.dispatchEvent(new Event('bigmouth:api-keys-changed'));
     } catch (error) {
       console.error('Error removing API keys:', error);
       setKeyError('Failed to remove API keys. Please try again later.');
@@ -128,9 +155,12 @@ const ApiKeyManager = () => {
       if (type === 'openai') {
         setOpenAICopied(true);
         setTimeout(() => setOpenAICopied(false), 2000);
-      } else {
+      } else if (type === 'anthropic') {
         setAnthropicCopied(true);
         setTimeout(() => setAnthropicCopied(false), 2000);
+      } else {
+        setOpenRouterCopied(true);
+        setTimeout(() => setOpenRouterCopied(false), 2000);
       }
     });
   };
@@ -156,7 +186,7 @@ const ApiKeyManager = () => {
             </button>
 
             <h2 className="text-xl font-bold">API Key Management</h2>
-            <p className='text-sm opacity-50'>All keys are encrypted.</p>
+            <p className='text-sm opacity-50'>Keys in your cloud profile are obfuscated before storage; local browser storage is not encrypted.</p>
 
             {keyError && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
@@ -168,6 +198,37 @@ const ApiKeyManager = () => {
             )}
 
             <div className="space-y-4">
+              <div>
+                <div className='flex'>
+                  <div className="w-8 h-8 mr-2 flex items-center justify-center rounded bg-slate-900 text-white font-bold">OR</div>
+                  <label className="block text-sm font-medium text-gray-700 text-center m-auto mx-0">OpenRouter API Key</label>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showOpenRouterKey ? "text" : "password"}
+                    placeholder="Enter OpenRouter API key"
+                    value={openRouterKey}
+                    onChange={(e) => setOpenRouterKey(e.target.value)}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 pr-20"
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+                    <button
+                      onClick={() => handleCopyKey(openRouterKey, 'openrouter')}
+                      className="p-1 text-gray-500 hover:text-gray-700"
+                    >
+                      {openRouterCopied ? <CheckCheck size={16} className="text-slate-500" /> : <Copy size={16} />}
+                    </button>
+                    <button
+                      onClick={() => setShowOpenRouterKey(!showOpenRouterKey)}
+                      className="p-1 text-gray-500 hover:text-gray-700"
+                    >
+                      {showOpenRouterKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Use one key to access models from multiple providers.</p>
+              </div>
+
               <div>
                 <div className='flex'>
                   <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png" className="w-8 h-8" alt="OpenAI Logo" />

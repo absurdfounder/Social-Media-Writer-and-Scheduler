@@ -28,7 +28,7 @@ import {
   HeartCrackIcon,
   Eclipse
 } from 'lucide-react';
-import { getAnthropicKey, decryptKey } from '../Utils/getApikey';
+import { getAnthropicKey } from '../Utils/getApikey';
 import { getFirestore, collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
@@ -185,6 +185,8 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
   const [feeling, setFeeling] = useState('not_specified');
   const [replyLength, setReplyLength] = useState('super_short');
   const [replyStance, setReplyStance] = useState('controversial');
+  const [provider, setProvider] = useState('openrouter');
+  const [openRouterModel, setOpenRouterModel] = useState('openrouter/auto');
 
   const [apikeyAdded, setApikeyAdded] = useState(false);
   const [TrainingData, setTraningData] = useState('');
@@ -194,6 +196,11 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     if (storedData) {
       setTraningData(storedData);
     }
+    const storedProvider = localStorage.getItem('socialWriterProvider');
+    if (storedProvider === 'openrouter' || storedProvider === 'anthropic') {
+      setProvider(storedProvider);
+    }
+    setOpenRouterModel(localStorage.getItem('openRouterModel') || 'openrouter/auto');
   }, []);
 
   // Log training data when it changes
@@ -203,8 +210,6 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     }
   }, [TrainingData]);
 
-  const [isValidatingKey, setIsValidatingKey] = useState(false);
-  const [apiKeyStatus, setApiKeyStatus] = useState('unchecked'); // 'unchecked', 'validating', 'valid', 'invalid'
 
   // New state for profiles and selected profiles
   const [profiles, setProfiles] = useState([]);
@@ -224,36 +229,22 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     examplecelebrity: "For Example Celebrity, use a quirky and fun tone with clever wordplay and a hint of irony."
   };
 
-  // Define validateApiKey function before using it
-  const validateApiKey = async () => {
-    const key = localStorage.getItem('anthropicKey');
-    if (!key) {
-      setApiKeyStatus('invalid');
+  const validateApiKey = () => {
+    const key = provider === 'openrouter'
+      ? localStorage.getItem('openRouterKey')
+      : localStorage.getItem('anthropicKey');
+    const prefix = provider === 'openrouter' ? 'sk-or-' : 'sk-ant-';
+    if (!key || !key.startsWith(prefix)) {
       setApikeyAdded(false);
       return;
     }
 
-    if (!key.startsWith('sk-')) {
-      setApiKeyStatus('invalid');
-      setApikeyAdded(false);
-      return;
-    }
-
-    setApiKeyStatus('validating');
-    setIsValidatingKey(true);
-
-    // Simulate API validation delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    setApiKeyStatus('valid');
     setApikeyAdded(true);
-    setIsValidatingKey(false);
   };
 
   // Load profiles from Firebase
   useEffect(() => {
     setIsClient(true);
-    validateApiKey();
 
     const loadProfiles = async () => {
       try {
@@ -331,57 +322,11 @@ const ThreadWriter = ({ onConfigureTrainingData }) => {
     }
   };
 
-  // Update the apiKey effect
   useEffect(() => {
-    const validateApiKey = async () => {
-      const key = localStorage.getItem('anthropicKey');
-      if (!key) {
-        setApiKeyStatus('invalid');
-        setApikeyAdded(false);
-        return;
-      }
-
-      if (!key.startsWith('sk-')) {
-        setApiKeyStatus('invalid');
-        setApikeyAdded(false);
-        return;
-      }
-
-      setApiKeyStatus('validating');
-      setIsValidatingKey(true);
-
-      // Simulate API validation delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      setApiKeyStatus('valid');
-      setApikeyAdded(true);
-      setIsValidatingKey(false);
-    };
-
     validateApiKey();
-  }, []);
-
-  // Update the status message JSX
-  const getStatusMessage = () => {
-    switch (apiKeyStatus) {
-      case 'validating':
-        return (
-          <div className="flex items-center gap-2 text-slate-500 text-xs sm:text-sm">
-            <Loader size={20} className="animate-spin" />
-            Please wait validating API key...
-          </div>
-        );
-      case 'invalid':
-        return (
-          <div className="flex items-center gap-2 text-red-500 text-xs sm:text-sm">
-            <InfoIcon size={20} />
-            Claude API key added seems wrong or invalid - save again.
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
+    window.addEventListener('bigmouth:api-keys-changed', validateApiKey);
+    return () => window.removeEventListener('bigmouth:api-keys-changed', validateApiKey);
+  }, [provider]);
 
   useEffect(() => {
     setIsBrowser(true);
@@ -914,30 +859,36 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
         systemPrompt = `${systemPrompt} Here Training Data for this response ${TrainingData}`;
       }
 
-      // Call Anthropic API through our /api/anthropic endpoint
-      const response = await fetch('/api/anthropic', {
+      const useOpenRouter = provider === 'openrouter';
+      const apiKey = useOpenRouter ? (localStorage.getItem('openRouterKey') || '') : getAnthropicKey();
+      const response = await fetch(useOpenRouter ? '/api/openrouter' : '/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': localStorage.getItem('anthropicKey')
+          ...(useOpenRouter
+            ? (apiKey ? { Authorization: `Bearer ${apiKey}` } : {})
+            : { 'x-api-key': apiKey })
         },
         body: JSON.stringify({
           temperature: 0.7,
-          max_tokens: 1000,
+          max_tokens: useOpenRouter ? Math.max(1200, maxTweets * 220) : 1000,
           messages: [{
             role: "user",
             content: `${mode === 'reply' ? 'Generate a reply' : 'Generate a new tweet or thread'} ${threadType === 'single' ? '(single tweet)' : `(thread of ${maxTweets} tweets)`} ${mode === 'reply' ? 'in response to' : 'about'} the following ${mode === 'share' ? 'update' : 'tweet'}: "${promptContent}" ${feelingPrompt} NOTE: i just need the tweet content without any extra text. Don't use emojis unless specifically requested. Don't write numbers in front of each tweet. Include one media suggestion (image or video) per tweet. In the URL, provide text describing what the image or video should show. Use spacing and line breaks to make the tweet stand out.`
           }],
           system: systemPrompt,
-          model: "claude-3-5-sonnet-20241022",
-          claudapikey: getAnthropicKey()
+          model: useOpenRouter ? (openRouterModel || 'openrouter/auto') : "claude-3-5-sonnet-20241022"
         })
       });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-      const generatedThreadContent = data.content[0].text.split('/endtweet').filter(tweet => tweet.trim() !== '');
+      const generatedText = useOpenRouter
+        ? data.choices?.[0]?.message?.content
+        : data.content?.[0]?.text;
+      if (!generatedText) throw new Error('The selected AI provider returned an empty response.');
+      const generatedThreadContent = generatedText.split('/endtweet').filter(tweet => tweet.trim() !== '');
 
       const generatedThread = generatedThreadContent.map((tweetContent) => {
         const { content, images, links, videos } = parseAIResponse(tweetContent);
@@ -961,13 +912,6 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
     }
   };
 
-  useEffect(() => {
-    const key = localStorage.getItem('anthropicKey');
-    if (key && key.startsWith('sk-')) {
-      setApikeyAdded(true);
-    }
-  }, []);
-
   return (
     <div className="bg-white rounded-md overflow-hidden p-4">
       <div className="p-2 sm:p-4 border-gray-400 grid items-center mb-2 sm:mb-4">
@@ -978,12 +922,26 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
               {!apikeyAdded ? (
                 <div className='flex items-center gap-2 text-red-500 text-xs sm:text-sm'>
                   <InfoIcon size={20} />
-                  Claude API key added seems wrong or invalid - save again.
+                  {provider === 'openrouter' ? 'Add a key in API Keys or configure OPENROUTER_API_KEY in Netlify.' : 'Add an Anthropic API key in API Keys to generate.'}
                 </div>
               ) : null}
             </div>
 
-            <div className={`flex items-center p-0.5 rounded-full bg-slate-100 shadow-inner w-fit`}>
+            <div className="flex items-center gap-2">
+              <select
+                value={provider}
+                onChange={(event) => {
+                  const nextProvider = event.target.value;
+                  setProvider(nextProvider);
+                  localStorage.setItem('socialWriterProvider', nextProvider);
+                }}
+                aria-label="AI provider"
+                className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm"
+              >
+                <option value="openrouter">OpenRouter</option>
+                <option value="anthropic">Anthropic</option>
+              </select>
+              <div className={`flex items-center p-0.5 rounded-full bg-slate-100 shadow-inner w-fit`}>
               <button
                 onClick={() => {
                   setMode('share');
@@ -1012,8 +970,25 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                 <span className="relative z-10">Reply</span>
                 {mode === 'reply' && <span className="absolute inset-0 rounded-full bg-green-600 animate-fadeIn" />}
               </button>
+              </div>
             </div>
           </div>
+          {provider === 'openrouter' && (
+            <div className="flex items-center gap-2 mt-2">
+              <label htmlFor="openrouter-model" className="text-xs font-medium text-gray-600">Model</label>
+              <input
+                id="openrouter-model"
+                type="text"
+                value={openRouterModel}
+                onChange={(event) => {
+                  setOpenRouterModel(event.target.value);
+                  localStorage.setItem('openRouterModel', event.target.value);
+                }}
+                placeholder="openrouter/auto"
+                className="p-2 rounded-md bg-white text-black border border-gray-300 text-xs sm:text-sm w-56"
+              />
+            </div>
+          )}
           <textarea
             className='w-full p-2 sm:p-4 rounded-md mt-2 sm:mt-4 bg-slate-50 text-slate-900 text-sm sm:text-base border-slate-200 border'
             value={overallPrompt}
@@ -1113,20 +1088,14 @@ NOTE : EVERY TIME I ASK, DO NOT USE THE SAME STYLE OF RESPONDING... GIVE ME VARI
                 Training Data
               </button>
 
-              {(apiKeyStatus === 'valid' || apiKeyStatus === 'validating') && (
-                <button
-                  className="bg-green-600 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-slate-900 text-xs sm:text-sm"
-                  onClick={generateAIThread}
-                  disabled={isGenerating || apiKeyStatus === 'validating'}
-                >
-                  {isGenerating || apiKeyStatus === 'validating' ? (
-                    <Loader size={14} className="animate-spin" />
-                  ) : (
-                    <Wand2 size={14} />
-                  )}
-                  {apiKeyStatus === 'validating' ? 'Validating API Key...' : `Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
-                </button>
-              )}
+              <button
+                className="bg-green-600 text-white px-4 p-2 rounded-md flex items-center justify-center gap-2 text-slate-900 text-xs sm:text-sm"
+                onClick={generateAIThread}
+                disabled={isGenerating}
+              >
+                {isGenerating ? <Loader size={14} className="animate-spin" /> : <Wand2 size={14} />}
+                {`Generate ${threadType === 'single' ? 'Tweet' : 'Thread'}`}
+              </button>
 
 
             </div>

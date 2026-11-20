@@ -5,19 +5,12 @@ import Anthropic from '@anthropic-ai/sdk';
 export async function POST(request) {
   try {
     const { temperature, max_tokens, messages, system, model } = await request.json();
-    console.log('Anthropic API route called with model:', model);
+    const apiKey = request.headers.get('x-api-key') || process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Add an Anthropic API key in your settings.' }, { status: 401 });
+    }
 
-    // Use hard-coded API key directly
-    const apiKey = "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";
-
-    const anthropic = new Anthropic({
-      apiKey: apiKey,
-    });
-
-    console.log(
-      'Sending request to Anthropic API with model:',
-      model || 'claude-3-5-sonnet-20241022'
-    );
+    const anthropic = new Anthropic({ apiKey });
 
     const response = await anthropic.messages.create({
       model: model || 'claude-3-5-sonnet-20241022',
@@ -27,7 +20,6 @@ export async function POST(request) {
       messages: messages,
     });
 
-    console.log('Received response from Anthropic API:', response);
     return NextResponse.json(response);
   } catch (error) {
     console.error('Anthropic API error:', error);

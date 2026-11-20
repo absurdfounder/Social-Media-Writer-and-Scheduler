@@ -6,7 +6,7 @@ import Image from 'next/image';
 import {
   Building2, Users, MessageCircle, Brain, Menu, X, Twitter, ScanFace,
   TrendingUp, Search, Bell, ChevronDown, Shapes, Book, Settings2,
-  DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, LaughIcon, MailIcon, Calendar, CalendarRange, ShieldAlert, HandMetal,
+  DollarSign, Chrome, Handshake, Heart, Check, CheckCircle2, MailIcon, Calendar, CalendarRange, ShieldAlert, HandMetal,
   Ellipsis,
   Eye,
   Atom
@@ -273,7 +273,6 @@ import RedditPostGenerator from './dashboard_pages/Reddit_Post';
 import ElevenLabsScriptOptimizer from './dashboard_pages/ElevenLabsScriptOptimizer';
 import TweetExtractor from './dashboard_pages/ContentAssess';
 import Captions from './dashboard_pages/captions';
-import MemeEditor from './dashboard_pages/MemeEditor';
 import LedgerCheck from './dashboard_pages/LedgerCheck';
 import AgingReport from './dashboard_pages/AgingReport';
 import CollectionThisWeek from './dashboard_pages/CollectionThisWeek';
@@ -381,11 +380,10 @@ function DashboardComponent() {
     { icon: Atom, label: 'Big Mouth AI', id: 'TweetExtractor' },
     { icon: Twitter, label: 'Build On X', id: 'twitter' },
     { icon: MailIcon, label: 'Outreach', id: 'OutreachAgent' },
-    { icon: TrendingUp, label: 'Go Viral', id: 'videoconstructor' },
+    { icon: TrendingUp, label: 'Go Viral', id: 'viralhooks' },
     { icon: MessageCircle, label: 'Reddit', id: 'partylist-db' },
     { icon: Brain, label: 'Preach', id: 'ledger-db' },
     { icon: Shapes, label: 'Trained On', id: 'BrandTraning' },
-    { icon: LaughIcon, label: 'Meme Editor', id: 'MemeEditor', isNew: true },
     { icon: CalendarRange, label: 'Scheduler', id: 'planner' },
   ];
 
@@ -487,6 +485,9 @@ function DashboardComponent() {
       case 'extension':
         window.open('https://chrome.google.com/webstore/category/extensions', '_blank');
         break;
+      case 'viralhooks':
+        window.open('https://viralhooks.org', '_blank', 'noopener,noreferrer');
+        break;
       case 'planner':
         window.open('https://www.canva.com/planner', '_blank');
         break;
@@ -523,8 +524,6 @@ function DashboardComponent() {
         return <ElevenLabsScriptOptimizer />;
       case 'TweetExtractor':
         return <TweetExtractor />;
-      case 'MemeEditor':
-        return <MemeEditor />;
       default:
         return <div className="text-center text-gray-500">Select a tab</div>;
     }

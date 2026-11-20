@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Big Mouth — Social Writer",
+  "short_name": "Big Mouth",
+  "version": "1.0.0",
+  "description": "Draft tweets, threads, replies, and social posts with OpenRouter.",
+  "permissions": ["storage", "contextMenus", "clipboardWrite"],
+  "host_permissions": ["https://openrouter.ai/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Big Mouth — Social Writer",
+    "default_popup": "popup.html"
+  }
+}

@@ -92,9 +92,10 @@ export async function POST(request) {
       console.log("🤖 Using default text-based model:", model);
     }
 
-    // Use a hard-coded API key (be sure to secure it in production)
-    const apiKey =
-      "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";
+    const apiKey = request.headers.get('x-api-key') || process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Add an Anthropic API key in your settings.' }, { status: 401 });
+    }
     const anthropic = new Anthropic({ apiKey });
 
     // Call the Anthropic API to generate content.

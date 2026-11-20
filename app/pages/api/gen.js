@@ -70,10 +70,8 @@ export default async function handler(req, res) {
       userMessage = { role: 'user', content: finalPrompt };
     }
 
-    // Initialize Anthropic with the API key.
-    // Note: In production, secure your API key appropriately.
-    const apiKey =
-      "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";
+    const apiKey = req.headers['x-api-key'] || process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) return res.status(401).json({ error: 'Add an Anthropic API key in your settings.' });
     const anthropic = new Anthropic({ apiKey });
 
     // Make the API call to Anthropic.

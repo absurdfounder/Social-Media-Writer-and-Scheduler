@@ -74,6 +74,7 @@ export const getOpenAIKey = () => {
   if (typeof window !== 'undefined') {
     const encryptedKey = localStorage.getItem('openAIKey');
     if (encryptedKey) {
+      if (encryptedKey.startsWith('sk-')) return encryptedKey;
       const decryptedKey = decryptKey(encryptedKey);
       if (decryptedKey && decryptedKey.startsWith('sk-')) {
         return decryptedKey;
@@ -86,19 +87,31 @@ showKeyAlert('OpenAI', 'OpenAI API key not found. Please add your API key in the
   return '';
 };
 
+export const getOpenRouterKey = () => {
+  if (typeof window !== 'undefined') {
+    const encryptedKey = localStorage.getItem('openRouterKey');
+    if (encryptedKey) {
+      if (encryptedKey.startsWith('sk-or-')) return encryptedKey;
+      const decryptedKey = decryptKey(encryptedKey);
+      if (decryptedKey && decryptedKey.startsWith('sk-or-')) {
+        return decryptedKey;
+      }
+    }
+    showKeyAlert('OpenRouter', 'OpenRouter API key not found. Please add your API key in the settings.');
+  }
+  return '';
+};
+
 export const getAnthropicKey = () => {
   if (typeof window !== 'undefined') {
     const encryptedKey = localStorage.getItem('anthropicKey');
     if (encryptedKey) {
+      if (encryptedKey.startsWith('sk-ant-')) return encryptedKey;
       const decryptedKey = decryptKey(encryptedKey);
-      if (decryptedKey && decryptedKey.startsWith('sk-')) {
+      if (decryptedKey && decryptedKey.startsWith('sk-ant-')) {
         return decryptedKey;
       }
     }
-    
-    // Default Anthropic key might be set in the ApiKeyManager component
-    const defaultKey = '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';
-    return defaultKey;
   }
   return '';
 };

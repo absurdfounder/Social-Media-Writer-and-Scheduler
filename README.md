@@ -1,68 +1,30 @@
-# Project Overview
+# Big Mouth
 
-This repository can generate AI-based tweets and threads using the Anthropic API. It includes various components and features to facilitate the creation and management of tweet threads, as well as support for image and video uploads.
+Big Mouth is a social writing app for drafting tweets, threads, replies, and other social posts. This repository contains the original Next.js app and a standalone Chrome extension.
 
-# Features
+## Chrome extension
 
-- Generate AI-based tweets and threads using Anthropic API.
-- Handle API requests to generate tweets with `app/api/anthropic/route.js` and `app/pages/api/anthropic.js`.
-- Create and manage tweet threads with the `ThreadWriter` component in `app/dashboard_pages/MainDashboard.js`.
-- Compose tweets using the `TipTapEditor` component in `app/dashboard_pages/MainDashboard.js`.
-- Support for image and video uploads for tweets.
-- Collect product information for personalized tweet generation with the `BrandTraning` component in `app/dashboard_pages/BrandTraning.js`.
-- Use Tailwind CSS for styling, as seen in `app/globals.css` and `tailwind.config.js`.
+The extension lives in `extension/` and uses OpenRouter directly. It does not need the Next.js server to run.
 
-# Installation
+1. Open `chrome://extensions` in Chrome and turn on **Developer mode**.
+2. Choose **Load unpacked** and select this repository's `extension/` folder.
+3. Open Big Mouth from the extensions toolbar, choose the settings button, and add your OpenRouter API key. The default model is `openrouter/auto`; enter another OpenRouter model ID to use a specific model.
+4. Choose a format, enter the context, and generate. You can edit each draft and copy one post or the full thread.
 
-To get started with this project, follow these steps:
+You can also select text on a page, right-click it, and choose **Use selection in Big Mouth**. The selected text is placed in the composer the next time you open the extension.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/SuperHuman12/TC_Tweets.git
-   cd TC_Tweets
-   ```
+The extension keeps its key in Chrome's local extension storage and sends generation requests directly to OpenRouter. Model usage is billed by OpenRouter according to the selected model.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Original Next.js app
 
-3. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
-   ```env
-   ANTHROPIC_API_KEY=your_anthropic_api_key
-   ```
+To run the original web app locally:
 
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
+1. Install dependencies with `npm install`.
+2. Run `npm run dev` and open [http://localhost:3000](http://localhost:3000).
 
-# Usage
+The web writer supports OpenRouter from the API Keys settings. Choose OpenRouter or Anthropic in the writer and set an OpenRouter model ID. The OpenRouter server route accepts a user key or reads `OPENROUTER_API_KEY` from the server environment. Anthropic routes use `ANTHROPIC_API_KEY` when no request key is supplied.
 
-1. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-2. Use the `ThreadWriter` component to create and manage tweet threads.
-3. Utilize the `TipTapEditor` component to compose tweets with rich text formatting.
-4. Upload images and videos to enhance your tweets.
-5. Collect product information using the `BrandTraning` component for personalized tweet generation.
+## Notes
 
-# Contributing
-
-We welcome contributions to improve this project. To contribute, follow these steps:
-
-1. Fork the repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Make your changes and commit them:
-   ```bash
-   git commit -m 'Add some feature'
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Open a pull request to the `main` branch of the original repository.
-
-Thank you for your contributions!
+- Do not commit `.env` files or API keys. Use `.env.example` for placeholder variable names if setup documentation is needed.
+- The extension requires an OpenRouter API key from [OpenRouter](https://openrouter.ai/keys).

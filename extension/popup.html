@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Big Mouth</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand-mark" aria-hidden="true">B</div>
+        <div class="brand-copy">
+          <h1>Big Mouth</h1>
+          <p>Say it like you mean it.</p>
+        </div>
+        <button id="settings-toggle" class="icon-button" type="button" aria-expanded="false" aria-controls="settings-panel" title="Open settings">
+          <span aria-hidden="true">⚙</span>
+        </button>
+      </header>
+
+      <section id="settings-panel" class="settings-panel" hidden>
+        <div class="section-heading">
+          <div>
+            <h2>OpenRouter settings</h2>
+            <p>Your key stays in this Chrome profile.</p>
+          </div>
+        </div>
+        <label class="field-label" for="api-key">OpenRouter API key</label>
+        <div class="input-with-action">
+          <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-or-v1-…" />
+          <button id="toggle-key" class="text-button" type="button">Show</button>
+        </div>
+        <label class="field-label" for="model">Model</label>
+        <input id="model" type="text" autocomplete="off" spellcheck="false" placeholder="openrouter/auto" />
+        <button id="save-settings" class="secondary-button" type="button">Save settings</button>
+        <p class="fine-print">Requests go directly from this extension to OpenRouter. Model usage may incur charges on your OpenRouter account.</p>
+      </section>
+
+      <form id="draft-form" class="composer">
+        <div class="controls-row">
+          <div class="control control-format">
+            <label class="field-label" for="format">Write a</label>
+            <select id="format">
+              <option value="tweet">Tweet</option>
+              <option value="thread">Thread</option>
+              <option value="reply">Reply</option>
+              <option value="quote">Quote post</option>
+              <option value="linkedin">LinkedIn post</option>
+              <option value="reddit">Reddit post</option>
+              <option value="hackernews">Hacker News post</option>
+            </select>
+          </div>
+          <div id="thread-count-control" class="control control-count" hidden>
+            <label class="field-label" for="thread-count">Posts</label>
+            <select id="thread-count">
+              <option value="3">3 posts</option>
+              <option value="5" selected>5 posts</option>
+              <option value="8">8 posts</option>
+            </select>
+          </div>
+          <div class="control control-tone">
+            <label class="field-label" for="tone">Tone</label>
+            <select id="tone">
+              <option value="natural">Natural</option>
+              <option value="witty">Witty</option>
+              <option value="insightful">Insightful</option>
+              <option value="bold">Bold</option>
+              <option value="helpful">Helpful</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="field-label prompt-label" for="prompt">What do you want to say?</label>
+        <textarea id="prompt" rows="5" placeholder="Share the rough idea, a moment from your day, or paste the post you want to reply to…" required></textarea>
+        <div class="prompt-meta">
+          <span id="selection-hint" class="selection-hint" hidden>Selected text added from the context menu</span>
+          <span id="prompt-count">0 characters</span>
+        </div>
+
+        <details class="voice-details">
+          <summary>Voice notes <span>Optional</span></summary>
+          <textarea id="voice-notes" rows="2" placeholder="Add your background, audience, or phrases to use or avoid…"></textarea>
+        </details>
+
+        <div id="reply-options" class="reply-options" hidden>
+          <div class="control">
+            <label class="field-label" for="reply-length">Reply length</label>
+            <select id="reply-length">
+              <option value="brief">Brief</option>
+              <option value="standard" selected>Standard</option>
+              <option value="detailed">Detailed</option>
+            </select>
+          </div>
+          <div class="control">
+            <label class="field-label" for="stance">Stance</label>
+            <select id="stance">
+              <option value="balanced">Balanced</option>
+              <option value="agree">Agree and add something</option>
+              <option value="disagree">Disagree thoughtfully</option>
+              <option value="question">Ask a useful question</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="generate" class="primary-button" type="submit">
+          <span id="generate-label">Write draft</span>
+          <span class="button-arrow" aria-hidden="true">↗</span>
+        </button>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+
+      <section id="results" class="results" hidden>
+        <div class="results-heading">
+          <div>
+            <h2>Your draft</h2>
+            <p id="result-model"></p>
+          </div>
+          <button id="copy-all" class="text-button" type="button">Copy all</button>
+        </div>
+        <div id="post-list" class="post-list"></div>
+        <div class="results-footer">
+          <button id="clear-results" class="quiet-button" type="button">Clear draft</button>
+          <span>Edit the text before you use it.</span>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>Powered by OpenRouter</span>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer">Get an API key</a>
+      </footer>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
